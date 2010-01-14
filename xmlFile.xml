@@ -1,0 +1,594 @@
+<Deck title="Times Tables" version_no="0.01" backward_compatible_iphone_version_no="0.01">
+  <Template>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">Question</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">Answer</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+  </Template>
+  <Cards>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">1 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">2 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">12</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">3 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">18</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">4 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">24</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">5 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">30</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">6 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">36</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">7 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">42</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">8 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">48</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">9 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">54</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">10 x 6</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">60</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">1 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">2 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">14</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">3 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">21</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">4 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">28</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">5 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">35</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">6 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">42</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">7 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">49</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">8 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">56</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">9 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">63</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+    <Card>
+      <Side>
+        <Component template_component_id="1" name="Question" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">10 x 7</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">65</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+      <Side>
+        <Component template_component_id="2" name="Answer" x="0" y="0" width="260" height="160">
+          <TextBox>
+            <text variable="true">70</text>
+            <font variable="false">Arial</font>
+            <fontSize variable="false">70</fontSize>
+            <foregroundColor variable="false" red="0" green="0" blue="0"/>
+            <backgroundColor variable="false" red="1" green="1" blue="0.4"/>
+            <alpha variable="false">1</alpha>
+            <alignment variable="false">center</alignment>
+          </TextBox>
+        </Component>
+      </Side>
+    </Card>
+  </Cards>
+</Deck>
