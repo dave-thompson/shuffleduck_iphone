@@ -24,6 +24,8 @@ UINavigationController *libraryNavController;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
 	
+	[application setStatusBarStyle:UIStatusBarStyleDefault];
+	
 	// open DB connection and retrieve state data
 	[self connectToDBAndRetrieveState];
 	
@@ -39,7 +41,7 @@ UINavigationController *libraryNavController;
 	[libraryNavController pushViewController:myDecksViewController animated:NO];
 	//libraryNavController.tabBarItem.title = @"Library";
 	//libraryNavController.tabBarItem.image = [UIImage imageNamed:@"library.png"];
-	libraryNavController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+	libraryNavController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
 	
 	//FeedbackViewController *feedbackViewController = [[FeedbackViewController alloc] initWithNibName:@"FeedbackView" bundle:nil];
 	//feedbackViewController.title = @"Feedback";

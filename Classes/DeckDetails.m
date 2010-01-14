@@ -12,13 +12,13 @@
 
 @synthesize title, deckID, firstSideID, numCards, numKnownCards;
 
--(id)initWithID:(int)initID firstSideID:(int)initFirstSideID title:(NSString *)initTitle numCards:(int)numberCards numKnownCards:(int)numberKnownCards
+-(id)initWithID:(int)aDeckID firstSideID:(int)aFirstSideID title:(NSString *)aTitle numCards:(int)theNumCards numKnownCards:(int)theNumKnownCards
 {
-	deckID = initID;
-	firstSideID = initFirstSideID;
-	title = [initTitle retain];
-	numCards = numberCards;
-	numKnownCards = numberKnownCards;
+	deckID = aDeckID; // the deck ID in the database
+	firstSideID = aFirstSideID;
+	title = [aTitle retain];
+	numCards = theNumCards;
+	numKnownCards = theNumKnownCards;
 	return self;
 }
 

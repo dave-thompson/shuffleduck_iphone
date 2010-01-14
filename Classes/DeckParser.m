@@ -88,6 +88,7 @@ sqlite3_stmt *addStmt;
 	}
 
 	NSString *deckTitle = [[[[doc rootElement] elementsForName:@"title"] objectAtIndex:0] stringValue];
+	NSString *author = @"dummy_author"; //[[[[doc rootElement] elementsForName:@"author"] objectAtIndex:0] stringValue];	
 	int userVisibleID = [[[[[doc rootElement] elementsForName:@"user_visible_id"] objectAtIndex:0] stringValue] integerValue];
 	
 	// insert a Deck row into the db to represent the incoming deck
@@ -112,7 +113,7 @@ sqlite3_stmt *addStmt;
 		updateStmt = nil;
 		
 		// now can actually insert the Deck row
-		const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id) VALUES(?,?,?,?)";
+		const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author) VALUES(?,?,?,?,?)";
 		if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 		{
 			NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg(database));
@@ -120,7 +121,8 @@ sqlite3_stmt *addStmt;
 		sqlite3_bind_text(addStmt, 1, [deckTitle UTF8String], -1, SQLITE_TRANSIENT);
 		sqlite3_bind_int(addStmt, 2, 1); // position should always be 1 (i.e. at top of list)
 		sqlite3_bind_int(addStmt, 3, 0); // deck is initially unshuffled
-		sqlite3_bind_int(addStmt, 4, userVisibleID);	
+		sqlite3_bind_int(addStmt, 4, userVisibleID);
+		sqlite3_bind_text(addStmt, 5, [author UTF8String], -1, SQLITE_TRANSIENT);	
 		if(SQLITE_DONE != sqlite3_step(addStmt))
 		{
 			NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg(database));
@@ -179,6 +181,9 @@ sqlite3_stmt *addStmt;
 	}
 	[errorAlert show];
 	[errorAlert release];
+	
+	// parsing has finished - refresh the UI
+	[self updateUIForParsingCompletion];
 }
 
 - (void) fullDeckRequestFinished:(ASIHTTPRequest *)request
@@ -240,6 +245,9 @@ sqlite3_stmt *addStmt;
 
 	// clean up
 	[self removeDeckWithUserVisibleID:userVisibleID];
+	
+	// parsing has finished - refresh the UI
+	[self updateUIForParsingCompletion];
 }
 
 
@@ -263,7 +271,12 @@ sqlite3_stmt *addStmt;
     if ([parser parserError])
 	{
 		NSLog([parser parserError].localizedDescription);
+		
+		// remove the offending deck
 		[self removeDeckWithUserVisibleID:userVisibleID];
+		
+		// refresh the UI
+		[self updateUIForParsingCompletion];
     }
 	
 	[self finalizeStatements];
@@ -282,7 +295,7 @@ sqlite3_stmt *addStmt;
 	NSLog(errorString);
 	
 	UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error loading downloaded deck" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-	[errorAlert show];
+	[errorAlert show];	
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
@@ -439,7 +452,7 @@ sqlite3_stmt *addStmt;
 	if ([elementName isEqualToString:@"Deck"])
 	{
 		// parsing has finished
-		[self finishParsing];
+		[self updateUIForParsingCompletion];
 	}
 	
 	// Nodes other than Deck and Cards are only interesting if we're inside a Cards block (otherwise it's template information)
@@ -526,7 +539,7 @@ sqlite3_stmt *addStmt;
 	currentText = [currentText stringByAppendingString:string];	
 }
 
-- (void)finishParsing
+- (void)updateUIForParsingCompletion
 {
 	// decrement the busy count (for progress indicator management)
 	[ProgressViewController stopShowingProgress];

@@ -56,8 +56,8 @@ SideViewController *miniSideViewController;
 	[super viewDidLoad];
 
 	// set up background color
-	UIColor *color = [[VariableStore sharedInstance] backgroundColor];	
-	super.view.backgroundColor = color;	
+	// UIColor *color = [[VariableStore sharedInstance] backgroundColor];	
+	// super.view.backgroundColor = color;	
 	
 	//setup custom back button
 	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
@@ -77,12 +77,16 @@ SideViewController *miniSideViewController;
 	int numKnownCards = [deck numKnownCards];
 	int numUnknownCards = numCards - numKnownCards;
 	int firstSideID = [deck getOriginalFirstSideID];
+	int userVisibleId = [deck userVisibleID];
+	
 	
 	// Print deck information to screen
 	titleLabel.text = [deck getDeckTitle];
 	totalCardsLabel.text = [NSString stringWithFormat: @"%d", numCards];
 	knownCardsLabel.text = [NSString stringWithFormat: @"%d", numKnownCards];
 	unknownCardsLabel.text = [NSString stringWithFormat: @"%d", numUnknownCards];
+	deckIdLabel.text = [NSString stringWithFormat: @"%d", userVisibleId];
+	authorLabel.text = [deck author];
 	
 	miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;

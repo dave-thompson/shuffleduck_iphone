@@ -41,6 +41,7 @@ static int numberOfOperationsInProgress = 0;
 	{
 		MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
 		[[appDelegate window] addSubview:[progressViewController view]];
+		//[progressViewController.activityIndicator startAnimating];
 	}	
 	
 	// Keep count of how many operations have requested a progress indicator
@@ -73,6 +74,7 @@ static int numberOfOperationsInProgress = 0;
 	if (numberOfOperationsInProgress == 0)
 	{
 		[progressViewController.view removeFromSuperview];
+		//[progressViewController.activityIndicator stopAnimating];
 	}
 	
 	// Update label to show how many decks remain to be downloaded
@@ -88,12 +90,12 @@ static int numberOfOperationsInProgress = 0;
 }
 
 
-- (void)viewWillAppear
+- (void)viewWillAppear:(BOOL)animated
 {
 	[activityIndicator startAnimating];
 }
 
-- (void)viewWillDisappear: (BOOL)animated
+- (void)viewWillDisappear:(BOOL)animated
 {
 	[activityIndicator stopAnimating];
 }

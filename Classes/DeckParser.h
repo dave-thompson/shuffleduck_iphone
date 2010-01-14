@@ -19,6 +19,6 @@
 - (void) parseXMLDeck:(NSString *)xmlString withUserID:(int)userVisibleID;
 -(void)removeDeckWithUserVisibleID:(int)aUserVisibleID;
 - (void) finalizeStatements;
-- (void)finishParsing;
+- (void)updateUIForParsingCompletion;
 
 @end

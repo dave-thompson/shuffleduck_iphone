@@ -46,8 +46,8 @@ InlineScoreViewController *inlineScoreViewController;
 
 // ----- INITIALISERS ------
 
-- (void)viewDidLoad { // should this be in viewWillLoad?
-
+- (void)viewDidLoad
+{
 	// initiate state data
 			processedCurrentSwipe = NO;
 			kMaximumVariance = tan(kMaximumVarianceInDegrees);
@@ -117,33 +117,29 @@ InlineScoreViewController *inlineScoreViewController;
 }
 
 
-
-/*
--(void)setBackgroundColor
+- (void)viewWillAppear:(BOOL)animated
 {
-	const char *sqlStatement = "SELECT red_color, blue_color, green_color FROM Setting;";
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		// should only be one row, so no real need for this loop
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			// Read the color data from the result row
-			red = (CGFloat)sqlite3_column_double(compiledStatement, 0);
-			blue = (CGFloat)sqlite3_column_double(compiledStatement, 1);
-			green = (CGFloat)sqlite3_column_double(compiledStatement, 2);
-		}
-	}
-	// Release the compiled statement from memory
-	sqlite3_finalize(compiledStatement);
+	[super viewDidAppear:animated];
 	
-	UIColor *color = [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
-	
-	outerView.backgroundColor = color;
-	topCardViewController.view.backgroundColor = color;
-	bottomCardViewController.view.backgroundColor = color;
+	// make status bar black
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
+
+	// make navigation bar black
+	UINavigationController *navController = [self navigationController];
+	navController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
 }
- */
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+	[super viewDidDisappear:animated];
+	
+	// make status bar blue
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+	
+	// make navigation bar blue
+	UINavigationController *navController = [self navigationController];
+	navController.navigationBar.barStyle = UIBarStyleDefault;	
+}
 
 -(void)setStudyType:(StudyType)studyType
 {

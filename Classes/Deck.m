@@ -297,6 +297,47 @@
 	return title;
 }
 
+-(NSString *)author
+{
+	NSString *author;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			author = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 0)];
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+	}
+	return author;
+}
+
+-(int)userVisibleID
+{
+	int userVisibleID;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			userVisibleID = sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+	}
+	return userVisibleID;
+}
+
+
 -(void)shuffle
 {
 	int deckLength = self.numCards;
@@ -364,6 +405,10 @@
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
 	
+	// Deck is still pointing at old 'first card'. Need to update it to point to new 'first card'.
+	// Note that shuffling is done from within the deck details screen, and the deck object is therefore ready for test mode - therefore include known cards
+	[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
+	
 }
 
 -(void)unshuffle
@@ -407,6 +452,10 @@
 	
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
+	
+	// Deck is still pointing at old 'first card'. Need to update it to point to new 'first card'.
+	// Note that shuffling is done from within the deck details screen, and the deck object is therefore ready for test mode - therefore include known cards
+	[self moveToCardAtPosition:FirstCard includeKnownCards:YES];	
 }
 
 -(BOOL)isShuffled

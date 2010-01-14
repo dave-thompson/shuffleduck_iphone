@@ -21,6 +21,9 @@
 	IBOutlet UILabel *unknownCardsLabel;
 	IBOutlet UIView *firstCardView;
 	
+	IBOutlet UILabel *deckIdLabel;
+	IBOutlet UILabel *authorLabel;
+	
 	Deck *deck;
 	sqlite3 *database;
 }
