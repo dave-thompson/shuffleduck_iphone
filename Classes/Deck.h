@@ -34,6 +34,8 @@ typedef enum {
 -(int)getOriginalFirstSideID;
 -(int)numCards;
 -(int)numKnownCards;
+-(NSString *)author;
+-(int)userVisibleID;
 
 -(BOOL)moveToCardInDirection:(ChangeCardDirection)direction includeKnownCards:(BOOL)includeKnown;
 -(BOOL)moveToCardAtPosition:(CardIndex)position includeKnownCards:(BOOL)includeKnown;

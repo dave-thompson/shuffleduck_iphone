@@ -62,7 +62,6 @@
 		5591B30F0FD62614000BECF8 /* study.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30E0FD62614000BECF8 /* study.png */; };
 		5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5591B4F20FD653BD000BECF8 /* DownloadView.xib */; };
 		5591B5180FD77759000BECF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5591B5170FD77759000BECF8 /* Settings.bundle */; };
-		55BAF476104A118E0050954D /* xmlFile.xml in Resources */ = {isa = PBXBuildFile; fileRef = 55BAF475104A118E0050954D /* xmlFile.xml */; };
 		55BEC4D40FAD3C640096FC1E /* RandomColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 55BEC4D30FAD3C640096FC1E /* RandomColor.m */; };
 		55CD3CB30FDC1AC100C4ECB2 /* SideView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */; };
 		55CD3CCB0FDC32CA00C4ECB2 /* SideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */; };
@@ -165,7 +164,6 @@
 		5591B30E0FD62614000BECF8 /* study.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = study.png; sourceTree = "<group>"; };
 		5591B4F20FD653BD000BECF8 /* DownloadView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadView.xib; sourceTree = "<group>"; };
 		5591B5170FD77759000BECF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		55BAF475104A118E0050954D /* xmlFile.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = xmlFile.xml; sourceTree = "<group>"; };
 		55BEC4D20FAD3C640096FC1E /* RandomColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RandomColor.h; sourceTree = "<group>"; };
 		55BEC4D30FAD3C640096FC1E /* RandomColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RandomColor.m; sourceTree = "<group>"; };
 		55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideView.xib; sourceTree = "<group>"; };
@@ -255,7 +253,6 @@
 			isa = PBXGroup;
 			children = (
 				5522BE8A107D9619006322F2 /* MindEgg.sqlite */,
-				55BAF475104A118E0050954D /* xmlFile.xml */,
 				556138390FAEDF1C00365DF1 /* XIBs */,
 				55DB728E0FD9375300B1A115 /* Images */,
 				8D1107310486CEB800E47090 /* Info.plist */,
@@ -536,7 +533,6 @@
 				55D0F9B80FDBCF1300DFB132 /* BackArrow.png in Resources */,
 				55D0F9BB0FDBD0EA00DFB132 /* MagnifyingGlass.png in Resources */,
 				55CD3CB30FDC1AC100C4ECB2 /* SideView.xib in Resources */,
-				55BAF476104A118E0050954D /* xmlFile.xml in Resources */,
 				5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */,
 				5510E22E107D1C940074B376 /* ReviseView.xib in Resources */,
 				550F4FCF107D7C10002A6662 /* NarrowGreenTick.png in Resources */,

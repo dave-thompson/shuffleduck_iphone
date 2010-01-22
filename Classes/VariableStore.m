@@ -24,7 +24,7 @@
         // initialize variables
 		myInstance.backgroundColor = [UIColor colorWithRed:0.525747001 green:0.596195996 blue:0.618924975 alpha:1.0];
 		//myInstance.contextURL = @"http://localhost:3000";
-		myInstance.contextURL = @"http://192.168.1.30:3000";
+		myInstance.contextURL = @"http://mindegg.heroku.com";
     }
     // return the instance of this class
     return myInstance;
