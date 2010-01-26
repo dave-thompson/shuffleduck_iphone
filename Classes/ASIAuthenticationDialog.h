@@ -9,20 +9,25 @@
 #import <Foundation/Foundation.h>
 @class ASIHTTPRequest;
 
-typedef enum _ASIAuthenticationType {
-	ASIStandardAuthenticationType = 0,
-    ASIProxyAuthenticationType = 1
-} ASIAuthenticationType;
-	
 @interface ASIAuthenticationDialog : NSObject <UIActionSheetDelegate, UITableViewDelegate, UITableViewDataSource> {
 	ASIHTTPRequest *request;
+	id delegate;
 	UIActionSheet *loginDialog;
-	ASIAuthenticationType type;
+	NSString *username;
 }
-+ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request;
-+ (void)presentProxyAuthenticationDialogForRequest:(ASIHTTPRequest *)request;
 
 @property (retain) ASIHTTPRequest *request;
+@property (nonatomic, assign) id delegate;
 @property (retain) UIActionSheet *loginDialog;
-@property (assign) ASIAuthenticationType type;
+@property (retain) NSString *username;
+
++ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername;
+
+@end
+
+
+@interface NSObject (ASIAuthenticationDialog)
+
+- (void)credentialsEntered;
+
 @end

@@ -8,9 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "sqlite3.h"
+#import "ASIHTTPRequest.h"
+
 #import "StudyViewController.h"
 #import "DeckDetailViewController.h"
 #import "TableFooterViewController.h"
+#import "CredentialsViewController.h"
 
 @interface MyDecksViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
 	NSMutableArray *localLibraryDetails;
@@ -23,13 +26,16 @@
 
 @property (nonatomic, assign) sqlite3 *database;
 
-+(id)getMyDecksViewController;
--(void)refreshTable;
--(void)updateTableSettingsBasedOnNumberOfDecks;
--(void)retrieveLocalLibraryDetails;
--(void)popDaughterScreen;
--(void)runDeletionWithSQL:(NSString *)sqlString;
-- (NSInteger)numDecks;
++ (id) getMyDecksViewController;
+- (void) refreshTable;
+- (void) updateTableSettingsBasedOnNumberOfDecks;
+- (void) retrieveLocalLibraryDetails;
+- (void) popDaughterScreen;
+- (void) runDeletionWithSQL:(NSString *)sqlString;
+- (NSInteger) numDecks;
 //-(IBAction)editTable:(id)sender;
+- (void) credentialsEntered;
+//- (void)pushCredentialsViewWithRequest:(ASIHTTPRequest *)request username:(NSString *)username;
+- (void) deckListRequestFailed:(ASIHTTPRequest *)request;
 
 @end

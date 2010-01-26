@@ -31,6 +31,7 @@
 		5510E22E107D1C940074B376 /* ReviseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22C107D1C940074B376 /* ReviseView.xib */; };
 		5515E1A4107C259D002E4339 /* FeedbackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A1107C259D002E4339 /* FeedbackViewController.m */; };
 		5515E1A5107C259D002E4339 /* ReviseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A3107C259D002E4339 /* ReviseViewController.m */; };
+		551C75C0110E3EC90031530F /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 551C75BF110E3EC90031530F /* Constants.m */; };
 		5522BE8B107D9619006322F2 /* MindEgg.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5522BE8A107D9619006322F2 /* MindEgg.sqlite */; };
 		552694070FDA6943003CECEF /* DeckDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = 552694060FDA6943003CECEF /* DeckDetails.m */; };
 		552A5A2710DBF39E00A8264B /* FinalScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 552A5A2510DBF39E00A8264B /* FinalScoreViewController.m */; };
@@ -118,6 +119,8 @@
 		5515E1A1107C259D002E4339 /* FeedbackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedbackViewController.m; sourceTree = "<group>"; };
 		5515E1A2107C259D002E4339 /* ReviseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviseViewController.h; sourceTree = "<group>"; };
 		5515E1A3107C259D002E4339 /* ReviseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviseViewController.m; sourceTree = "<group>"; };
+		551C75BE110E3EC90031530F /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		551C75BF110E3EC90031530F /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		5522BE8A107D9619006322F2 /* MindEgg.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = MindEgg.sqlite; sourceTree = "<group>"; };
 		552694050FDA6943003CECEF /* DeckDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDetails.h; sourceTree = "<group>"; };
 		552694060FDA6943003CECEF /* DeckDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDetails.m; sourceTree = "<group>"; };
@@ -393,6 +396,8 @@
 				55CFB05910814B03002FF68D /* VariableStore.m */,
 				55BEC4D20FAD3C640096FC1E /* RandomColor.h */,
 				55BEC4D30FAD3C640096FC1E /* RandomColor.m */,
+				551C75BE110E3EC90031530F /* Constants.h */,
+				551C75BF110E3EC90031530F /* Constants.m */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -592,6 +597,7 @@
 				5576B11710FC8A1D00306F4C /* DDXMLElement.m in Sources */,
 				5576B11810FC8A1D00306F4C /* DDXMLDocument.m in Sources */,
 				55814A9410FE483D00B2A625 /* ProgressViewController.m in Sources */,
+				551C75C0110E3EC90031530F /* Constants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

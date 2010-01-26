@@ -13,10 +13,12 @@
 #import "ReviseViewController.h"
 #import "SideViewController.h"
 #import "DDXML.h"
-#import "ASIHTTPRequest.h"
 #import "DeckParser.h"
 #import "VariableStore.h"
 #import "ProgressViewController.h"
+#import "Constants.h"
+#import "ASIAuthenticationDialog.h"
+
 @implementation MyDecksViewController
 
 @synthesize database;
@@ -188,7 +190,7 @@ static MyDecksViewController *myDecksViewController;
 	}
 	deckDetailViewController.title = [deck getDeckTitle];
 	deckDetailViewController.deck = deck;
-	deckDetailViewController.database = database;			
+	deckDetailViewController.database = database;
 	[self.navigationController pushViewController:deckDetailViewController animated:YES];	
 	
 	[deck release];
@@ -297,68 +299,113 @@ static MyDecksViewController *myDecksViewController;
 
 - (IBAction)syncDecksWithServer:(id)sender
 {
-	// show busy indicator
-	[ProgressViewController startShowingProgress];
-	
-	// retrieve deck list
-	NSURL *url = [NSURL URLWithString:[[[VariableStore sharedInstance] contextURL]stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
+	// setup URL
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-	[request setDelegate:self];
-	[request setDidFinishSelector:@selector(deckListRequestFinished:)];
-	[request setDidFailSelector:@selector(deckListRequestFailed:)];
-	[request startAsynchronous];
+	// check for credentials in the keychain
+	NSURLCredential *authenticationCredentials = [ASIHTTPRequest savedCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
+	if (authenticationCredentials) // if credentials exist, request the deck list
+	{
+		// show busy indicator
+		[ProgressViewController startShowingProgress];
+		// send request
+		[request setUsername:[authenticationCredentials user]];
+		[request setPassword:[authenticationCredentials password]];
+		[request setDelegate:self];
+		[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[authenticationCredentials user], @"username", nil]];
+		[request setDidFinishSelector:@selector(deckListRequestFinished:)];
+		[request setDidFailSelector:@selector(deckListRequestFailed:)];
+		[request startAsynchronous];		
+	}
+	else // no credentials exist, so ask for them
+	{
+		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@""];
+		
+		//[ASIAuthenticationDialog performSelectorOnMainThread:@selector(presentAuthenticationDialogForRequest:) withObject:self waitUntilDone:[NSThread isMainThread]];
+		//[self pushCredentialsViewWithRequest:request username:@""];
+	}
+}
+
+/*
+- (void)pushCredentialsViewWithRequest:(ASIHTTPRequest *)request username:(NSString *)username
+{
+	// push a modal credentials view controller from the bottom
+	CredentialsViewController *credentialsViewController = [[CredentialsViewController alloc] initWithNibName:@"CredentialsView" delegate:self forASIHTTPRequest:request bundle:nil];
+	credentialsViewController.title = @"mindegg.com";
+	credentialsViewController.hidesBottomBarWhenPushed = YES;
+	[self.navigationController presentModalViewController:credentialsViewController animated:YES];		
+	[credentialsViewController release];	
+}
+*/
+
+- (void) credentialsEntered
+{
+	// have another go at syncing, using the newly entered credentials
+	//[self.navigationController popViewControllerAnimated:YES];
+	[self syncDecksWithServer:self];
 }
 
 - (void) deckListRequestFinished:(ASIHTTPRequest *)request
 {
-	// instantiate variables
 	DDXMLDocument *doc;
-	
-	// get XML response
 	NSString *responseString = [request responseString];
-	NSLog(responseString);
-	
-	// create document, ready to parse XML response
 	doc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:nil];
-	if (doc == nil) // if something went wrong, clean up
+	if (doc == nil)	{[doc release];	return;}
+
+	DDXMLElement *rootElement = [doc rootElement];
+	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error...
 	{
-		[doc release];
-		return;
-	}
-	
-	// populate database based on retrieved xml_string
-	int numberDecksReceived = [[doc rootElement] childCount];
-	
-	// remove busy indicator for now (deckparser will put it back on for each individual deck download - the gap shouldn't be noticeable to the user)
-	[ProgressViewController stopShowingProgress];
-	
-	// loop through the decks received
-	for (int i = 0; i <numberDecksReceived; i++)
-	{
+		// what are the specifics of the failure?
+		BOOL userRecognised = [[[rootElement elementsForName:@"logon_succeeded"] objectAtIndex:0] boolValue];
+		NSString *username = [request.userInfo valueForKey:@"username"];
+		// tell the user
+		NSString *errorDescription = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
+		UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:[ERROR_DIALOG_TITLE copy] message:errorDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[errorAlert show];
 		
-		// find this deck's user_visible_id
-		int userVisibleID = [[[[(DDXMLElement *)[[doc rootElement] childAtIndex:i] elementsForName:@"user_visible_id"] objectAtIndex: 0] stringValue] integerValue];
-		
-		// check if this deck already exists on iphone
-		BOOL deckExistsAlready = NO;
-		const char *sqlStatement = "SELECT user_visible_id FROM Deck WHERE user_visible_id =?;";
-		sqlite3_stmt *compiledStatement;
-		if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+		// if the error was due to a failed logon, show the credentials dialog
+		if (!(userRecognised))
 		{
-			sqlite3_bind_int(compiledStatement,1,userVisibleID);
-			while(sqlite3_step(compiledStatement) == SQLITE_ROW) // if a row is returned
-			{
-				deckExistsAlready = YES;
-			}
+			[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:username];
+			//[self pushCredentialsViewWithRequest:request username:username];
 		}
-		// Release the compiled statement from memory
-		sqlite3_finalize(compiledStatement);
-				
-		// if the deck doesn't already exist, retrieve it
-		if (!(deckExistsAlready))
+	}
+	else // the server returned the deck summary information, so process this and then ask for the full deck
+	{
+		// populate database based on retrieved xml_string
+		int numberDecksReceived = [[doc rootElement] childCount];
+		
+		// remove busy indicator for now (deckparser will put it back on for each individual deck download - the gap shouldn't be noticeable to the user)
+		[ProgressViewController stopShowingProgress];
+		
+		// loop through the decks received
+		for (int i = 0; i <numberDecksReceived; i++)
 		{
-			DeckParser *deckParser = [[DeckParser alloc] init];
-			[deckParser getDeckWithUserDeckID:userVisibleID intoDB:database userProvidedID:NO];
+			
+			// find this deck's user_visible_id
+			int userVisibleID = [[[[(DDXMLElement *)[[doc rootElement] childAtIndex:i] elementsForName:@"user_visible_id"] objectAtIndex: 0] stringValue] integerValue];
+			
+			// check if this deck already exists on iphone
+			BOOL deckExistsAlready = NO;
+			const char *sqlStatement = "SELECT user_visible_id FROM Deck WHERE user_visible_id =?;";
+			sqlite3_stmt *compiledStatement;
+			if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+			{
+				sqlite3_bind_int(compiledStatement,1,userVisibleID);
+				while(sqlite3_step(compiledStatement) == SQLITE_ROW) // if a row is returned
+				{
+					deckExistsAlready = YES;
+				}
+			}
+			// Release the compiled statement from memory
+			sqlite3_finalize(compiledStatement);
+					
+			// if the deck doesn't already exist, retrieve it
+			if (!(deckExistsAlready))
+			{
+				DeckParser *deckParser = [[DeckParser alloc] init];
+				[deckParser getDeckWithUserDeckID:userVisibleID intoDB:database];
+			}
 		}
 	}
 	
@@ -368,6 +415,9 @@ static MyDecksViewController *myDecksViewController;
 
 - (void) deckListRequestFailed:(ASIHTTPRequest *)request
 {
+	// remove busy indicator
+	[ProgressViewController stopShowingProgress];
+
 	// tell user that there was a problem and that decks are not being synchronised
  	UIAlertView *errorAlert = [[UIAlertView alloc]
 							   initWithTitle:  [NSString stringWithFormat:@"Couldn't Synchronize Decks"]

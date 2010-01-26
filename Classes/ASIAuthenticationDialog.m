@@ -5,6 +5,7 @@
 //  Created by Ben Copsey on 21/08/2009.
 //  Copyright 2009 All-Seeing Interactive. All rights reserved.
 //
+//	Modified by Dave Thompson on 26/01/2010
 
 #import "ASIAuthenticationDialog.h"
 #import "ASIHTTPRequest.h"
@@ -25,26 +26,16 @@ NSLock *dialogLock = nil;
 	}
 }
 
-+ (void)presentProxyAuthenticationDialogForRequest:(ASIHTTPRequest *)request
++ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername
 {
 	[dialogLock lock];
 	[sharedDialog release];
 	sharedDialog = [[self alloc] init];
 	[sharedDialog setRequest:request];
-	[sharedDialog setType:ASIProxyAuthenticationType];
-	[sharedDialog show];
-	[dialogLock unlock];	
-}
-
-+ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request
-{
-	[dialogLock lock];
-	[sharedDialog release];
-	sharedDialog = [[self alloc] init];
-	[sharedDialog setRequest:request];
+	sharedDialog.delegate = aDelegate;
+	sharedDialog.username = aUsername;
 	[sharedDialog show];
 	[dialogLock unlock];
-	
 }
 
 - (void)show
@@ -65,11 +56,7 @@ NSLock *dialogLock = nil;
 	// Setup the title (Couldn't figure out how to put this in the same toolbar as the buttons)
 	UIToolbar *titleBar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0,0,320,30)] autorelease];
 	UILabel *label = [[[UILabel alloc] initWithFrame:CGRectMake(10,0,300,30)] autorelease];
-	if ([self type] == ASIProxyAuthenticationType) {
-		[label setText:@"Login to this secure proxy server."];
-	} else {
-		[label setText:@"Login to this secure server."];
-	}
+	[label setText:@"Go to mindegg.com to create cards."];
 	[label setTextColor:[UIColor blackColor]];
 	[label setFont:[UIFont systemFontOfSize:13.0]];
 	[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5]];
@@ -85,15 +72,11 @@ NSLock *dialogLock = nil;
 	UIToolbar *toolbar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0,30,320,50)] autorelease];
 
 	NSMutableArray *items = [[[NSMutableArray alloc] init] autorelease];
-	UIBarButtonItem *backButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAuthenticationFromDialog:)] autorelease];
+	UIBarButtonItem *backButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)] autorelease];
 	[items addObject:backButton];
 	
 	label = [[[UILabel alloc] initWithFrame:CGRectMake(0,0,170,50)] autorelease];
-	if ([self type] == ASIProxyAuthenticationType) {
-		[label setText:[[self request] proxyHost]];
-	} else {
-		[label setText:[[[self request] url] host]];
-	}
+	[label setText:@"mindegg.com"];
 	[label setTextColor:[UIColor whiteColor]];
 	[label setFont:[UIFont boldSystemFontOfSize:22.0]];
 	[label setShadowColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.5]];
@@ -107,7 +90,7 @@ NSLock *dialogLock = nil;
 	UIBarButtonItem *labelButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:nil action:nil] autorelease];
 	[labelButton setCustomView:label];
 	[items addObject:labelButton];
-	[items addObject:[[[UIBarButtonItem alloc] initWithTitle:@"Login" style:UIBarButtonItemStyleDone target:self action:@selector(loginWithCredentialsFromDialog:)] autorelease]];
+	[items addObject:[[[UIBarButtonItem alloc] initWithTitle:@"Sync" style:UIBarButtonItemStyleDone target:self action:@selector(loginButtonPressed:)] autorelease]];
 	[toolbar setItems:items];
 	
 	[[self loginDialog] addSubview:toolbar];
@@ -118,70 +101,64 @@ NSLock *dialogLock = nil;
 	
 }
 
-- (void)cancelAuthenticationFromDialog:(id)sender
+- (void)cancelButtonPressed:(id)sender
 {
-	[[self request] cancelAuthentication];
 	[[self loginDialog] dismissWithClickedButtonIndex:0 animated:YES];
 }
 
-- (void)loginWithCredentialsFromDialog:(id)sender
+- (void)loginButtonPressed:(id)sender
 {
-	NSString *username = [[[[[[[self loginDialog] subviews] objectAtIndex:0] cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]] subviews] objectAtIndex:2] text];
+	// save entered credentials to the keychain
+	NSString *user = [[[[[[[self loginDialog] subviews] objectAtIndex:0] cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]] subviews] objectAtIndex:2] text];
 	NSString *password = [[[[[[[self loginDialog] subviews] objectAtIndex:0] cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]] subviews] objectAtIndex:2] text];
-	
-	if ([self type] == ASIProxyAuthenticationType) {
-		[[self request] setProxyUsername:username];
-		[[self request] setProxyPassword:password];
-	} else {
-		[[self request] setUsername:username];
-		[[self request] setPassword:password];		
-	}
-	
-	// Handle NTLM domains
-	NSString *scheme = ([self type] == ASIStandardAuthenticationType) ? [[self request] authenticationScheme] : [[self request] proxyAuthenticationScheme];
-	if ([scheme isEqualToString:(NSString *)kCFHTTPAuthenticationSchemeNTLM]) {
-		NSString *domain = [[[[[[[self loginDialog] subviews] objectAtIndex:0] cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:2]] subviews] objectAtIndex:2] text];
-		if ([self type] == ASIProxyAuthenticationType) {
-			[[self request] setProxyDomain:domain];
-		} else {
-			[[self request] setDomain:domain];
-		}
-	}
+	NSURLCredential *credential = [NSURLCredential credentialWithUser:user password:password persistence:NSURLCredentialPersistencePermanent];
+	[ASIHTTPRequest saveCredentials:credential forHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
+		
+	//[[self request] setUsername:username];
+	//[[self request] setPassword:password];
 	
 	[[self loginDialog] dismissWithClickedButtonIndex:1 animated:YES];
-	[[self request] retryUsingSuppliedCredentials];	
+	
+	// advise delegate that credentials have been entered
+	if ([delegate respondsToSelector:@selector(credentialsEntered)])
+        [delegate credentialsEntered];
+    else
+    { 
+        [NSException raise:NSInternalInconsistencyException format:@"Delegate doesn't respond to credentialsEntered"];
+    }	
 }
 
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	NSString *scheme = ([self type] == ASIStandardAuthenticationType) ? [[self request] authenticationScheme] : [[self request] proxyAuthenticationScheme];
-	if ([scheme isEqualToString:(NSString *)kCFHTTPAuthenticationSchemeNTLM]) {
-		return 3;
-	}
 	return 2;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
-	if (section == [self numberOfSectionsInTableView:tableView]-1) {
-		return 30;
+	if (section == [self numberOfSectionsInTableView:tableView]-1)
+	{
+		return 50;
 	}
 	return 0;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-	if (section == 0) {
-		return 30;
+	if (section == 0)
+	{
+		return 7;
 	}
 	return 0;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-	if (section == 0) {
-		return [[self request] authenticationRealm];
+	
+	if (section == 0)
+	{
+		return @" ";
+		//return @"mindegg.com";
 	}
 	return nil;
 }
@@ -197,13 +174,18 @@ NSLock *dialogLock = nil;
 	[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
 	UITextField *textField = [[[UITextField alloc] initWithFrame:CGRectMake(20,12,260,25)] autorelease];
 	[textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
-	if ([indexPath section] == 0) {
-		[textField setPlaceholder:@"User"];
-	} else if ([indexPath section] == 1) {
+	if ([indexPath section] == 0)
+	{
+		[textField setPlaceholder:@"Username"];
+		if (![username isEqualToString:@""])
+		{
+			[textField setText:username];
+		}
+	}
+	else if ([indexPath section] == 1)
+	{
 		[textField setPlaceholder:@"Password"];
 		[textField setSecureTextEntry:YES];
-	} else if ([indexPath section] == 2) {
-		[textField setPlaceholder:@"Domain"];
 	}	
 	[cell addSubview:textField];
 	
@@ -218,19 +200,16 @@ NSLock *dialogLock = nil;
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-	if (section == [self numberOfSectionsInTableView:tableView]-1) {
-		// If we're using Basic authentication and the connection is not using SSL, we'll show the plain text message
-		if ([[[self request] authenticationScheme] isEqualToString:(NSString *)kCFHTTPAuthenticationSchemeBasic] && ![[[[self request] url] scheme] isEqualToString:@"https"]) {
-			return @"Password will be sent in the clear.";
-		// We are using Digest, NTLM, or any scheme over SSL
-		} else {
-			return @"Password will be sent securely.";
-		}
+	if (section == [self numberOfSectionsInTableView:tableView]-1)
+	{	
+		return @"You can download existing cards without an account by supplying a Deck ID.";
+		//return @"No account required to download existing cards by Deck ID.";
 	}
 	return nil;
 }
 
 @synthesize request;
+@synthesize delegate;
+@synthesize username;
 @synthesize loginDialog;
-@synthesize type;
 @end

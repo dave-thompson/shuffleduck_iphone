@@ -18,8 +18,8 @@
 - (void)viewDidLoad {
 
 	// set up background color
-	UIColor *color = [[VariableStore sharedInstance] backgroundColor];
-	super.view.backgroundColor = color;
+	//UIColor *color = [[VariableStore sharedInstance] backgroundColor];
+	//super.view.backgroundColor = color;
 	
 	[idTextField	becomeFirstResponder];
 	
@@ -43,7 +43,7 @@
 	{			
 		// get the deck
 		DeckParser *deckParser = [[DeckParser alloc] init];
-		[deckParser getDeckWithUserDeckID:[idTextField.text integerValue] intoDB:database userProvidedID:YES];
+		[deckParser getDeckWithUserDeckID:[idTextField.text integerValue] intoDB:database];
 	}
 	
 	// go back to the library screen

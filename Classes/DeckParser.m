@@ -2,6 +2,7 @@
 //  DeckParser.m
 //  MindEgg
 //
+//
 //  Created by Dave Thompson on 1/11/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
@@ -12,6 +13,7 @@
 #import "VariableStore.h"
 #import "MyDecksViewController.h"
 #import "ProgressViewController.h"
+#import "Constants.h"
 
 @implementation DeckParser
 
@@ -20,9 +22,6 @@
 NSString *xmlFileName = @"xmlFile.xml";
 
 BOOL inCardsDefinition; // is XML parser currently looking at cards (rather than template)
-
-// variable to be set by the object's user
-BOOL userProvidedID;
 
 // variable to store the text within current element
 NSString *currentText = @"";
@@ -52,19 +51,22 @@ NSDate *startTime;
 
 sqlite3_stmt *addStmt;
 
-- (void) getDeckWithUserDeckID:(int)userDeckID intoDB:(sqlite3 *)db userProvidedID:(BOOL)upid
+- (void) getDeckWithUserDeckID:(int)did intoDB:(sqlite3 *)db
 {
 	// show busy indicator
 	[ProgressViewController startShowingProgress];
 	
 	// store source and destination information
 	database = db;
-	userProvidedID = upid;
+	int userVisibleID = did;
 		
 	// retrieve deck metadata
-	NSURL *url = [NSURL URLWithString:[[[VariableStore sharedInstance] contextURL] stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", userDeckID]]];
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", userVisibleID]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-	[request setDelegate:self];	
+	[request setUsername:@"dave"];
+	[request setPassword:@"wrong"];
+	[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d", userVisibleID], @"userVisibleID", nil]];
+	[request setDelegate:self];
 	[request setDidFinishSelector:@selector(metadataRequestFinished:)];
 	[request setDidFailSelector:@selector(metadataRequestFailed:)];
 	[request startAsynchronous];
@@ -73,80 +75,86 @@ sqlite3_stmt *addStmt;
 - (void) metadataRequestFinished:(ASIHTTPRequest *)request
 {
 	// instantiate variables
-	DDXMLDocument *doc;
-	
-	// get XML response
+	DDXMLDocument *doc;	
 	NSString *responseString = [request responseString];
-	NSLog(responseString);
-	
-	// create document, ready to parse XML response
 	doc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:nil];
-	if (doc == nil) // if something went wrong, clean up
+	if (doc == nil) {[doc release]; return;}
+	
+	DDXMLElement *rootElement = [doc rootElement];
+	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error, abort and tell the user
 	{
-		[doc release];
-		return;
+		// parsing has finished - refresh the UI
+		[self updateUIForParsingCompletion];
+		
+		// tell the user
+		NSString *errorDescription = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
+		UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:[ERROR_DIALOG_TITLE copy] message:errorDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[errorAlert show];	
+		
 	}
-
-	NSString *deckTitle = [[[[doc rootElement] elementsForName:@"title"] objectAtIndex:0] stringValue];
-	NSString *author = @"dummy_author"; //[[[[doc rootElement] elementsForName:@"author"] objectAtIndex:0] stringValue];	
-	int userVisibleID = [[[[[doc rootElement] elementsForName:@"user_visible_id"] objectAtIndex:0] stringValue] integerValue];
-	
-	// insert a Deck row into the db to represent the incoming deck
-	
-		// first, increment the positions of all existing Decks to move them down the list
-		// write value to database
-		sqlite3_stmt *updateStmt = nil;
-		if(updateStmt == nil)
-		{
-			const char *updateSQL = "UPDATE Deck SET position  = position + 1";
-			if(sqlite3_prepare_v2(database, updateSQL, -1, &updateStmt, NULL) != SQLITE_OK)
-				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
-		}
-		else
-		{
-			NSLog(@"Error: updatestmt not nil");
-		}
+	else // the server returned the deck summary information, so process this and then ask for the full deck
+	{
+		NSString *deckTitle = [[[rootElement elementsForName:@"title"] objectAtIndex:0] stringValue];
+		NSString *author = @"dummy_author";
+		int userVisibleID = [[[[[doc rootElement] elementsForName:@"user_visible_id"] objectAtIndex:0] stringValue] integerValue];
 		
-		if(SQLITE_DONE != sqlite3_step(updateStmt))
-		{NSAssert1(0, @"Error while incrementing DB positions. '%s'", sqlite3_errmsg(database));}
-		sqlite3_reset(updateStmt);
-		updateStmt = nil;
+		// insert a Deck row into the db to represent the incoming deck
 		
-		// now can actually insert the Deck row
-		const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author) VALUES(?,?,?,?,?)";
-		if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
-		{
-			NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg(database));
-		}
-		sqlite3_bind_text(addStmt, 1, [deckTitle UTF8String], -1, SQLITE_TRANSIENT);
-		sqlite3_bind_int(addStmt, 2, 1); // position should always be 1 (i.e. at top of list)
-		sqlite3_bind_int(addStmt, 3, 0); // deck is initially unshuffled
-		sqlite3_bind_int(addStmt, 4, userVisibleID);
-		sqlite3_bind_text(addStmt, 5, [author UTF8String], -1, SQLITE_TRANSIENT);	
-		if(SQLITE_DONE != sqlite3_step(addStmt))
-		{
-			NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg(database));
-		}
-		else
-		{
-			// store the autoincremented primary key to reference from future inserts
-			//deckID = sqlite3_last_insert_rowid(database);
-		}
-		addStmt = nil;
-	
-	// refresh the decks table to include the new deck
-	[[MyDecksViewController getMyDecksViewController] refreshTable];
-	
-	// ask server to send over full deck details
-	NSURL *url = [NSURL URLWithString:[[[VariableStore sharedInstance] contextURL] stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", userVisibleID]]];
-	ASIHTTPRequest *fullDeckRequest = [ASIHTTPRequest requestWithURL:url];
-	[fullDeckRequest setDelegate:self];
-	[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];
-	[fullDeckRequest setDidFailSelector:@selector(fullDeckRequestFailed:)];
-	fullDeckRequest.userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-								[NSString stringWithFormat:@"%d", userVisibleID], @"userVisibleID",
-								nil];
-	[fullDeckRequest startAsynchronous];
+			// first, increment the positions of all existing Decks to move them down the list
+			// write value to database
+			sqlite3_stmt *updateStmt = nil;
+			if(updateStmt == nil)
+			{
+				const char *updateSQL = "UPDATE Deck SET position  = position + 1";
+				if(sqlite3_prepare_v2(database, updateSQL, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+			}
+			else
+			{
+				NSLog(@"Error: updatestmt not nil");
+			}
+			
+			if(SQLITE_DONE != sqlite3_step(updateStmt))
+			{NSAssert1(0, @"Error while incrementing DB positions. '%s'", sqlite3_errmsg(database));}
+			sqlite3_reset(updateStmt);
+			updateStmt = nil;
+			
+			// now can actually insert the Deck row
+			const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author) VALUES(?,?,?,?,?)";
+			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			{
+				NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg(database));
+			}
+			sqlite3_bind_text(addStmt, 1, [deckTitle UTF8String], -1, SQLITE_TRANSIENT);
+			sqlite3_bind_int(addStmt, 2, 1); // position should always be 1 (i.e. at top of list)
+			sqlite3_bind_int(addStmt, 3, 0); // deck is initially unshuffled
+			sqlite3_bind_int(addStmt, 4, userVisibleID);
+			sqlite3_bind_text(addStmt, 5, [author UTF8String], -1, SQLITE_TRANSIENT);	
+			if(SQLITE_DONE != sqlite3_step(addStmt))
+			{
+				NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg(database));
+			}
+			else
+			{
+				// store the autoincremented primary key to reference from future inserts
+				//deckID = sqlite3_last_insert_rowid(database);
+			}
+			addStmt = nil;
+		
+		// refresh the decks table to include the new deck
+		[[MyDecksViewController getMyDecksViewController] refreshTable];
+		
+		// ask server to send over full deck details
+		NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", userVisibleID]]];
+		ASIHTTPRequest *fullDeckRequest = [ASIHTTPRequest requestWithURL:url];
+		[fullDeckRequest setDelegate:self];
+		[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];
+		[fullDeckRequest setDidFailSelector:@selector(fullDeckRequestFailed:)];
+		fullDeckRequest.userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+									[NSString stringWithFormat:@"%d", userVisibleID], @"userVisibleID",
+									nil];
+		[fullDeckRequest startAsynchronous];
+	}
 	
 	// clean up
 	[doc release];
@@ -160,25 +168,13 @@ sqlite3_stmt *addStmt;
 
 	// tell user that there was a problem and their deck is not being downloaded
 	UIAlertView *errorAlert;
-	if (userProvidedID)
-	{
-		errorAlert =  [[UIAlertView alloc]
-								   initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with userVisibleID %d.", userVisibleID]
-									message: [NSString stringWithFormat:@"Please check the Deck ID and your network connection and try again."]
-									delegate: nil
-									cancelButtonTitle: @"OK"
-									otherButtonTitles: nil];
-	}
-	else
-	{
-		errorAlert =  [[UIAlertView alloc]
-									initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with userVisibleID %d.", userVisibleID]
-									message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-									delegate: nil
-									cancelButtonTitle: @"OK"
-									otherButtonTitles: nil];
+	errorAlert =  [[UIAlertView alloc]
+					initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with Deck ID %d.", userVisibleID]
+					message: [NSString stringWithFormat:@"Please check your network connection and try again."]
+					delegate: nil
+					cancelButtonTitle: @"OK"
+					otherButtonTitles: nil];
 				
-	}
 	[errorAlert show];
 	[errorAlert release];
 	
@@ -221,25 +217,12 @@ sqlite3_stmt *addStmt;
 	
 	// tell user that there was a problem and their deck is not being downloaded
 		UIAlertView *errorAlert;
-		if (userProvidedID)
-		{
-			errorAlert =  [[UIAlertView alloc]
-										initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck"]
-										message: [NSString stringWithFormat:@"Please check the Deck ID and your network connection and try again."]
-										delegate: nil
-										cancelButtonTitle: @"OK"
-										otherButtonTitles: nil];
-		}
-		else
-		{
-			errorAlert =  [[UIAlertView alloc]
-										initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck"]
-										message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-										delegate: nil
-										cancelButtonTitle: @"OK"
-										otherButtonTitles: nil];
-			
-		}
+		errorAlert =  [[UIAlertView alloc]
+						initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck"]
+						message: [NSString stringWithFormat:@"Please check your network connection and try again."]
+						delegate: nil
+						cancelButtonTitle: @"OK"
+						otherButtonTitles: nil];
 		[errorAlert show];
 		[errorAlert release];	
 
@@ -539,19 +522,6 @@ sqlite3_stmt *addStmt;
 	currentText = [currentText stringByAppendingString:string];	
 }
 
-- (void)updateUIForParsingCompletion
-{
-	// decrement the busy count (for progress indicator management)
-	[ProgressViewController stopShowingProgress];
-	
-	// refresh the library
-	[[MyDecksViewController getMyDecksViewController] refreshTable];
-}
-
-- (void) finalizeStatements {
-	if(addStmt) sqlite3_finalize(addStmt);
-}
-
 -(void)removeDeckWithUserVisibleID:(int)aUserVisibleID
 {
 	// remove deck row from DB
@@ -574,6 +544,19 @@ sqlite3_stmt *addStmt;
 	
 	// refresh library
 	[[MyDecksViewController getMyDecksViewController] refreshTable];
+}
+
+- (void)updateUIForParsingCompletion
+{
+	// decrement the busy count (for progress indicator management)
+	[ProgressViewController stopShowingProgress];
+	
+	// refresh the library
+	[[MyDecksViewController getMyDecksViewController] refreshTable];
+}
+
+- (void) finalizeStatements {
+	if(addStmt) sqlite3_finalize(addStmt);
 }
 
 @end
