@@ -95,7 +95,7 @@ sqlite3_stmt *addStmt;
 	else // the server returned the deck summary information, so process this and then ask for the full deck
 	{
 		NSString *deckTitle = [[[rootElement elementsForName:@"title"] objectAtIndex:0] stringValue];
-		NSString *author = @"dummy_author";
+		NSString *author = [[[rootElement elementsForName:@"author"] objectAtIndex:0] stringValue];
 		int userVisibleID = [[[[[doc rootElement] elementsForName:@"user_visible_id"] objectAtIndex:0] stringValue] integerValue];
 		
 		// insert a Deck row into the db to represent the incoming deck
