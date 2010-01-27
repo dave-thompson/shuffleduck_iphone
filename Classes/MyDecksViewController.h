@@ -29,12 +29,13 @@
 - (void) refreshTable;
 - (void) updateTableSettingsBasedOnNumberOfDecks;
 - (void) retrieveLocalLibraryDetails;
-- (void) popDaughterScreen;
 - (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
 //-(IBAction)editTable:(id)sender;
 - (void) credentialsEntered;
-//- (void)pushCredentialsViewWithRequest:(ASIHTTPRequest *)request username:(NSString *)username;
 - (void) deckListRequestFailed:(ASIHTTPRequest *)request;
+- (IBAction)pushDownloadScreen:(id)sender;
+- (IBAction)syncDecksWithServer:(id)sender;
+
 
 @end

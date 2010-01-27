@@ -7,7 +7,6 @@
 //
 
 #import "StudyViewController.h"
-#import "RandomColor.h"
 #import "SideViewController.h"
 #import "CardViewController.h"
 #import "InlineScoreViewController.h"
@@ -40,6 +39,9 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 	// Test
 	int cardsCompleted;
 	int cardsCorrect;
+
+// Navigation Management
+BOOL didPushDaughterScreen = NO; // true iff a daughter screen is currently pushed to the view hierarchy
 
 CardViewController *topCardViewController, *bottomCardViewController;
 InlineScoreViewController *inlineScoreViewController;
@@ -110,37 +112,56 @@ InlineScoreViewController *inlineScoreViewController;
 	topCardViewController.view.backgroundColor = color;
 	bottomCardViewController.view.backgroundColor = color;
 	
-	//[self setBackgroundColor];	
+	//setup custom back button
+	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
+																		style:UIBarButtonItemStyleDone
+																	   target:nil
+																	   action:nil]; 
+	self.navigationItem.backBarButtonItem = backArrowButton;
+	[backArrowButton release];		
 	
+	//[self setBackgroundColor];	
+		
 	//call super
 	[super viewDidLoad];
 }
 
-
 - (void)viewWillAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
-	
+{	
 	// make status bar black
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
 
 	// make navigation bar black
 	UINavigationController *navController = [self navigationController];
-	navController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
+	navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+	
+	/*
+	// if popping up the navigation hierarchy, skip the study view controller
+	if (didPushDaughterScreen)
+	{
+		[self.navigationController popViewControllerAnimated:YES];
+		didPushDaughterScreen = NO;
+	}
+	 */
+	
+	[super viewWillAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
+/*
+-(void)viewDidAppear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
-	
-	// make status bar blue
-	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-	
-	// make navigation bar blue
-	UINavigationController *navController = [self navigationController];
-	navController.navigationBar.barStyle = UIBarStyleDefault;	
-}
+	[self.navigationController popViewControllerAnimated:YES];
 
+	// if popping up the navigation hierarchy, skip the study view controller
+	if (didPushDaughterScreen)
+	{
+		[self.navigationController popViewControllerAnimated:YES];
+		didPushDaughterScreen = NO;
+	}
+
+	[super viewDidAppear:animated];
+}
+*/
 -(void)setStudyType:(StudyType)studyType
 {
 	_studyType = studyType;
@@ -334,7 +355,7 @@ InlineScoreViewController *inlineScoreViewController;
 
 // ---- ACTION METHODS ------
 
-- (IBAction)bottomButtonClicked:(id)sender;
+- (IBAction)bottomButtonClicked:(id)sender
 {
 	if (_studyType == Test)
 	{
@@ -380,7 +401,9 @@ InlineScoreViewController *inlineScoreViewController;
 					finalScoreViewController.actualScore = cardsCorrect;
 					// push to stack
 					[self.navigationController pushViewController:finalScoreViewController animated:YES];
-					[finalScoreViewController release];				
+					[finalScoreViewController release];
+					// remember that the controller was pushed
+				didPushDaughterScreen = YES;
 			}
 			else // move to the next card
 			{

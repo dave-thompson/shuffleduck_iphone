@@ -42,33 +42,38 @@ static MyDecksViewController *myDecksViewController;
 	//setup custom back button
 	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
 																		style:UIBarButtonItemStyleDone
-																	   target:self
-																	   action:@selector(popDaughterScreen:)]; 
+																	   target:nil
+																	   action:nil];
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];
 	
-	// setup download button
-	UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithTitle:@"Download" style:UIBarButtonItemStyleBordered target:self action:@selector(pushDownloadScreen:)]; 
+	// setup feedback button
+	UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(pushFeedbackScreen:)]; 
 	self.navigationItem.rightBarButtonItem = downloadButton;
 	[downloadButton release];
 	
-	// setup sync button
-	UIBarButtonItem *syncButton = [[UIBarButtonItem alloc] initWithTitle:@"Sync" style:UIBarButtonItemStyleBordered target:self action:@selector(syncDecksWithServer:)]; 
-	self.navigationItem.leftBarButtonItem = syncButton;
-	[syncButton release];
-	
+	// Sync / Download Buttons
+	/*
+		// setup download button
+		UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(pushDownloadScreen:)]; 
+		self.navigationItem.rightBarButtonItem = downloadButton;
+		[downloadButton release];
+		
+		// setup sync button
+		UIBarButtonItem *syncButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(syncDecksWithServer:)]; 
+		self.navigationItem.leftBarButtonItem = syncButton;
+		[syncButton release];
+	*/
 	
 	// create table footer
 	tableFooterViewController = [[TableFooterViewController alloc] initWithNibName:@"TableFooterView" bundle:nil];
 	
-	/* RE-ORDERING DECKS DESCOPED
-	 // SEE http[colon]//adeem.me/blog/2009/05/29/iphone-sdk-tutorial-part-5-add-delete-reorder-uitableview-rows/
+	 // SEE http[colon]//adeem.me/blog/2009/05/29/iphone-sdk-tutorial-add-delete-reorder-uitableview-row/
 	 // POSSIBLE USE OF EDIT FUNCTIONALITY TO REPLACE DOWNLOAD BUTTON, WITH GREEN ADD ROW OPTION....
 	// setup edit button
 	UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editTable:)];
 	[self.navigationItem setLeftBarButtonItem:editButton];
 	[editButton release];
-	*/
 	
 	myDecksViewController = self;
 }
@@ -77,6 +82,13 @@ static MyDecksViewController *myDecksViewController;
 {	
 	// refresh table
 	[self refreshTable];
+	
+	// make status bar blue
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];
+	
+	// make navigation bar blue
+	UINavigationController *navController = [self navigationController];
+	navController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
 	
 	[super viewWillAppear:animated];
 }
@@ -90,12 +102,6 @@ static MyDecksViewController *myDecksViewController;
 	[libraryTableView reloadData];
 	[self updateTableSettingsBasedOnNumberOfDecks];
 }
-
--(void)popDaughterScreen
-{
-	[self.navigationController popViewControllerAnimated:YES];
-}
-
 
 #pragma mark -
 #pragma mark Table View Data Source Methods
@@ -201,7 +207,7 @@ static MyDecksViewController *myDecksViewController;
 #pragma mark -
 #pragma mark Table Edit Methods
 
-/*
+
 - (IBAction)editTable:(id)sender
 {
 	if(self.editing) // if already editing, quit
@@ -222,41 +228,103 @@ static MyDecksViewController *myDecksViewController;
 	}
 }
 
-// TO CO-EXIST WITH SWIPE DELETE, THIS MUST BE WRITTEN TO RETURN DELETE WHEN NOT EDITING AND NONE WHEN EDITING
-// (CHECK STATUS OF EDIT BUTTON TO DETERMINE)
-- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-	// just want to allow reordering - display no button on left
-	return UITableViewCellEditingStyleNone;
+- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if ([self.navigationItem.leftBarButtonItem.title isEqualToString:@"Done"]) // if currently editing, do not show Delete
+	{
+		return UITableViewCellEditingStyleNone;
+	}
+	else // otherwise - user has swiped - show delete
+	{
+		return UITableViewCellEditingStyleDelete;
+	}
 }
 
 
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	return YES;
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 {
-	// update database
-	// TO BE WRITTEN
-	
-	// update localLibraryDetails
-	NSString *item = [[localLibraryDetails objectAtIndex:fromIndexPath.row] retain];
-	[localLibraryDetails removeObject:item];
-	[localLibraryDetails insertObject:item atIndex:toIndexPath.row];
-	[item release];
+	int oldPosition = fromIndexPath.row + 1; // row is 0-based; DB positions are 1-based
+	int newPosition = toIndexPath.row + 1;
+
+	// Only process if deck was moved to a new position
+	if (oldPosition != newPosition)
+	{
+		// update database
+			DeckDetails *movedDeckDetails = [[localLibraryDetails objectAtIndex:fromIndexPath.row] retain];
+			int DBDeckID = movedDeckDetails.deckID;
+		
+			// find the DB position of the deck in the destination position (this is necessary as DB positions do not maintain sequential ordering following e.g. deck deletions)
+			const char *sqlStatement = "SELECT MAX(position) FROM (SELECT id, position FROM Deck ORDER BY position ASC LIMIT ?)";
+			sqlite3_stmt *compiledStatement;
+			if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+			{
+				sqlite3_bind_int(compiledStatement, 1, newPosition);
+				while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+				{
+					newPosition = (int)sqlite3_column_int(compiledStatement, 0);					
+				}
+			}
+		
+			// move all decks that weren't the deck explicitly moved
+			sqlite3_stmt *updateStmt = nil;
+			if(updateStmt == nil)
+			{
+				const char *sql;
+				if (newPosition > oldPosition)
+				{sql = "UPDATE Deck SET position = position-1 WHERE position > ? AND position <= ?";}
+				else
+				{sql = "UPDATE Deck SET position = position + 1 WHERE position < ? AND position >= ?";}
+				if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+			}
+			else
+			{
+				NSLog(@"Error: updatestmt not nil");
+			}
+			sqlite3_bind_int(updateStmt, 1, oldPosition);
+			sqlite3_bind_int(updateStmt, 2, newPosition);
+			if(SQLITE_DONE != sqlite3_step(updateStmt))
+			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg(database));}
+			sqlite3_reset(updateStmt);
+			updateStmt = nil;
+			
+			// move the deck explicitly moved
+			if(updateStmt == nil)
+			{
+				const char *sql;
+				sql = "UPDATE Deck SET position = ? WHERE id = ?";
+				if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+			}
+			else
+			{
+				NSLog(@"Error: updatestmt not nil");
+			}
+			sqlite3_bind_int(updateStmt, 1, newPosition);
+			sqlite3_bind_int(updateStmt, 2, DBDeckID);
+			if(SQLITE_DONE != sqlite3_step(updateStmt))
+			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg(database));}
+			sqlite3_reset(updateStmt);		
+			updateStmt = nil;
+		
+		// update localLibraryDetails
+			[localLibraryDetails removeObject:movedDeckDetails];
+			[localLibraryDetails insertObject:movedDeckDetails atIndex:toIndexPath.row];
+			[movedDeckDetails release];
+	}
 }
-*/
+
 
 #pragma mark -
 #pragma mark Row Deletion Methods
 
 -(void)tableView:(UITableView*)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath
 {
-}
-
-- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-	// just want to allow reordering - display no button on left
-	return UITableViewCellEditingStyleDelete;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -268,14 +336,14 @@ static MyDecksViewController *myDecksViewController;
 		uint rowIndex = [indexPath row];
 		DeckDetails *deckDetailsForDeletion = (DeckDetails *)[localLibraryDetails objectAtIndex:(rowIndex)];
 		uint deckIDToDelete = deckDetailsForDeletion.deckID;
-		
+
 		// delete the deck from localLibraryDetails (which feeds the table)
 		[localLibraryDetails removeObjectAtIndex:rowIndex];
 		
-		// delete the deck from the database (DB cascades deletions and updates positions)
+		// delete the deck from the database (DB cascades deletions)
 		NSString *deletionString = [NSString stringWithFormat:@"DELETE FROM Deck WHERE id = %d", deckIDToDelete];
 		[self runDeletionWithSQL:deletionString];
-		
+				
 		// Animate the deletion from the table.
 		[libraryTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
 		
@@ -287,6 +355,10 @@ static MyDecksViewController *myDecksViewController;
 
 #pragma mark -
 #pragma mark Action Methods
+
+-(void)pushFeedbackScreen:(id)sender
+{
+}
 
 - (IBAction)pushDownloadScreen:(id)sender
 {

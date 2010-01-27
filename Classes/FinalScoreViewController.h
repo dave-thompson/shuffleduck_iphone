@@ -20,7 +20,7 @@
 	int potentialScore;
 }
 
--(IBAction)studyButtonClicked:(id)sender;
+-(void)studyButtonPressed:(id)sender;
 
 @property (nonatomic, assign) int percent;
 @property (nonatomic, assign) int actualScore;

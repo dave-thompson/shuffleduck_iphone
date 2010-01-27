@@ -53,21 +53,13 @@ SideViewController *miniSideViewController;
 
 - (void)viewDidLoad
 {
-	[super viewDidLoad];
-
-	// set up background color
-	// UIColor *color = [[VariableStore sharedInstance] backgroundColor];	
-	// super.view.backgroundColor = color;	
-	
 	//setup custom back button
-	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
-																		style:UIBarButtonItemStyleDone
-																	   target:self
-																	   action:@selector(popDaughterScreen:)]; 
+	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];	
-}
 
+	[super viewDidLoad];
+}
 
 
 - (void)viewWillAppear:(BOOL)animated
@@ -103,7 +95,14 @@ SideViewController *miniSideViewController;
 	else
 	{
 		unshuffleButton.enabled = NO;
-	}	
+	}
+	
+	// make status bar blue
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];
+	
+	// make navigation bar blue
+	UINavigationController *navController = [self navigationController];
+	navController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
 }
 
 
