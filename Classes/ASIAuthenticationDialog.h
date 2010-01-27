@@ -14,14 +14,16 @@
 	id delegate;
 	UIActionSheet *loginDialog;
 	NSString *username;
+	BOOL repeatAttempt;
 }
 
 @property (retain) ASIHTTPRequest *request;
 @property (nonatomic, assign) id delegate;
 @property (retain) UIActionSheet *loginDialog;
 @property (retain) NSString *username;
+@property (nonatomic, assign) BOOL repeatAttempt;
 
-+ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername;
++ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername repeatAttempt:(BOOL)aRepeatAttempt;
 
 @end
 

@@ -19,7 +19,7 @@
 
 @synthesize database;
 
-NSString *xmlFileName = @"xmlFile.xml";
+//NSString *xmlFileName = @"xmlFile.xml";
 
 BOOL inCardsDefinition; // is XML parser currently looking at cards (rather than template)
 

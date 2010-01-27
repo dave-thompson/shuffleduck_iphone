@@ -21,6 +21,7 @@
 - (void) copyDatabaseIfNeeded;
 - (void) connectToDBAndRetrieveState;
 - (NSString *)getDBPath;
+- (void) connectToDBAndRetrieveState;
+- (void) processUserDefaults;
 
 @end
-

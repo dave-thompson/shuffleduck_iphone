@@ -18,6 +18,7 @@
 #import "ProgressViewController.h"
 #import "Constants.h"
 #import "ASIAuthenticationDialog.h"
+#import "MindEggUtilities.h"
 
 @implementation MyDecksViewController
 
@@ -319,24 +320,10 @@ static MyDecksViewController *myDecksViewController;
 	}
 	else // no credentials exist, so ask for them
 	{
-		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@""];
-		
+		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@"" repeatAttempt:NO];		
 		//[ASIAuthenticationDialog performSelectorOnMainThread:@selector(presentAuthenticationDialogForRequest:) withObject:self waitUntilDone:[NSThread isMainThread]];
-		//[self pushCredentialsViewWithRequest:request username:@""];
 	}
 }
-
-/*
-- (void)pushCredentialsViewWithRequest:(ASIHTTPRequest *)request username:(NSString *)username
-{
-	// push a modal credentials view controller from the bottom
-	CredentialsViewController *credentialsViewController = [[CredentialsViewController alloc] initWithNibName:@"CredentialsView" delegate:self forASIHTTPRequest:request bundle:nil];
-	credentialsViewController.title = @"mindegg.com";
-	credentialsViewController.hidesBottomBarWhenPushed = YES;
-	[self.navigationController presentModalViewController:credentialsViewController animated:YES];		
-	[credentialsViewController release];	
-}
-*/
 
 - (void) credentialsEntered
 {
@@ -355,19 +342,22 @@ static MyDecksViewController *myDecksViewController;
 	DDXMLElement *rootElement = [doc rootElement];
 	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error...
 	{
+		// remove busy indicator
+		[ProgressViewController stopShowingProgress];		
+		
 		// what are the specifics of the failure?
-		BOOL userRecognised = [[[rootElement elementsForName:@"logon_succeeded"] objectAtIndex:0] boolValue];
+		BOOL userRecognised = [[[[rootElement elementsForName:@"logon_succeeded"] objectAtIndex:0] stringValue] boolValue];
 		NSString *username = [request.userInfo valueForKey:@"username"];
-		// tell the user
-		NSString *errorDescription = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
-		UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:[ERROR_DIALOG_TITLE copy] message:errorDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-		[errorAlert show];
 		
 		// if the error was due to a failed logon, show the credentials dialog
 		if (!(userRecognised))
 		{
-			[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:username];
-			//[self pushCredentialsViewWithRequest:request username:username];
+			[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:username repeatAttempt:YES];
+		}
+		else // otherwise, just notify the user of the failure
+		{
+			NSString *error_description = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
+			[MindEggUtilities mindEggErrorAlertWithMessage:error_description];
 		}
 	}
 	else // the server returned the deck summary information, so process this and then ask for the full deck

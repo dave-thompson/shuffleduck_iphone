@@ -6,6 +6,7 @@
 //  Copyright 2009 All-Seeing Interactive. All rights reserved.
 //
 //	Modified by Dave Thompson on 26/01/2010
+//  Modifications copyright 2009 MindEgg Ltd. All rights reserved.
 
 #import "ASIAuthenticationDialog.h"
 #import "ASIHTTPRequest.h"
@@ -26,7 +27,7 @@ NSLock *dialogLock = nil;
 	}
 }
 
-+ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername
++ (void)presentAuthenticationDialogForRequest:(ASIHTTPRequest *)request delegate:(id)aDelegate username:(NSString *)aUsername repeatAttempt:(BOOL)aRepeatAttempt
 {
 	[dialogLock lock];
 	[sharedDialog release];
@@ -34,6 +35,7 @@ NSLock *dialogLock = nil;
 	[sharedDialog setRequest:request];
 	sharedDialog.delegate = aDelegate;
 	sharedDialog.username = aUsername;
+	sharedDialog.repeatAttempt = aRepeatAttempt;
 	[sharedDialog show];
 	[dialogLock unlock];
 }
@@ -56,14 +58,24 @@ NSLock *dialogLock = nil;
 	// Setup the title (Couldn't figure out how to put this in the same toolbar as the buttons)
 	UIToolbar *titleBar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0,0,320,30)] autorelease];
 	UILabel *label = [[[UILabel alloc] initWithFrame:CGRectMake(10,0,300,30)] autorelease];
-	[label setText:@"Go to mindegg.com to create cards."];
-	[label setTextColor:[UIColor blackColor]];
+	[label setBackgroundColor:nil];
 	[label setFont:[UIFont systemFontOfSize:13.0]];
-	[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5]];
 	[label setShadowOffset:CGSizeMake(0, 1.0)];
 	[label setOpaque:NO];
-	[label setBackgroundColor:nil];
 	[label setTextAlignment:UITextAlignmentCenter];
+	if (repeatAttempt)
+	{
+		[titleBar setTintColor: [UIColor redColor]];
+		[label setTextColor:[UIColor whiteColor]];
+		[label setText:@"Couldn't log you on. Please try again."];
+		[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.0]];
+	}
+	else
+	{
+		[label setTextColor:[UIColor blackColor]];
+		[label setText:@"Go to mindegg.com to create cards."];
+		[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5]];
+	}
 	
 	[titleBar addSubview:label];
 	[[self loginDialog] addSubview:titleBar];
@@ -113,7 +125,7 @@ NSLock *dialogLock = nil;
 	NSString *password = [[[[[[[self loginDialog] subviews] objectAtIndex:0] cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]] subviews] objectAtIndex:2] text];
 	NSURLCredential *credential = [NSURLCredential credentialWithUser:user password:password persistence:NSURLCredentialPersistencePermanent];
 	[ASIHTTPRequest saveCredentials:credential forHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
-		
+	
 	//[[self request] setUsername:username];
 	//[[self request] setPassword:password];
 	
@@ -174,6 +186,7 @@ NSLock *dialogLock = nil;
 	[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
 	UITextField *textField = [[[UITextField alloc] initWithFrame:CGRectMake(20,12,260,25)] autorelease];
 	[textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
+	[textField setAutocorrectionType:UITextAutocorrectionTypeNo];
 	if ([indexPath section] == 0)
 	{
 		[textField setPlaceholder:@"Username"];
@@ -212,4 +225,5 @@ NSLock *dialogLock = nil;
 @synthesize delegate;
 @synthesize username;
 @synthesize loginDialog;
+@synthesize repeatAttempt;
 @end

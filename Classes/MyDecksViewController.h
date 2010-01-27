@@ -13,7 +13,6 @@
 #import "StudyViewController.h"
 #import "DeckDetailViewController.h"
 #import "TableFooterViewController.h"
-#import "CredentialsViewController.h"
 
 @interface MyDecksViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
 	NSMutableArray *localLibraryDetails;

@@ -36,6 +36,7 @@
 		552694070FDA6943003CECEF /* DeckDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = 552694060FDA6943003CECEF /* DeckDetails.m */; };
 		552A5A2710DBF39E00A8264B /* FinalScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 552A5A2510DBF39E00A8264B /* FinalScoreViewController.m */; };
 		552A5A2810DBF39E00A8264B /* FinalScoreView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 552A5A2610DBF39E00A8264B /* FinalScoreView.xib */; };
+		552BB678110FBA4000793DE3 /* MindEggUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 552BB677110FBA4000793DE3 /* MindEggUtilities.m */; };
 		553A8E101010F59A00496BE5 /* Deck.m in Sources */ = {isa = PBXBuildFile; fileRef = 553A8E0F1010F59A00496BE5 /* Deck.m */; };
 		555D1AD7108409990041DB21 /* TableFooterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 555D1AD6108409990041DB21 /* TableFooterViewController.m */; };
 		555D1ADB108409AF0041DB21 /* TableFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 555D1ADA108409AF0041DB21 /* TableFooterView.xib */; };
@@ -63,7 +64,6 @@
 		5591B30F0FD62614000BECF8 /* study.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30E0FD62614000BECF8 /* study.png */; };
 		5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5591B4F20FD653BD000BECF8 /* DownloadView.xib */; };
 		5591B5180FD77759000BECF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5591B5170FD77759000BECF8 /* Settings.bundle */; };
-		55BEC4D40FAD3C640096FC1E /* RandomColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 55BEC4D30FAD3C640096FC1E /* RandomColor.m */; };
 		55CD3CB30FDC1AC100C4ECB2 /* SideView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */; };
 		55CD3CCB0FDC32CA00C4ECB2 /* SideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */; };
 		55CD3EE90FDC593A00C4ECB2 /* CardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3EE80FDC593A00C4ECB2 /* CardViewController.m */; };
@@ -127,6 +127,8 @@
 		552A5A2410DBF39E00A8264B /* FinalScoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FinalScoreViewController.h; sourceTree = "<group>"; };
 		552A5A2510DBF39E00A8264B /* FinalScoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FinalScoreViewController.m; sourceTree = "<group>"; };
 		552A5A2610DBF39E00A8264B /* FinalScoreView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = FinalScoreView.xib; path = Classes/FinalScoreView.xib; sourceTree = "<group>"; };
+		552BB676110FBA4000793DE3 /* MindEggUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MindEggUtilities.h; sourceTree = "<group>"; };
+		552BB677110FBA4000793DE3 /* MindEggUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MindEggUtilities.m; sourceTree = "<group>"; };
 		553A8E0E1010F59A00496BE5 /* Deck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Deck.h; sourceTree = "<group>"; };
 		553A8E0F1010F59A00496BE5 /* Deck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Deck.m; sourceTree = "<group>"; };
 		555D1AD5108409990041DB21 /* TableFooterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableFooterViewController.h; sourceTree = "<group>"; };
@@ -167,8 +169,6 @@
 		5591B30E0FD62614000BECF8 /* study.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = study.png; sourceTree = "<group>"; };
 		5591B4F20FD653BD000BECF8 /* DownloadView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadView.xib; sourceTree = "<group>"; };
 		5591B5170FD77759000BECF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		55BEC4D20FAD3C640096FC1E /* RandomColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RandomColor.h; sourceTree = "<group>"; };
-		55BEC4D30FAD3C640096FC1E /* RandomColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RandomColor.m; sourceTree = "<group>"; };
 		55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideView.xib; sourceTree = "<group>"; };
 		55CD3CC90FDC32CA00C4ECB2 /* SideViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SideViewController.h; sourceTree = "<group>"; };
 		55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SideViewController.m; sourceTree = "<group>"; };
@@ -394,10 +394,10 @@
 			children = (
 				55CFB05810814B03002FF68D /* VariableStore.h */,
 				55CFB05910814B03002FF68D /* VariableStore.m */,
-				55BEC4D20FAD3C640096FC1E /* RandomColor.h */,
-				55BEC4D30FAD3C640096FC1E /* RandomColor.m */,
 				551C75BE110E3EC90031530F /* Constants.h */,
 				551C75BF110E3EC90031530F /* Constants.m */,
+				552BB676110FBA4000793DE3 /* MindEggUtilities.h */,
+				552BB677110FBA4000793DE3 /* MindEggUtilities.m */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -568,7 +568,6 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* MindEggAppDelegate.m in Sources */,
 				28D7ACF80DDB3853001CB0EB /* StudyViewController.m in Sources */,
-				55BEC4D40FAD3C640096FC1E /* RandomColor.m in Sources */,
 				556138340FAEDECC00365DF1 /* MyDecksViewController.m in Sources */,
 				556138370FAEDEFC00365DF1 /* DownloadViewController.m in Sources */,
 				552694070FDA6943003CECEF /* DeckDetails.m in Sources */,
@@ -598,6 +597,7 @@
 				5576B11810FC8A1D00306F4C /* DDXMLDocument.m in Sources */,
 				55814A9410FE483D00B2A625 /* ProgressViewController.m in Sources */,
 				551C75C0110E3EC90031530F /* Constants.m in Sources */,
+				552BB678110FBA4000793DE3 /* MindEggUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

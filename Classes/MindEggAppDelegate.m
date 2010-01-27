@@ -12,6 +12,7 @@
 #import "DownloadViewController.h"
 #import "FeedbackViewController.h"
 #import "ReviseViewController.h"
+#import "Constants.h"
 
 @implementation MindEggAppDelegate
 
@@ -25,6 +26,9 @@ UINavigationController *libraryNavController;
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
 	
 	[application setStatusBarStyle:UIStatusBarStyleDefault];
+	
+	// process and defaults the user has set in the settings application
+	[self processUserDefaults];
 	
 	// open DB connection and retrieve state data
 	[self connectToDBAndRetrieveState];
@@ -81,6 +85,22 @@ UINavigationController *libraryNavController;
 	
 	// retrieve application state from DB
 		// Currently no state other than color, which is loaded from the DB locally by the respective view controllers
+}
+
+- (void) processUserDefaults
+{
+	// remove the user's credentials from the keychain if the user has asked to reset them
+	BOOL resetAccount = [[[NSUserDefaults standardUserDefaults] objectForKey:@"resetAccount"] boolValue];
+	if (resetAccount)
+	{
+		// create a dummy request to identify the credentials' location in the keychain
+		NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
+		ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+		// remove the credentials
+		[ASIHTTPRequest removeCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
+		// reset the user defaults so that we don't do this again next time - unless the user specifically asks us to again
+		[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"resetAccount"];
+	}
 }
 
 - (void) copyDatabaseIfNeeded
