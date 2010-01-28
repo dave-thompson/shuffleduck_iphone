@@ -7,6 +7,8 @@
 //
 
 #import "LibraryCell.h"
+#import "Constants.h"
+#import "VariableStore.h"
 
 @implementation LibraryCell
 
@@ -41,8 +43,8 @@
 		deckTitle.textColor = [UIColor blackColor];
 		unknownDescriptionLabel.textColor = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.) alpha:1.0]; // #878787 (grey)
 		knownDescriptionLabel.textColor = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.) alpha:1.0]; // #878787 (grey)
-		known.textColor = [UIColor colorWithRed:(0/255.0) green:(115/255.0) blue:(2/255.) alpha:1.0]; // #007302 (green)
-		unknown.textColor = [UIColor colorWithRed:(255/255.0) green:(43/255.0) blue:(10/255.) alpha:1.0]; // #FF2B0A (red)		
+		known.textColor = [[VariableStore sharedInstance] mindeggGreen];
+		unknown.textColor = [[VariableStore sharedInstance] mindeggRed];
 	}
 	 
 }

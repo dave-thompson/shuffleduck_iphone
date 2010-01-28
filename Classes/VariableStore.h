@@ -12,10 +12,14 @@
 @interface VariableStore : NSObject
 {
 	UIColor *backgroundColor;
+	UIColor *mindeggGreen;
+	UIColor *mindeggRed;
 	NSString *contextURL;
 }
 
 @property (nonatomic, retain) UIColor *backgroundColor;
+@property (nonatomic, retain) UIColor *mindeggGreen;
+@property (nonatomic, retain) UIColor *mindeggRed;
 @property (nonatomic, retain) NSString *contextURL;
 
 + (VariableStore *)sharedInstance;

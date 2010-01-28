@@ -8,6 +8,8 @@
 
 #import "Constants.h"
 
+#define __IPHONE_3_0 30000
+
 
 @implementation Constants
 

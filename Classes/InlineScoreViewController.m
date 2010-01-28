@@ -11,16 +11,7 @@
 
 @implementation InlineScoreViewController
 
--(void)setTopLabelText:(NSString *)labelText
-{
-	topLabel.text = labelText;
-}
-
--(void)setBottomLabelText:(NSString *)labelText
-{
-	bottomLabel.text = labelText;
-}
-
+@synthesize topMultipartLabel, bottomMultipartLabel;
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.

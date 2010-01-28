@@ -12,6 +12,7 @@
 #import "InlineScoreViewController.h"
 #import "VariableStore.h"
 #import "FinalScoreViewController.h"
+#import "Constants.h"
 
 @implementation StudyViewController
 
@@ -78,6 +79,7 @@ InlineScoreViewController *inlineScoreViewController;
 	
 	// Set up the inline score view
 	inlineScoreViewController = [[InlineScoreViewController alloc] initWithNibName:@"InlineScoreView" bundle:nil];
+	//self.navigationItem.titleView = inlineScoreViewController.view;
 	UIBarButtonItem *scoreBarButton = [[UIBarButtonItem alloc] initWithCustomView:inlineScoreViewController.view];
 	self.navigationItem.rightBarButtonItem = scoreBarButton; 
 	[scoreBarButton release];
@@ -433,13 +435,26 @@ InlineScoreViewController *inlineScoreViewController;
 {
 	if (_studyType == Learn)
 	{
-		[inlineScoreViewController setTopLabelText:[NSString stringWithFormat: @"Known: %d", cardsKnown]];
-		[inlineScoreViewController setBottomLabelText:[NSString stringWithFormat: @"Left:  %d", numCards - cardsKnown]];	
+		// top label
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:2];
+		[[inlineScoreViewController topMultipartLabel] setText:@"Unknown:  " andColor:[UIColor whiteColor] forLabel:0];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", numCards - cardsKnown] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
+		
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:2];
+		[[inlineScoreViewController bottomMultipartLabel] setText:@"Known:  " andColor:[UIColor whiteColor] forLabel:0];
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsKnown] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];		
 	}
 	else // is a test
 	{
-		[inlineScoreViewController setTopLabelText:[NSString stringWithFormat: @"%d / %d", cardsCorrect, cardsCompleted]];
-		[inlineScoreViewController setBottomLabelText:[NSString stringWithFormat: @"(%d left)", numCards - cardsCompleted]];
+		// top label
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:3];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0];
+		[[inlineScoreViewController topMultipartLabel] setText:@" | " andColor:[UIColor whiteColor] forLabel:1];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCompleted - cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:2];
+		
+		// bottom label
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1];
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"(%d left)", numCards - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
 	}
 }
 

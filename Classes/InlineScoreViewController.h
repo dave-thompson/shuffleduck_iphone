@@ -7,16 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "MultipartLabel.h"
 
 @interface InlineScoreViewController : UIViewController {
 
-	IBOutlet UILabel *topLabel;
-	IBOutlet UILabel *bottomLabel;
-	
+	IBOutlet MultipartLabel *topMultipartLabel;
+	IBOutlet MultipartLabel *bottomMultipartLabel;
 }
 
--(void)setTopLabelText:(NSString *)labelText;
--(void)setBottomLabelText:(NSString *)labelText;
+@property (nonatomic, retain) MultipartLabel *topMultipartLabel;
+@property (nonatomic, retain) MultipartLabel *bottomMultipartLabel;
 
 @end

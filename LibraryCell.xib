@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="3"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -81,7 +81,7 @@
 									<object class="IBUILabel" id="450998264">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{114, 25}, {52, 21}}</string>
+										<string key="NSFrame">{{114, 40}, {52, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
@@ -115,7 +115,7 @@
 									<object class="IBUILabel" id="1033104605">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{113, 40}, {54, 21}}</string>
+										<string key="NSFrame">{{114, 25}, {54, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
@@ -134,13 +134,13 @@
 									<object class="IBUILabel" id="742116780">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{174, 25}, {32, 21}}</string>
+										<string key="NSFrame">{{174, 40}, {32, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
 										<int key="IBUIContentMode">9</int>
 										<bool key="IBUIUserInteractionEnabled">NO</bool>
-										<string key="IBUIText">999</string>
+										<string key="IBUIText">888</string>
 										<reference key="IBUIFont" ref="1073345691"/>
 										<object class="NSColor" key="IBUITextColor">
 											<int key="NSColorSpace">1</int>
@@ -154,7 +154,7 @@
 									<object class="IBUILabel" id="719272129">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{174, 40}, {32, 21}}</string>
+										<string key="NSFrame">{{174, 25}, {32, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
