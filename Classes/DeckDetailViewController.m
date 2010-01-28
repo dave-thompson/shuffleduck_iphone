@@ -70,6 +70,10 @@ SideViewController *miniSideViewController;
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];	
 
+	// set numbers to standard colours
+	knownCardsLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
+	unknownCardsLabel.textColor = [[VariableStore sharedInstance] mindeggRed];
+	
 	[super viewDidLoad];
 }
 

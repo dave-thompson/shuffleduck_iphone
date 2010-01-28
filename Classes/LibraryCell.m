@@ -15,8 +15,11 @@
 @synthesize deckTitle, miniCardView, known, unknown, miniCardViewController, knownDescriptionLabel, unknownDescriptionLabel, mainView;
 
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
-    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
-        // Initialization code
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier])
+	{
+        // set up colours
+		unknownDescriptionLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
+		knownDescriptionLabel.textColor = [[VariableStore sharedInstance] mindeggRed];
     }
     return self;
 }
