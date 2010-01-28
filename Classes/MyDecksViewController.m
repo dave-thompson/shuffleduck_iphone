@@ -132,8 +132,8 @@ static MyDecksViewController *myDecksViewController;
 	DeckDetails *currentCellDeck = (DeckDetails *)[localLibraryDetails objectAtIndex:(row)];
 	
 	cell.deckTitle.text = currentCellDeck.title;
-	cell.subTitle.text = [NSString stringWithFormat: @"Cards: %d   Unknown: %d", currentCellDeck.numCards, currentCellDeck.numCards - currentCellDeck.numKnownCards];
-
+	cell.known.text = [NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards];
+	cell.unknown.text = [NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards];	
 	SideViewController *miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;
 	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
