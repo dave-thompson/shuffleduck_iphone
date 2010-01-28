@@ -7,6 +7,7 @@
 //
 
 #import "FinalScoreViewController.h"
+#import "MindEggAppDelegate.h"
 
 
 @implementation FinalScoreViewController
@@ -36,9 +37,8 @@
 
 -(void)studyButtonPressed:(id)sender
 {
-	[self.navigationController popViewControllerAnimated:YES];
-	[self.navigationController popViewControllerAnimated:YES];
-	[self.navigationController popViewControllerAnimated:YES];
+	MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
+	[appDelegate closeFinalScoreView];
 }
 
 - (void)viewWillAppear:(BOOL)animated

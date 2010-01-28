@@ -73,7 +73,7 @@ NSLock *dialogLock = nil;
 	else
 	{
 		[label setTextColor:[UIColor blackColor]];
-		[label setText:@"Go to mindegg.com to create cards."];
+		[label setText:@"Create cards and an account on mindegg.com."];
 		[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5]];
 	}
 	

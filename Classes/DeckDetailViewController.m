@@ -7,7 +7,6 @@
 //
 
 #import "DeckDetailViewController.h"
-#import "StudyViewController.h"
 #import "VariableStore.h"
 #import "SideViewController.h"
 
@@ -31,15 +30,28 @@ SideViewController *miniSideViewController;
 
 -(IBAction)testButtonClicked:(id)sender
 {
-	// Push a study view controller (referencing the deck object) onto the navigation stack
+	[self pushStudyViewController:Test];	
+}
+
+-(IBAction)studyButtonClicked:(id)sender
+{
+	[self pushStudyViewController:Learn];	
+}
+
+-(void)pushStudyViewController:(StudyType)type
+{
+	// Prepare a study view controller (referencing the new deck object)
 	StudyViewController *studyViewController = [[StudyViewController alloc] initWithNibName:@"StudyView" bundle:nil];
 	studyViewController.title = @"";
 	studyViewController.deck = deck;
 	studyViewController.database = database;
-	[studyViewController setStudyType:Test];
+	[studyViewController setStudyType:type];
 	studyViewController.hidesBottomBarWhenPushed = YES;
 	
+	// Push the study view controller onto the navigation stack
 	[self.navigationController pushViewController:studyViewController animated:YES];
+	
+	// release allocated objects
 	[studyViewController release];
 }
 

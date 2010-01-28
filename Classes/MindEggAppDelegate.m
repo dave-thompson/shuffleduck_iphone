@@ -69,6 +69,12 @@ UINavigationController *libraryNavController;
 	[myDecksViewController release];	
 }
 
+-(void)closeFinalScoreView
+{
+	[libraryNavController popViewControllerAnimated:NO];
+	[libraryNavController popViewControllerAnimated:NO];
+	[libraryNavController popViewControllerAnimated:NO];	
+}
 
 - (void) connectToDBAndRetrieveState
 {

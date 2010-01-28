@@ -23,5 +23,6 @@
 - (NSString *)getDBPath;
 - (void) connectToDBAndRetrieveState;
 - (void) processUserDefaults;
+-(void)closeFinalScoreView;
 
 @end

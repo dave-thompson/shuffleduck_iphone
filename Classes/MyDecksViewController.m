@@ -106,6 +106,12 @@ static MyDecksViewController *myDecksViewController;
 #pragma mark -
 #pragma mark Table View Data Source Methods
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+	int numberOfRows = [self numDecks];
+	return numberOfRows;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	static NSString *libraryCellIdentifier = @"LibraryCell";
@@ -139,13 +145,6 @@ static MyDecksViewController *myDecksViewController;
 	return cell;
 }
 
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-	int numberOfRows = [self numDecks];
-	return numberOfRows;
-}
-
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	// return same height as that of LibraryCell...
@@ -153,34 +152,12 @@ static MyDecksViewController *myDecksViewController;
 	return 65;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+-(BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	// find the DB deck id for the selected row
-	int selectedDeckIndex = [indexPath indexAtPosition:([indexPath length]-1)];
-	DeckDetails* selectedDeckDetails = [localLibraryDetails objectAtIndex:selectedDeckIndex];
-	int DBDeckID = selectedDeckDetails.deckID;
-	
-	// instantiate a deck object for this deck ID
-	Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID Database:database includeKnownCards:NO];
-	
-	// Prepare a study view controller (referencing the new deck object)
-	StudyViewController *studyViewController = [[StudyViewController alloc] initWithNibName:@"StudyView" bundle:nil];
-	studyViewController.title = @"";
-	studyViewController.deck = deck;
-	studyViewController.database = database;
-	[studyViewController setStudyType:Learn];
-	studyViewController.hidesBottomBarWhenPushed = YES;
-	
-	// Push the study view controller onto the navigation stack
-	[self.navigationController pushViewController:studyViewController animated:YES];
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-	
-	// release allocated objects
-	[studyViewController release];
-	[deck release];
+	return NO;
 }
 
-- (void) tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	// find the DB deck id for the selected row
 	int selectedDeckIndex = [indexPath indexAtPosition:([indexPath length]-1)];
@@ -200,9 +177,8 @@ static MyDecksViewController *myDecksViewController;
 	deckDetailViewController.database = database;
 	[self.navigationController pushViewController:deckDetailViewController animated:YES];	
 	
-	[deck release];
+	[deck release];	
 }
-
 
 #pragma mark -
 #pragma mark Table Edit Methods

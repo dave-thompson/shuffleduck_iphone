@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "sqlite3.h"
 #import "Deck.h"
-
+#import "StudyViewController.h"
 
 @interface DeckDetailViewController : UIViewController {
 
@@ -34,5 +34,7 @@
 -(IBAction)shuffleButtonClicked:(id)sender;
 -(IBAction)unshuffleButtonClicked:(id)sender;
 -(IBAction)testButtonClicked:(id)sender;
+-(IBAction)studyButtonClicked:(id)sender;
+-(void)pushStudyViewController:(StudyType)type;
 
 @end
