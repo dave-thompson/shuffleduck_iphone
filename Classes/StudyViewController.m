@@ -12,6 +12,7 @@
 #import "InlineScoreViewController.h"
 #import "VariableStore.h"
 #import "FinalScoreViewController.h"
+#import "CongratulationsViewController.h"
 #import "Constants.h"
 
 static StudyViewController *sharedStudyViewController = nil;
@@ -163,6 +164,23 @@ InlineScoreViewController *inlineScoreViewController;
 	[self showNewCard];	
 	
 	[super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	
+	// eliminate any view controllers that are on the stack between this one and the DeckDetail view controller
+	NSArray *oldVCArray = [self navigationController].viewControllers;
+	NSMutableArray *newVCArray = [[NSMutableArray alloc] init];
+	for (UIViewController *vc in oldVCArray)
+	{
+		if ((!(vc == [FinalScoreViewController sharedInstance])) && (!(vc == [CongratulationsViewController sharedInstance])))
+		{
+			[newVCArray addObject:vc];
+		}
+	}
+	[self navigationController].viewControllers = newVCArray;
 }
 
 -(void)setStudyType:(StudyType)studyType
@@ -401,7 +419,6 @@ InlineScoreViewController *inlineScoreViewController;
 					finalScoreViewController.correctScore = cardsCorrect;
 					// push to stack
 					[self.navigationController pushViewController:finalScoreViewController animated:YES];
-					[finalScoreViewController release];
 			}
 			else // move to the next card
 			{
@@ -423,6 +440,18 @@ InlineScoreViewController *inlineScoreViewController;
 		
 		// update score display
 		[self updateInlineScore];
+		
+		if (cardsKnown == numCards) // if all cards have been tested
+		{
+			// Push the CongratulationsViewController onto the navigation stack
+				CongratulationsViewController *congratulationsViewController = [CongratulationsViewController sharedInstance];
+				// set the scores
+				congratulationsViewController.totalCards = numCards;
+				// push to stack
+				[self.navigationController pushViewController:congratulationsViewController animated:YES];
+		}
+		
+		
 	}
 }
 

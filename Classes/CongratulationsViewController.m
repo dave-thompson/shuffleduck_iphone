@@ -1,32 +1,34 @@
 //
-//  FinalScoreViewController.m
+//  CongratulationsViewController.m
 //  MindEgg
 //
-//  Created by Dave Thompson on 12/18/09.
-//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//  Created by Dave Thompson on 01/29/10.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "FinalScoreViewController.h"
+#import "CongratulationsViewController.h"
 #import "MindEggAppDelegate.h"
+#import "StudyViewController.h"
 #import "VariableStore.h"
+#import "DeckDetailViewController.h"
 
-static FinalScoreViewController *sharedFinalScoreViewController = nil;
+static CongratulationsViewController *sharedCongratulationsViewController = nil;
 
-@implementation FinalScoreViewController
+@implementation CongratulationsViewController
 
-@synthesize percent, correctScore, incorrectScore;
+@synthesize totalCards;
 
 // manage the shared instance of this singleton View Controller
-+ (FinalScoreViewController *)sharedInstance
++ (CongratulationsViewController *)sharedInstance
 {
 	@synchronized(self)
 	{
-		if (!sharedFinalScoreViewController)
+		if (!sharedCongratulationsViewController)
 		{
-			sharedFinalScoreViewController = [[[self class] alloc] initWithNibName:@"FinalScoreView" bundle:nil];
+			sharedCongratulationsViewController = [[[self class] alloc] initWithNibName:@"CongratulationsView" bundle:nil];
 		}
 	}
-    return sharedFinalScoreViewController;
+    return sharedCongratulationsViewController;
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -37,16 +39,15 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 	self.hidesBottomBarWhenPushed = YES;
 	
 	// set numbers to standard colours
-	correctScoreLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
-	incorrectScoreLabel.textColor = [[VariableStore sharedInstance] mindeggRed];	
+	totalCardsLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
 	
 	// call super
     [super viewDidLoad];
 }
 
--(IBAction)studyButtonPressed:(id)sender
+-(IBAction)testButtonPressed:(id)sender
 {
-	[[DeckDetailViewController sharedInstance] pushStudyViewController:Learn];
+	[[DeckDetailViewController sharedInstance] pushStudyViewController:Test];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -54,19 +55,7 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 	[super viewWillAppear:animated];
 	
 	// set up score labels
-	percentLabel.text = [NSString stringWithFormat: @"%d%%", percent];
-	correctScoreLabel.text = [NSString stringWithFormat: @"%d", correctScore];
-	incorrectScoreLabel.text = [NSString stringWithFormat: @"%d", incorrectScore];	
-	
-	// enable / disable Learn button
-	if (incorrectScore == 0)
-	{
-		learnButton.enabled = NO;
-	}
-	else
-	{
-		learnButton.enabled = YES;
-	}
+	totalCardsLabel.text = [NSString stringWithFormat: @"%d", totalCards];
 	
 	// make status bar blue
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];
@@ -97,9 +86,7 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 -(void)viewDidDisappear:(BOOL)animated
 {
 	// wipe score from screen
-	percentLabel.text = @"";
-	correctScoreLabel.text = @"";
-	incorrectScoreLabel.text = @"";
+	totalCardsLabel.text = @"";
 }
 
 - (void)didReceiveMemoryWarning {

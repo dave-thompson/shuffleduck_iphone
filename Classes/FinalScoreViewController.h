@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "StudyViewController.h"
+#import "DeckDetailViewController.h"
 
 
 @interface FinalScoreViewController : UIViewController
@@ -14,6 +16,8 @@
 	IBOutlet UILabel *percentLabel;
 	IBOutlet UILabel *correctScoreLabel;
 	IBOutlet UILabel *incorrectScoreLabel;
+	
+	IBOutlet UIButton *learnButton;
 	
 	int percent;
 	int correctScore;

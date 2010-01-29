@@ -130,7 +130,14 @@ SideViewController *miniSideViewController;
 	{
 		studyButton.enabled = YES;		
 	}
-	
+	if (numCards == 0)
+	{
+		testButton.enabled = NO;
+	}
+	else
+	{
+		testButton.enabled = YES;		
+	}
 	
 	// make status bar blue
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];

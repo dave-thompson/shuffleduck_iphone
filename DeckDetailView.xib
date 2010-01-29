@@ -8,7 +8,6 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -32,7 +31,7 @@
 				<string key="IBProxiedObjectIdentifier">IBFirstResponder</string>
 			</object>
 			<object class="IBUIView" id="191373211">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">292</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -80,7 +79,7 @@
 						<reference key="IBUIHighlightedTitleColor" ref="72989587"/>
 						<object class="NSColor" key="IBUIDisabledTitleColor">
 							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC41MjU0NDcwNyAwLjU2Mzk3MTIyIDAuNjU3NjA4NjkgMC41AA</bytes>
+							<bytes key="NSRGB">MC41MjE1Njg2NiAwLjU2MDc4NDM0IDAuNjU0OTAxOTgAA</bytes>
 						</object>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
@@ -105,6 +104,10 @@
 						<int key="IBUIButtonType">1</int>
 						<string key="IBUINormalTitle">Test</string>
 						<reference key="IBUIHighlightedTitleColor" ref="72989587"/>
+						<object class="NSColor" key="IBUIDisabledTitleColor">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MC41MjE1Njg2NiAwLjU2MDc4NDM0IDAuNjU0OTAxOTgAA</bytes>
+						</object>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
 							<bytes key="NSRGB">MC4xOTYwNzg0MyAwLjMwOTgwMzkzIDAuNTIxNTY4NjYAA</bytes>
@@ -385,6 +388,10 @@
 						<int key="IBUIButtonType">1</int>
 						<string key="IBUINormalTitle">Learn</string>
 						<reference key="IBUIHighlightedTitleColor" ref="72989587"/>
+						<object class="NSColor" key="IBUIDisabledTitleColor">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MC41MjE1Njg2NiAwLjU2MDc4NDM0IDAuNjU0OTAxOTgAA</bytes>
+						</object>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
 							<bytes key="NSRGB">MC4xOTYwNzg0MyAwLjMwOTgwMzkzIDAuNTIxNTY4NjYAA</bytes>
@@ -393,7 +400,6 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{320, 416}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">10</int>
 					<object class="NSImage" key="NSImage">
@@ -614,11 +620,19 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">testButton</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="517797619"/>
+					</object>
+					<int key="connectionID">45</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">studyButton</string>
 						<reference key="source" ref="372490531"/>
 						<reference key="destination" ref="263529383"/>
 					</object>
-					<int key="connectionID">44</int>
+					<int key="connectionID">46</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -792,7 +806,7 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>DeckDetailViewController</string>
 					<string>UIResponder</string>
-					<string>{{836, 320}, {320, 416}}</string>
+					<string>{{395, 242}, {320, 416}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -834,7 +848,7 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">44</int>
+			<int key="maxID">46</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -868,6 +882,7 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 							<string>firstCardView</string>
 							<string>knownCardsLabel</string>
 							<string>studyButton</string>
+							<string>testButton</string>
 							<string>titleLabel</string>
 							<string>totalCardsLabel</string>
 							<string>unknownCardsLabel</string>
@@ -879,6 +894,7 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 							<string>UILabel</string>
 							<string>UIView</string>
 							<string>UILabel</string>
+							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UILabel</string>
 							<string>UILabel</string>

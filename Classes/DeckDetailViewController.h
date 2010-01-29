@@ -15,6 +15,7 @@
 
 	IBOutlet UIButton *unshuffleButton;
 	IBOutlet UIButton *studyButton;
+	IBOutlet UIButton *testButton;
 	
 	IBOutlet UILabel *titleLabel;
 	IBOutlet UILabel *totalCardsLabel;	
