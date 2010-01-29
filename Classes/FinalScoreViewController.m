@@ -12,30 +12,21 @@
 
 @implementation FinalScoreViewController
 
-@synthesize percent, actualScore, potentialScore;
+@synthesize percent, correctScore, incorrectScore;
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
-	
-	// set up score labels
-	percentLabel.text = [NSString stringWithFormat: @"%d%%", percent];
-	actualScoreLabel.text = [NSString stringWithFormat: @"%d", actualScore];
-	potentialScoreLabel.text = [NSString stringWithFormat: @"%d", potentialScore];
-	
-	
-	// setup Study button
-	UIBarButtonItem *studyButton = [[UIBarButtonItem alloc] initWithTitle:@"Study Missed Cards" style:UIBarButtonItemStyleBordered target:self action:@selector(studyButtonPressed:)]; 
-	self.navigationItem.rightBarButtonItem = studyButton;
-	[studyButton release];
-	
+- (void)viewDidLoad
+{
+	// set up view details				
+	self.title = @"";
+	self.hidesBottomBarWhenPushed = YES;
 	
 	// call super
     [super viewDidLoad];
-	
 }
 
--(void)studyButtonPressed:(id)sender
+-(IBAction)studyButtonPressed:(id)sender
 {
 	MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate closeFinalScoreView];
@@ -43,14 +34,36 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+	[super viewWillAppear:animated];
+	
+	// set up score labels
+	percentLabel.text = [NSString stringWithFormat: @"%d%%", percent];
+	correctScoreLabel.text = [NSString stringWithFormat: @"%d", correctScore];
+	incorrectScoreLabel.text = [NSString stringWithFormat: @"%d", incorrectScore];	
+	
+	// make status bar blue
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];
+	
+	// make navigation bar blue
+	UINavigationController *navController = [self navigationController];
+	navController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
 	[super viewDidAppear:animated];
 	
-	// make status bar black
-	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
+	// remove Study View Controller from the navigation stack so that the back button goes straight to Deck Details
 	
-	// make navigation bar black
-	UINavigationController *navController = [self navigationController];
-	navController.navigationBar.barStyle = UIBarStyleBlackOpaque;	
+	
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+	// wipe score from screen
+	percentLabel.text = @"";
+	correctScoreLabel.text = @"";
+	incorrectScoreLabel.text = @"";
 }
 
 - (void)didReceiveMemoryWarning {

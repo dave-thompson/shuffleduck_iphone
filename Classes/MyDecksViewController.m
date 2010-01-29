@@ -28,6 +28,18 @@ static sqlite3_stmt *deleteStmt = nil;
 
 static MyDecksViewController *myDecksViewController;
 
+/*
+// manage the shared instance of this singleton View Controller
++ (MyDecksViewController *)sharedInstance
+{
+	static MyDecksViewController *sharedMyDecksViewController;
+    if (sharedMyDecksViewController == nil)
+	{
+        sharedMyDecksViewController = [[[self class] alloc] init];
+    }
+    return sharedMyDecksViewController;
+}
+*/
 
 + (id)getMyDecksViewController
 {

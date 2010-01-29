@@ -12,18 +12,18 @@
 @interface FinalScoreViewController : UIViewController
 {
 	IBOutlet UILabel *percentLabel;
-	IBOutlet UILabel *actualScoreLabel;
-	IBOutlet UILabel *potentialScoreLabel;
+	IBOutlet UILabel *correctScoreLabel;
+	IBOutlet UILabel *incorrectScoreLabel;
 	
 	int percent;
-	int actualScore;
-	int potentialScore;
+	int correctScore;
+	int incorrectScore;
 }
 
--(void)studyButtonPressed:(id)sender;
+-(IBAction)studyButtonPressed:(id)sender;
 
 @property (nonatomic, assign) int percent;
-@property (nonatomic, assign) int actualScore;
-@property (nonatomic, assign) int potentialScore;
+@property (nonatomic, assign) int correctScore;
+@property (nonatomic, assign) int incorrectScore;
 
 @end

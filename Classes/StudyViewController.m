@@ -41,9 +41,6 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 	int cardsCompleted;
 	int cardsCorrect;
 
-// Navigation Management
-BOOL didPushDaughterScreen = NO; // true iff a daughter screen is currently pushed to the view hierarchy
-
 CardViewController *topCardViewController, *bottomCardViewController;
 InlineScoreViewController *inlineScoreViewController;
 
@@ -394,18 +391,14 @@ InlineScoreViewController *inlineScoreViewController;
 				// Push a FinalScoreViewController onto the navigation stack
 					// create view controller
 					FinalScoreViewController *finalScoreViewController = [[FinalScoreViewController alloc] initWithNibName:@"FinalScoreView" bundle:nil];
-					finalScoreViewController.title = @"";
-					finalScoreViewController.hidesBottomBarWhenPushed = YES;
 					// set the scores
 					float percent = ((float)cardsCorrect / (float)cardsCompleted) * 100.0;
 					finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
-					finalScoreViewController.potentialScore = cardsCompleted;
-					finalScoreViewController.actualScore = cardsCorrect;
+					finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
+					finalScoreViewController.correctScore = cardsCorrect;
 					// push to stack
 					[self.navigationController pushViewController:finalScoreViewController animated:YES];
 					[finalScoreViewController release];
-					// remember that the controller was pushed
-				didPushDaughterScreen = YES;
 			}
 			else // move to the next card
 			{
@@ -413,7 +406,7 @@ InlineScoreViewController *inlineScoreViewController;
 				if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 				{
 					[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
-				}						
+				}
 			}
 	}
 	else // study type is Learn
