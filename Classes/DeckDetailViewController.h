@@ -14,6 +14,7 @@
 @interface DeckDetailViewController : UIViewController {
 
 	IBOutlet UIButton *unshuffleButton;
+	IBOutlet UIButton *studyButton;
 	
 	IBOutlet UILabel *titleLabel;
 	IBOutlet UILabel *totalCardsLabel;	

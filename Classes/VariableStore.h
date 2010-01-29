@@ -14,12 +14,14 @@
 	UIColor *backgroundColor;
 	UIColor *mindeggGreen;
 	UIColor *mindeggRed;
+	UIColor *mindeggGreyText;
 	NSString *contextURL;
 }
 
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *mindeggGreen;
 @property (nonatomic, retain) UIColor *mindeggRed;
+@property (nonatomic, retain) UIColor *mindeggGreyText;
 @property (nonatomic, retain) NSString *contextURL;
 
 + (VariableStore *)sharedInstance;

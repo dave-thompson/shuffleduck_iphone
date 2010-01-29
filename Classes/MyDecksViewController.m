@@ -137,8 +137,8 @@ static sqlite3_stmt *deleteStmt = nil;
 	DeckDetails *currentCellDeck = (DeckDetails *)[localLibraryDetails objectAtIndex:(row)];
 	
 	cell.deckTitle.text = currentCellDeck.title;
-	cell.known.text = [NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards];
-	cell.unknown.text = [NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards];	
+	[cell.leftMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards] forLabel:1];
+	[cell.rightMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards] forLabel:1];
 	SideViewController *miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;
 	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4

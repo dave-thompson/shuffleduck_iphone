@@ -12,16 +12,30 @@
 
 @implementation LibraryCell
 
-@synthesize deckTitle, miniCardView, known, unknown, miniCardViewController, knownDescriptionLabel, unknownDescriptionLabel, mainView;
+@synthesize deckTitle, miniCardView, leftMultipartLabel, rightMultipartLabel, miniCardViewController, mainView;
 
-- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
+
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
+{
     if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier])
 	{
-        // set up colours
-		unknownDescriptionLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
-		knownDescriptionLabel.textColor = [[VariableStore sharedInstance] mindeggRed];
     }
     return self;
+}
+
+
+- (void)awakeFromNib
+{
+	[super awakeFromNib];
+	
+	// set up multipart labels
+	[leftMultipartLabel updateNumberOfLabels:2 fontSize:12 alignment:MultipartLabelLeft];
+	[leftMultipartLabel setText:@"Unknown:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
+	[leftMultipartLabel setText:@"" andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
+	
+	[rightMultipartLabel  updateNumberOfLabels:2 fontSize:12 alignment:MultipartLabelLeft];
+	[rightMultipartLabel setText:@"Known:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
+	[rightMultipartLabel setText:@"" andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];	
 }
 
 
@@ -34,31 +48,26 @@
 		// set background to blue and text to white
 		mainView.backgroundColor = [UIColor blueColor];
 		deckTitle.textColor = [UIColor whiteColor];
-		unknownDescriptionLabel.textColor = [UIColor whiteColor];
-		knownDescriptionLabel.textColor = [UIColor whiteColor];
-		known.textColor = [UIColor whiteColor];
-		unknown.textColor = [UIColor whiteColor];
+		[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
+		[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
 	}
 	else
 	{
 		// restore to original colors
 		mainView.backgroundColor = [UIColor whiteColor];
 		deckTitle.textColor = [UIColor blackColor];
-		unknownDescriptionLabel.textColor = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.) alpha:1.0]; // #878787 (grey)
-		knownDescriptionLabel.textColor = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.) alpha:1.0]; // #878787 (grey)
-		known.textColor = [[VariableStore sharedInstance] mindeggGreen];
-		unknown.textColor = [[VariableStore sharedInstance] mindeggRed];
-	}
-	 
-}
+		[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
+		[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];
 
+	}
+}
 
 - (void)dealloc {
 	[deckTitle release];
 	[miniCardView release];
-	[known release];
-	[unknown release];
 	[miniCardViewController release];
+	[leftMultipartLabel release];
+	[rightMultipartLabel release];
     [super dealloc];
 }
 

@@ -8,6 +8,8 @@
 
 #import "FinalScoreViewController.h"
 #import "MindEggAppDelegate.h"
+#import "StudyViewController.h"
+#import "VariableStore.h"
 
 static FinalScoreViewController *sharedFinalScoreViewController = nil;
 
@@ -35,14 +37,17 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 	self.title = @"";
 	self.hidesBottomBarWhenPushed = YES;
 	
+	// set numbers to standard colours
+	correctScoreLabel.textColor = [[VariableStore sharedInstance] mindeggGreen];
+	incorrectScoreLabel.textColor = [[VariableStore sharedInstance] mindeggRed];	
+	
 	// call super
     [super viewDidLoad];
 }
 
 -(IBAction)studyButtonPressed:(id)sender
 {
-	MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate closeFinalScoreView];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -67,8 +72,17 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 	[super viewDidAppear:animated];
 	
 	// remove Study View Controller from the navigation stack so that the back button goes straight to Deck Details
-	
-	
+	NSArray *oldVCArray = [self navigationController].viewControllers;
+	NSMutableArray *newVCArray = [[NSMutableArray alloc] init];
+	for (UIViewController *vc in oldVCArray)
+	{
+		if (!(vc == [StudyViewController sharedInstance]))
+		{
+			[newVCArray addObject:vc];
+		}
+	}
+	[self navigationController].viewControllers = newVCArray;
+	 
 }
 
 -(void)viewDidDisappear:(BOOL)animated

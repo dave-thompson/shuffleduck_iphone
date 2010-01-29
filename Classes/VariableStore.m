@@ -10,7 +10,7 @@
 
 @implementation VariableStore
 
-@synthesize backgroundColor, contextURL, mindeggGreen, mindeggRed;
+@synthesize backgroundColor, contextURL, mindeggGreen, mindeggRed, mindeggGreyText;
 
 + (VariableStore *)sharedInstance
 {
@@ -23,10 +23,11 @@
         myInstance  = [[[self class] alloc] init];
         // initialize variables
 		myInstance.backgroundColor = [UIColor colorWithRed:0.525747001 green:0.596195996 blue:0.618924975 alpha:1.0];
-		//myInstance.mindeggGreen = [UIColor colorWithRed:(0/255.0) green:(115/255.0) blue:(2/255.) alpha:1.0]; // #007302 (green)
-		//myInstance.mindeggRed = [UIColor colorWithRed:(255/255.0) green:(43/255.0) blue:(10/255.) alpha:1.0]; // #FF2B0A (red)
-		myInstance.mindeggRed = [UIColor colorWithRed:(231/255.0) green:(41/255.0) blue:(16/255.) alpha:1.0]; // #E72910 (red)
-		myInstance.mindeggGreen = [UIColor colorWithRed:(0/255.0) green:(163/255.0) blue:(4/255.) alpha:1.0]; // #00A304 (green)
+		//myInstance.mindeggGreen = [UIColor colorWithRed:(0/255.0) green:(115/255.0) blue:(2/255.0) alpha:1.0]; // #007302 (green)
+		//myInstance.mindeggRed = [UIColor colorWithRed:(255/255.0) green:(43/255.0) blue:(10/255.0) alpha:1.0]; // #FF2B0A (red)
+		myInstance.mindeggRed = [UIColor colorWithRed:(231/255.0) green:(41/255.0) blue:(16/255.0) alpha:1.0]; // #E72910 (red)
+		myInstance.mindeggGreen = [UIColor colorWithRed:(0/255.0) green:(163/255.0) blue:(4/255.0) alpha:1.0]; // #00A304 (green)
+		myInstance.mindeggGreyText = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.0) alpha:1.0]; // #878787 (grey)		
     }
     // return the instance of this class
     return myInstance;

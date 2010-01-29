@@ -15,6 +15,8 @@
 	IBOutlet MultipartLabel *bottomMultipartLabel;
 }
 
++ (InlineScoreViewController *)sharedInstance;
+
 @property (nonatomic, retain) MultipartLabel *topMultipartLabel;
 @property (nonatomic, retain) MultipartLabel *bottomMultipartLabel;
 

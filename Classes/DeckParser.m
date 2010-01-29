@@ -542,7 +542,7 @@ sqlite3_stmt *addStmt;
 	sqlite3_reset(deleteStmt);
 	deleteStmt = nil;
 	
-	// refresh library
+	// refresh libraryterm
 	[[MyDecksViewController sharedInstance] refreshTable];
 }
 

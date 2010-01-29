@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "SideViewController.h"
+#import "MultipartLabel.h"
 
 @interface LibraryCell : UITableViewCell {
 
@@ -16,12 +17,8 @@
 	IBOutlet UIView *mainView;
 	// variable text
 	IBOutlet UILabel *deckTitle;
-	IBOutlet UILabel *known;
-	IBOutlet UILabel *unknown;
-	
-	// static text
-	IBOutlet UILabel *unknownDescriptionLabel;
-	IBOutlet UILabel *knownDescriptionLabel;	
+	IBOutlet MultipartLabel *leftMultipartLabel;
+	IBOutlet MultipartLabel *rightMultipartLabel;
 	
 	SideViewController *miniCardViewController;
 }
@@ -30,11 +27,8 @@
 @property (nonatomic, retain) UIView *mainView;
 
 @property (nonatomic, retain) UILabel *deckTitle;
-@property (nonatomic, retain) UILabel *known;
-@property (nonatomic, retain) UILabel *unknown;
-
-@property (nonatomic, retain) UILabel *unknownDescriptionLabel;
-@property (nonatomic, retain) UILabel *knownDescriptionLabel;
+@property (nonatomic, retain) MultipartLabel *leftMultipartLabel;
+@property (nonatomic, retain) MultipartLabel *rightMultipartLabel;
 
 @property (nonatomic, retain) SideViewController *miniCardViewController;
 

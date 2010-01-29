@@ -37,11 +37,11 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 	int numCards;
 
 	// Study
-	int cardsKnown;
+	int cardsKnown = 0;
 
 	// Test
-	int cardsCompleted;
-	int cardsCorrect;
+	int cardsCompleted = 0;
+	int cardsCorrect = 0;
 
 CardViewController *topCardViewController, *bottomCardViewController;
 InlineScoreViewController *inlineScoreViewController;
@@ -67,15 +67,14 @@ InlineScoreViewController *inlineScoreViewController;
 	// set up view
 	self.title = @"";
 	self.hidesBottomBarWhenPushed = YES;
+	kMaximumVariance = tan(kMaximumVarianceInDegrees);
 
-	// initiate state data
-			processedCurrentSwipe = NO;
-			kMaximumVariance = tan(kMaximumVarianceInDegrees);
-			numCards = deck.numCards;
-			cardsKnown = deck.numKnownCards;
-			cardsCompleted = 0;
-			cardsCorrect = 0;
-	
+	// set up custom back button (going back to this screen will never be allowed, but this back button will allow subsequent screens to go back to DeckDetails)
+	//setup custom back button
+	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
+	self.navigationItem.backBarButtonItem = backArrowButton;
+	[backArrowButton release];	
+
 	/* SEARCH FUNCTIONALITY DESCOPED
 	// setup search button
 			UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"MagnifyingGlass.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(showSearchBar:)]; 
@@ -95,28 +94,11 @@ InlineScoreViewController *inlineScoreViewController;
 			bottomCardViewController.database = deck.database;
 	
 	// Set up the inline score view
-	inlineScoreViewController = [[InlineScoreViewController alloc] initWithNibName:@"InlineScoreView" bundle:nil];
-	//self.navigationItem.titleView = inlineScoreViewController.view;
+	inlineScoreViewController = [InlineScoreViewController sharedInstance];
 	UIBarButtonItem *scoreBarButton = [[UIBarButtonItem alloc] initWithCustomView:inlineScoreViewController.view];
 	self.navigationItem.rightBarButtonItem = scoreBarButton; 
 	[scoreBarButton release];
-	[self updateInlineScore];
-	
-	// set up StudyType specifics
-			if (_studyType == Learn)
-			{
-				// remove the cross button & resize the tick button
-				[crossButton removeFromSuperview];
-				tickButton.frame = CGRectMake(0, 0, 320, 49);				
-			}
-			else // is a test
-			{
-				// do nothing
-			}
-	
-	//load first side of first card (incoming deck object already set to first card)
-			[self showNewCard];
-	
+		
 	/* SEARCH BAR FUNCTIONALITY DESCOPED
 	// reposition search bar on top of cards
 			[searchBarView retain];
@@ -130,16 +112,6 @@ InlineScoreViewController *inlineScoreViewController;
 	outerView.backgroundColor = color;
 	topCardViewController.view.backgroundColor = color;
 	bottomCardViewController.view.backgroundColor = color;
-	
-	//setup custom back button
-	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
-																		style:UIBarButtonItemStyleDone
-																	   target:nil
-																	   action:nil]; 
-	self.navigationItem.backBarButtonItem = backArrowButton;
-	[backArrowButton release];		
-	
-	//[self setBackgroundColor];	
 		
 	//call super
 	[super viewDidLoad];
@@ -154,33 +126,45 @@ InlineScoreViewController *inlineScoreViewController;
 	UINavigationController *navController = [self navigationController];
 	navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
 	
-	/*
-	// if popping up the navigation hierarchy, skip the study view controller
-	if (didPushDaughterScreen)
+	// initiate state data
+	processedCurrentSwipe = NO;
+	numCards = deck.numCards;
+	cardsKnown = deck.numKnownCards;
+	cardsCompleted = 0;
+	cardsCorrect = 0;
+	[self updateInlineScore];
+	
+	// set up StudyType specifics
+	if (_studyType == Learn)
 	{
-		[self.navigationController popViewControllerAnimated:YES];
-		didPushDaughterScreen = NO;
+		// if the view is set up for Test, change it
+		if (!(crossButton.superview == nil))
+		{
+			// remove the cross button, resize the tick button and ensure tick is white
+			[crossButton removeFromSuperview];
+			tickButton.frame = CGRectMake(0, 0, 320, 49);
+			[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];
+		}
 	}
-	 */
+	else // is a test
+	{
+		// if the view is set up for Study, change it
+		if (crossButton.superview == nil)
+		{
+			// add the cross button,  resize the tick button and ensure tick is green
+			[bottomBarView addSubview:crossButton];
+			//crossButton.frame = CGRectMake(0, 0, 160, 49);
+			tickButton.frame = CGRectMake(160, 0, 160, 49);
+			[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];			
+		}
+	}
+	
+	//load first side of first card (incoming deck object already set to first card)
+	[self showNewCard];	
 	
 	[super viewWillAppear:animated];
 }
 
-/*
--(void)viewDidAppear:(BOOL)animated
-{
-	[self.navigationController popViewControllerAnimated:YES];
-
-	// if popping up the navigation hierarchy, skip the study view controller
-	if (didPushDaughterScreen)
-	{
-		[self.navigationController popViewControllerAnimated:YES];
-		didPushDaughterScreen = NO;
-	}
-
-	[super viewDidAppear:animated];
-}
-*/
 -(void)setStudyType:(StudyType)studyType
 {
 	_studyType = studyType;
@@ -448,25 +432,25 @@ InlineScoreViewController *inlineScoreViewController;
 	if (_studyType == Learn)
 	{
 		// top label
-		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:2];
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:2 fontSize:13 alignment:MultipartLabelRight];
 		[[inlineScoreViewController topMultipartLabel] setText:@"Unknown:  " andColor:[UIColor whiteColor] forLabel:0];
 		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", numCards - cardsKnown] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
 		
-		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:2];
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:2 fontSize:13 alignment:MultipartLabelRight];
 		[[inlineScoreViewController bottomMultipartLabel] setText:@"Known:  " andColor:[UIColor whiteColor] forLabel:0];
 		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsKnown] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];		
 	}
 	else // is a test
 	{
 		// top label
-		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:3];
-		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0];
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:3 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCompleted - cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
 		[[inlineScoreViewController topMultipartLabel] setText:@" | " andColor:[UIColor whiteColor] forLabel:1];
-		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCompleted - cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:2];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsCorrect] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:2];
 		
 		// bottom label
-		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1];
-		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"(%d left)", numCards - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d left", numCards - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
 	}
 }
 

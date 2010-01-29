@@ -16,8 +16,10 @@
 @synthesize containerView;
 @synthesize labels;
 
--(void)updateNumberOfLabels:(int)numLabels;
+-(void)updateNumberOfLabels:(int)numLabels fontSize:(int)aFontSize alignment:(MultipartLabelAlignment)anAlignment;
 {
+	alignment = anAlignment;
+	
 	[containerView removeFromSuperview];
 	self.containerView = nil;
 	
@@ -26,9 +28,10 @@
 	[self addSubview:self.containerView];
 	self.labels = [NSMutableArray array];
 	
-	while (numLabels-- > 0) {
+	while (numLabels-- > 0)
+	{
 		UILabel * label = [[UILabel alloc] initWithFrame:CGRectZero];
-		label.font = [UIFont fontWithName:@"Helvetica" size:13];
+		label.font = [UIFont fontWithName:@"Helvetica" size:aFontSize];
 		label.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.0];
 		[self.containerView addSubview:label];
 		[self.labels addObject:label];
@@ -48,6 +51,18 @@
 	
 	[self updateLayout];
 }
+
+-(void)setColor:(UIColor*)color forLabel:(int)labelNum;
+{
+	if( [self.labels count] > labelNum && labelNum >= 0 )
+	{
+		UILabel * thisLabel = [self.labels objectAtIndex:labelNum];
+		thisLabel.textColor = color;
+	}
+	
+	[self updateLayout];
+}
+
 
 -(void)setText:(NSString *)text andFont:(UIFont*)font forLabel:(int)labelNum;
 {
@@ -86,36 +101,36 @@
 	[self updateLayout];
 }
 
-- (void)updateLayout {
-	
-	/*
-	// For left alignment, use this block rather than the following one
-	int thisX = 0;
-	
-	for (UILabel * thisLabel in self.labels)
+- (void)updateLayout
+{	
+	if (alignment == MultipartLabelLeft)
 	{
-		CGSize size = [thisLabel.text sizeWithFont:thisLabel.font constrainedToSize:CGSizeMake(9999, 9999) lineBreakMode:thisLabel.lineBreakMode];
-		CGRect thisFrame = CGRectMake( thisX, 0, size.width, size.height );
-		thisLabel.frame = thisFrame;
+		int thisX = 0;
 		
-		thisX += size.width;
+		for (UILabel * thisLabel in self.labels)
+		{
+			CGSize size = [thisLabel.text sizeWithFont:thisLabel.font constrainedToSize:CGSizeMake(9999, 9999) lineBreakMode:thisLabel.lineBreakMode];
+			CGRect thisFrame = CGRectMake( thisX, 0, size.width, size.height );
+			thisLabel.frame = thisFrame;
+			
+			thisX += size.width;
+		}
 	}
-	 */
-	 
-	
-	int thisX = self.frame.size.width;
-	
-	UILabel *thisLabel;
-	int numLabels = self.labels.count;
-	for (int i=1; i <= numLabels; i++)
-	{	
-		thisLabel = [self.labels objectAtIndex:(numLabels - i)];
-		CGSize size = [thisLabel.text sizeWithFont:thisLabel.font constrainedToSize:CGSizeMake(9999, 9999) lineBreakMode:thisLabel.lineBreakMode];
-		thisX -= size.width;
-		CGRect thisFrame = CGRectMake( thisX, 0, size.width, size.height );
-		thisLabel.frame = thisFrame;
-	}
-	
+	else // alignment = MultipartLabelRight
+	{
+		int thisX = self.frame.size.width;
+		
+		UILabel *thisLabel;
+		int numLabels = self.labels.count;
+		for (int i=1; i <= numLabels; i++)
+		{	
+			thisLabel = [self.labels objectAtIndex:(numLabels - i)];
+			CGSize size = [thisLabel.text sizeWithFont:thisLabel.font constrainedToSize:CGSizeMake(9999, 9999) lineBreakMode:thisLabel.lineBreakMode];
+			thisX -= size.width;
+			CGRect thisFrame = CGRectMake( thisX, 0, size.width, size.height );
+			thisLabel.frame = thisFrame;
+		}
+	}	
 }
 
 

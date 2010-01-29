@@ -66,13 +66,6 @@ UINavigationController *libraryNavController;
 	// clean up memory
 }
 
--(void)closeFinalScoreView
-{
-	[libraryNavController popViewControllerAnimated:NO];
-	[libraryNavController popViewControllerAnimated:NO];
-	[libraryNavController popViewControllerAnimated:NO];	
-}
-
 - (void) connectToDBAndRetrieveState
 {
 	

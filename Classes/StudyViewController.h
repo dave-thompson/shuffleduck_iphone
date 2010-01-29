@@ -24,6 +24,7 @@
 
 	IBOutlet UIButton *tickButton;
 	IBOutlet UIButton *crossButton;
+	IBOutlet UIView *bottomBarView;
 	
 	Deck *deck;
 	sqlite3 *database;
