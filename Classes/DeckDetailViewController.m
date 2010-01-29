@@ -10,11 +10,26 @@
 #import "VariableStore.h"
 #import "SideViewController.h"
 
+static DeckDetailViewController *sharedDeckDetailViewController = nil;
+
 @implementation DeckDetailViewController
 
 @synthesize deck, database;
 
 SideViewController *miniSideViewController;
+
+// manage the shared instance of this singleton View Controller
++ (DeckDetailViewController *)sharedInstance
+{
+	@synchronized(self)
+	{
+		if (!sharedDeckDetailViewController)
+		{
+			sharedDeckDetailViewController = [[[self class] alloc] initWithNibName:@"DeckDetailView" bundle:nil];
+		}
+	}
+    return sharedDeckDetailViewController;
+}
 
 -(IBAction)shuffleButtonClicked:(id)sender
 {
@@ -40,19 +55,14 @@ SideViewController *miniSideViewController;
 
 -(void)pushStudyViewController:(StudyType)type
 {
-	// Prepare a study view controller (referencing the new deck object)
-	StudyViewController *studyViewController = [[StudyViewController alloc] initWithNibName:@"StudyView" bundle:nil];
-	studyViewController.title = @"";
+	// Prepare the study view controller (referencing the new deck object)
+	StudyViewController *studyViewController = [StudyViewController sharedInstance];
 	studyViewController.deck = deck;
 	studyViewController.database = database;
 	[studyViewController setStudyType:type];
-	studyViewController.hidesBottomBarWhenPushed = YES;
 	
 	// Push the study view controller onto the navigation stack
 	[self.navigationController pushViewController:studyViewController animated:YES];
-	
-	// release allocated objects
-	[studyViewController release];
 }
 
 - (void)didReceiveMemoryWarning {

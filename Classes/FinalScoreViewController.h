@@ -20,6 +20,8 @@
 	int incorrectScore;
 }
 
++ (FinalScoreViewController *)sharedInstance;
+
 -(IBAction)studyButtonPressed:(id)sender;
 
 @property (nonatomic, assign) int percent;

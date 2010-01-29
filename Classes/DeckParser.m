@@ -142,7 +142,7 @@ sqlite3_stmt *addStmt;
 			addStmt = nil;
 		
 		// refresh the decks table to include the new deck
-		[[MyDecksViewController getMyDecksViewController] refreshTable];
+		[[MyDecksViewController sharedInstance] refreshTable];
 		
 		// ask server to send over full deck details
 		NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", userVisibleID]]];
@@ -543,7 +543,7 @@ sqlite3_stmt *addStmt;
 	deleteStmt = nil;
 	
 	// refresh library
-	[[MyDecksViewController getMyDecksViewController] refreshTable];
+	[[MyDecksViewController sharedInstance] refreshTable];
 }
 
 - (void)updateUIForParsingCompletion
@@ -552,7 +552,7 @@ sqlite3_stmt *addStmt;
 	[ProgressViewController stopShowingProgress];
 	
 	// refresh the library
-	[[MyDecksViewController getMyDecksViewController] refreshTable];
+	[[MyDecksViewController sharedInstance] refreshTable];
 }
 
 - (void) finalizeStatements {

@@ -14,6 +14,8 @@
 #import "FinalScoreViewController.h"
 #import "Constants.h"
 
+static StudyViewController *sharedStudyViewController = nil;
+
 @implementation StudyViewController
 
 @synthesize deck, database;
@@ -46,8 +48,26 @@ InlineScoreViewController *inlineScoreViewController;
 
 // ----- INITIALISERS ------
 
+// manage the shared instance of this singleton View Controller
++ (StudyViewController *)sharedInstance
+{
+	@synchronized(self)
+	{
+		if (!sharedStudyViewController)
+		{
+			sharedStudyViewController = [[[self class] alloc] initWithNibName:@"StudyView" bundle:nil];
+		}
+	}
+    return sharedStudyViewController;
+}
+
+
 - (void)viewDidLoad
 {
+	// set up view
+	self.title = @"";
+	self.hidesBottomBarWhenPushed = YES;
+
 	// initiate state data
 			processedCurrentSwipe = NO;
 			kMaximumVariance = tan(kMaximumVarianceInDegrees);
@@ -388,9 +408,8 @@ InlineScoreViewController *inlineScoreViewController;
 		// move to next card or show finish screen
 			if (cardsCompleted == numCards) // if all cards have been tested
 			{
-				// Push a FinalScoreViewController onto the navigation stack
-					// create view controller
-					FinalScoreViewController *finalScoreViewController = [[FinalScoreViewController alloc] initWithNibName:@"FinalScoreView" bundle:nil];
+				// Push the FinalScoreViewController onto the navigation stack
+					FinalScoreViewController *finalScoreViewController = [FinalScoreViewController sharedInstance];
 					// set the scores
 					float percent = ((float)cardsCorrect / (float)cardsCompleted) * 100.0;
 					finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)

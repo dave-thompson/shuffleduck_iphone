@@ -39,7 +39,7 @@ UINavigationController *libraryNavController;
 	
 	libraryNavController = [[UINavigationController alloc] init];
 	
-	MyDecksViewController *myDecksViewController = [[MyDecksViewController alloc] initWithNibName:@"MyDecksView" bundle:nil];
+	MyDecksViewController *myDecksViewController = [MyDecksViewController sharedInstance];
 	myDecksViewController.title = @"MindEgg";
 	myDecksViewController.database = database;
 	[libraryNavController pushViewController:myDecksViewController animated:NO];
@@ -64,9 +64,6 @@ UINavigationController *libraryNavController;
 	[window makeKeyAndVisible];
 
 	// clean up memory
-	//[feedbackViewController release];
-	//[reviseViewController release];
-	[myDecksViewController release];	
 }
 
 -(void)closeFinalScoreView

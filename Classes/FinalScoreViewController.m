@@ -9,11 +9,24 @@
 #import "FinalScoreViewController.h"
 #import "MindEggAppDelegate.h"
 
+static FinalScoreViewController *sharedFinalScoreViewController = nil;
 
 @implementation FinalScoreViewController
 
 @synthesize percent, correctScore, incorrectScore;
 
+// manage the shared instance of this singleton View Controller
++ (FinalScoreViewController *)sharedInstance
+{
+	@synchronized(self)
+	{
+		if (!sharedFinalScoreViewController)
+		{
+			sharedFinalScoreViewController = [[[self class] alloc] initWithNibName:@"FinalScoreView" bundle:nil];
+		}
+	}
+    return sharedFinalScoreViewController;
+}
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad

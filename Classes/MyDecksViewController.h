@@ -18,14 +18,13 @@
 	NSMutableArray *localLibraryDetails;
 	sqlite3 *database;	
 	IBOutlet UITableView *libraryTableView;
-	DeckDetailViewController *deckDetailViewController;
 	TableFooterViewController *tableFooterViewController;
 	UIImageView *noContentImageView;
 }
 
 @property (nonatomic, assign) sqlite3 *database;
 
-+ (id) getMyDecksViewController;
++ (MyDecksViewController *)sharedInstance;
 - (void) refreshTable;
 - (void) updateTableSettingsBasedOnNumberOfDecks;
 - (void) retrieveLocalLibraryDetails;

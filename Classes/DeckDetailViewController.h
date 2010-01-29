@@ -31,6 +31,8 @@
 @property (nonatomic, retain) Deck *deck;
 @property (nonatomic, assign) sqlite3 *database;
 
++ (DeckDetailViewController *)sharedInstance;
+
 -(IBAction)shuffleButtonClicked:(id)sender;
 -(IBAction)unshuffleButtonClicked:(id)sender;
 -(IBAction)testButtonClicked:(id)sender;

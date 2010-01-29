@@ -20,31 +20,26 @@
 #import "ASIAuthenticationDialog.h"
 #import "MindEggUtilities.h"
 
+static MyDecksViewController *sharedMyDecksViewController = nil;
+
 @implementation MyDecksViewController
 
 @synthesize database;
 
 static sqlite3_stmt *deleteStmt = nil;
 
-static MyDecksViewController *myDecksViewController;
-
-/*
 // manage the shared instance of this singleton View Controller
 + (MyDecksViewController *)sharedInstance
 {
-	static MyDecksViewController *sharedMyDecksViewController;
-    if (sharedMyDecksViewController == nil)
+	@synchronized(self)
 	{
-        sharedMyDecksViewController = [[[self class] alloc] init];
-    }
+		if (!sharedMyDecksViewController)
+		{
+			sharedMyDecksViewController = [[[self class] alloc] initWithNibName:@"MyDecksView" bundle:nil];
+		}
+	}
     return sharedMyDecksViewController;
 }
-*/
-
-+ (id)getMyDecksViewController
-{
-	return myDecksViewController;
-} 
 
 #pragma mark View Controller Methods
 
@@ -86,8 +81,6 @@ static MyDecksViewController *myDecksViewController;
 	UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editTable:)];
 	[self.navigationItem setLeftBarButtonItem:editButton];
 	[editButton release];
-	
-	myDecksViewController = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -179,11 +172,8 @@ static MyDecksViewController *myDecksViewController;
 	// instantiate a deck object for this deck ID
 	Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID Database:database includeKnownCards:YES];
 	
-	// Push a deck detail view controller (referencing the new deck object) onto the navigation stack
-	if (deckDetailViewController == nil)
-	{
-		deckDetailViewController = [[DeckDetailViewController alloc] initWithNibName:@"DeckDetailView" bundle:nil];
-	}
+	// Push the deck detail view controller onto the navigation stack and reference the new deck object
+	DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
 	deckDetailViewController.title = [deck getDeckTitle];
 	deckDetailViewController.deck = deck;
 	deckDetailViewController.database = database;
@@ -626,7 +616,6 @@ static MyDecksViewController *myDecksViewController;
 - (void)dealloc {
 	[tableFooterViewController release];
 	[localLibraryDetails release];
-	[deckDetailViewController release];
     [super dealloc];
 }
 

@@ -38,6 +38,8 @@ typedef enum {
 @property (nonatomic, retain) Deck *deck;
 @property (nonatomic, assign) sqlite3 *database;
 
++ (StudyViewController *)sharedInstance;
+
 -(IBAction)bottomButtonClicked:(id)sender;
 //-(void)setBackgroundColor;
 -(void)setStudyType:(StudyType)studyType;

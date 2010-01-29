@@ -16,7 +16,4 @@
 
 @property (nonatomic, retain) UILabel *label;
 
-//- (void)showContentlessImage;
-//- (void)showTableContent;
-
 @end
