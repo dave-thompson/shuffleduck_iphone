@@ -113,31 +113,27 @@ SideViewController *miniSideViewController;
 	miniSideViewController.view.frame = CGRectMake(1, 1, 104, 64);
 	[firstCardView addSubview:miniSideViewController.view];
 	
-	// Disable / Enable buttons
-	if ([deck isShuffled])
-	{
-		unshuffleButton.enabled = YES;
-	}
-	else
-	{
-		unshuffleButton.enabled = NO;
-	}
-	if (numUnknownCards == 0)
-	{
-		studyButton.enabled = NO;
-	}
-	else
-	{
-		studyButton.enabled = YES;		
-	}
-	if (numCards == 0)
-	{
-		testButton.enabled = NO;
-	}
-	else
-	{
-		testButton.enabled = YES;		
-	}
+	// Disable / Enable buttons	
+		// Only enable study button if there's at least 1 unknown card to study
+		if (numUnknownCards == 0)	studyButton.enabled = NO;
+		else						studyButton.enabled = YES;
+
+		// Only enable test button if there's at least 1 card in the deck to be tested on
+		if (numCards == 0)			testButton.enabled = NO;
+		else						testButton.enabled = YES;
+		
+		// only enable shuffle buttons if there are at least 2 cards in the deck to shuffle; additionaly only enable unshuffle button if the cards are already shuffled
+		if (numCards < 2)
+		{
+			shuffleButton.enabled = NO;
+			unshuffleButton.enabled = NO;
+		}
+		else
+		{
+			shuffleButton.enabled = YES;
+			if ([deck isShuffled])	unshuffleButton.enabled = YES;
+			else					unshuffleButton.enabled = NO;
+		}
 	
 	// make status bar blue
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault]; //UIStatusBarStyleBlackOpaque];
