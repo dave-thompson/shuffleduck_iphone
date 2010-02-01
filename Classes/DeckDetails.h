@@ -15,6 +15,7 @@
 	NSString *title;
 	int numCards;
 	int numKnownCards;
+	BOOL fullyDownloaded;
 }
 
 @property (nonatomic, retain) NSString *title;
@@ -22,7 +23,8 @@
 @property (nonatomic, assign) int firstSideID;
 @property (nonatomic, assign) int numCards;
 @property (nonatomic, assign) int numKnownCards;
+@property (nonatomic, assign) BOOL fullyDownloaded;
 
--(id)initWithID:(int)initID firstSideID:(int)initFirstSideID title:(NSString *)initTitle numCards:(int)numberCards numKnownCards:(int)numberKnownCards;
+-(id)initWithID:(int)aDeckID firstSideID:(int)aFirstSideID title:(NSString *)aTitle numCards:(int)theNumCards numKnownCards:(int)theNumKnownCards fullyDownloaded:(BOOL)downloaded;
 
 @end

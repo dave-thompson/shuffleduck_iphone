@@ -14,6 +14,7 @@
 #import "MyDecksViewController.h"
 #import "ProgressViewController.h"
 #import "Constants.h"
+#import "DeckDownloaderQueueItem.h"
 
 static DeckDownloader *sharedDeckDownloader = nil;
 static NSMutableArray *downloadQueue;
@@ -51,7 +52,7 @@ NSDate *startTime;
 sqlite3_stmt *addStmt;
 
 #pragma mark -
-#pragma mark Web Service Methods
+#pragma mark Singleton Accessor
 
 + (DeckDownloader *)sharedInstance
 {
@@ -67,12 +68,16 @@ sqlite3_stmt *addStmt;
     return sharedDeckDownloader;
 }
 
+#pragma mark -
+#pragma mark Top Level Download Request Methods
+
 -(void)downloadDeckID:(int)userVisibleID
 {
 	// If the DeckDownloader is already busy, then queue this request. Otherwise, download it.
 	if (locked)
 	{
-		[downloadQueue addObject:[NSNumber numberWithInteger:userVisibleID]];
+		DeckDownloaderQueueItem *queueItem = [[DeckDownloaderQueueItem alloc] initWithUserVisibleID:userVisibleID];
+		[downloadQueue addObject:queueItem];
 	}
 	else
 	{
@@ -80,14 +85,41 @@ sqlite3_stmt *addStmt;
 		// [ProgressViewController startShowingProgress];
 		
 		// retrieve deck metadata
-		NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", userVisibleID]]];
-		ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-		[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d", userVisibleID], @"userVisibleID", nil]];
-		[request setDelegate:self];
-		[request setDidFinishSelector:@selector(metadataRequestFinished:)];
-		[request setDidFailSelector:@selector(metadataRequestFailed:)];
-		[request startAsynchronous];
+		[self sendMetadataRequestForUserVisibleDeckID:userVisibleID];
+
 	}
+}
+
+-(void)completeDownloadOfDeckID:(int)userVisibleID withIPhoneDeckID:(int)deckID
+{
+	// If the DeckDownloader is already busy, then queue this request. Otherwise, download it.
+	if (locked)
+	{
+		DeckDownloaderQueueItem *queueItem = [[DeckDownloaderQueueItem alloc] initWithUserVisibleID:userVisibleID iPhoneSpecificID:deckID];
+		[downloadQueue addObject:queueItem];
+	}
+	else
+	{
+		locked = YES;
+		// [ProgressViewController startShowingProgress];
+		
+		// retrieve deck
+		[self sendFullDeckRequestForUserVisibleDeckID:userVisibleID iPhoneDeckID:deckID];		
+	}
+}
+
+#pragma mark -
+#pragma mark Metadata Request Methods
+
+-(void)sendMetadataRequestForUserVisibleDeckID:(int)aUserVisibleID
+{
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", aUserVisibleID]]];
+	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+	[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d", aUserVisibleID], @"userVisibleID", nil]];
+	[request setDelegate:self];
+	[request setDidFinishSelector:@selector(metadataRequestFinished:)];
+	[request setDidFailSelector:@selector(metadataRequestFailed:)];
+	[request startAsynchronous];	
 }
 
 - (void) metadataRequestFinished:(ASIHTTPRequest *)request
@@ -115,83 +147,84 @@ sqlite3_stmt *addStmt;
 		NSString *author = [[[rootElement elementsForName:@"author"] objectAtIndex:0] stringValue];
 		int userVisibleID = [[[[[doc rootElement] elementsForName:@"user_visible_id"] objectAtIndex:0] stringValue] integerValue];
 		
-		// insert a Deck row into the db to represent the incoming deck
+		// insert a Deck row into the db to represent the incoming deck. Store the iPhone specific deckID.
+		int iPhoneDeckID = [DeckDownloader insertNewDeckMetadataToDBWithUserVisibleID:userVisibleID title:deckTitle author:author];
 		
-			// first, increment the positions of all existing Decks to move them down the list
-			// write value to database
-			sqlite3_stmt *updateStmt = nil;
-			if(updateStmt == nil)
-			{
-				const char *updateSQL = "UPDATE Deck SET position  = position + 1";
-				if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &updateStmt, NULL) != SQLITE_OK)
-					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-			}
-			else
-			{
-				NSLog(@"Error: updatestmt not nil");
-			}
-			
-			if(SQLITE_DONE != sqlite3_step(updateStmt))
-			{NSAssert1(0, @"Error while incrementing DB positions. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-			sqlite3_reset(updateStmt);
-			updateStmt = nil;
-			
-			// now can actually insert the Deck row
-			const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author) VALUES(?,?,?,?,?)";
-			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
-			{
-				NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-			}
-			sqlite3_bind_text(addStmt, 1, [deckTitle UTF8String], -1, SQLITE_TRANSIENT);
-			sqlite3_bind_int(addStmt, 2, 1); // position should always be 1 (i.e. at top of list)
-			sqlite3_bind_int(addStmt, 3, 0); // deck is initially unshuffled
-			sqlite3_bind_int(addStmt, 4, userVisibleID);
-			sqlite3_bind_text(addStmt, 5, [author UTF8String], -1, SQLITE_TRANSIENT);	
-			if(SQLITE_DONE != sqlite3_step(addStmt))
-			{
-				NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-			}
-			else
-			{
-				// store the autoincremented primary key to reference from future inserts
-				deckID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
-			}
-			addStmt = nil;
-		
-		// refresh the decks table to include the new deck
-		[[MyDecksViewController sharedInstance] refreshTable];
-		
-		// ask server to send over full deck details
-		NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", userVisibleID]]];
-		ASIHTTPRequest *fullDeckRequest = [ASIHTTPRequest requestWithURL:url];
-		[fullDeckRequest setDelegate:self];
-		[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];
-		[fullDeckRequest setDidFailSelector:@selector(fullDeckRequestFailed:)];
-		fullDeckRequest.userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-									[NSString stringWithFormat:@"%d", userVisibleID], @"userVisibleID",
-									nil];
-		[fullDeckRequest startAsynchronous];
+		// download the full list of cards for this deck
+		[self sendFullDeckRequestForUserVisibleDeckID:userVisibleID iPhoneDeckID:iPhoneDeckID];
 	}
-	
 	// clean up
 	[doc release];
+}
+
++ (int)insertNewDeckMetadataToDBWithUserVisibleID:(int)aUserVisibleID title:(NSString *)aTitle author:(NSString *)anAuthor
+{
+	int returnedID;
 	
+	// first, increment the positions of all existing Decks to move them down the list
+	// write value to database
+	sqlite3_stmt *stmt = nil;
+	if(stmt == nil)
+	{
+		const char *updateSQL = "UPDATE Deck SET position  = position + 1";
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
+			NSLog(@"Error while creating update statement: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	else
+	{
+		NSLog(@"Error: stmt not nil");
+	}
+	
+	if(SQLITE_DONE != sqlite3_step(stmt))
+	{NSAssert1(0, @"Error while incrementing DB positions: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
+	sqlite3_reset(stmt);
+	stmt = nil;
+	
+	// now can actually insert the Deck row
+	const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author, fully_downloaded) VALUES(?,?,?,?,?,?)";
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &stmt, NULL) != SQLITE_OK)
+	{
+		NSLog(@"Error while creating Deck INSERT statement: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	sqlite3_bind_text(stmt, 1, [aTitle UTF8String], -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int(stmt, 2, 1); // position should always be 1 (i.e. at top of list)
+	sqlite3_bind_int(stmt, 3, 0); // deck is initially unshuffled
+	sqlite3_bind_int(stmt, 4, aUserVisibleID);
+	sqlite3_bind_text(stmt, 5, [anAuthor UTF8String], -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int(stmt, 6, 0); // deck is not yet fully downloaded
+	
+	if(SQLITE_DONE != sqlite3_step(stmt))
+	{
+		NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	else
+	{
+		// store the autoincremented primary key to reference from future inserts
+		returnedID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
+	}
+	stmt = nil;
+	
+	// refresh the decks table to include the new deck
+	[[MyDecksViewController sharedInstance] refreshTable];
+	
+	// return the newly generated iPhone specific Deck ID
+	return returnedID;
 }
 
 - (void)metadataRequestFailed:(ASIHTTPRequest *)request
 {
 	// What deck does this failure correspond to?
 	int userVisibleID = [[request.userInfo valueForKey:@"userVisibleID"] integerValue];
-
+	
 	// tell user that there was a problem and their deck is not being downloaded
 	UIAlertView *errorAlert;
 	errorAlert =  [[UIAlertView alloc]
-					initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with Deck ID %d.", userVisibleID]
-					message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-					delegate: nil
-					cancelButtonTitle: @"OK"
-					otherButtonTitles: nil];
-				
+				   initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with Deck ID %d.", userVisibleID]
+				   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
+				   delegate: nil
+				   cancelButtonTitle: @"OK"
+				   otherButtonTitles: nil];
+	
 	[errorAlert show];
 	[errorAlert release];
 	
@@ -199,6 +232,26 @@ sqlite3_stmt *addStmt;
 	[self completeDownload];
 }
 
+
+#pragma mark -
+#pragma mark Full Deck Request Methods
+
+-(void)sendFullDeckRequestForUserVisibleDeckID:(int)aUserVisibleID iPhoneDeckID:(int)anIphoneDeckID
+{
+	// store iPhone Deck ID for use by remainder of download process
+	deckID = anIphoneDeckID;
+	
+	// ask server to send over full deck details
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", aUserVisibleID]]];
+	ASIHTTPRequest *fullDeckRequest = [ASIHTTPRequest requestWithURL:url];
+	[fullDeckRequest setDelegate:self];
+	[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];
+	[fullDeckRequest setDidFailSelector:@selector(fullDeckRequestFailed:)];
+	fullDeckRequest.userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+								[NSString stringWithFormat:@"%d", aUserVisibleID], @"userVisibleID",
+								nil];
+	[fullDeckRequest startAsynchronous];
+}
 
 - (void) fullDeckRequestFinished:(ASIHTTPRequest *)request
 {
@@ -431,8 +484,25 @@ sqlite3_stmt *addStmt;
 	if ([elementName isEqualToString:@"Deck"])
 	{
 		// parsing has finished
-		// No need to finish off - is handled by parseXMLDeck: above
-		//[self updateUIForParsingCompletion];
+		// update database to show that deck is fully loaded
+		sqlite3_stmt *stmt = nil;
+		if(stmt == nil)
+		{
+			const char *updateSQL = "UPDATE Deck SET fully_downloaded = 1 WHERE id = ?";
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
+				NSLog(@"Error while creating update statement: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+		}
+		else
+		{
+			NSLog(@"Error: stmt not nil");
+		}
+		
+		sqlite3_bind_int(stmt, 1, deckID);
+		
+		if(SQLITE_DONE != sqlite3_step(stmt))
+		{NSAssert1(0, @"Error while setting deck to fully_downloaded in DB: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
+		sqlite3_reset(stmt);
+		stmt = nil;
 	}
 	
 	// Nodes other than Deck and Cards are only interesting if we're inside a Cards block (otherwise it's template information)
@@ -560,9 +630,21 @@ sqlite3_stmt *addStmt;
 	// if there are any downloads waiting, start the oldest now
 	if ([downloadQueue count] > 0)
 	{
-		int nextDeckToDownload = [[downloadQueue objectAtIndex:0] integerValue];
+		DeckDownloaderQueueItem *nextItem = [downloadQueue objectAtIndex:0];
 		[downloadQueue removeObjectAtIndex:0];
-		[self downloadDeckID:nextDeckToDownload];
+		// If there is already metadata in the DB for this queue item, complete its download
+		if ([nextItem metadataAlreadyExists])
+		{
+			[self completeDownloadOfDeckID:[nextItem userVisibleID] withIPhoneDeckID:[nextItem iPhoneDeckID]];
+		}
+		else // otherwise, download the metadata first and then go on to complete it
+		{
+			[self downloadDeckID:[nextItem userVisibleID]];
+		}		
+	}
+	else // if there are no downloads queued, then any sync that was in progress has finished - re-enable the sync button
+	{
+		[MyDecksViewController sharedInstance].syncButton.enabled = YES;
 	}
 }
 

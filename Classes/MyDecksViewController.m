@@ -13,16 +13,16 @@
 #import "ReviseViewController.h"
 #import "SideViewController.h"
 #import "DDXML.h"
-#import "DeckDownloader.h"
 #import "VariableStore.h"
 #import "ProgressViewController.h"
 #import "Constants.h"
-#import "ASIAuthenticationDialog.h"
-#import "MindEggUtilities.h"
+#import "Synchroniser.h"
 
 static MyDecksViewController *sharedMyDecksViewController = nil;
 
 @implementation MyDecksViewController
+
+@synthesize syncButton;
 
 static sqlite3_stmt *deleteStmt = nil;
 
@@ -130,13 +130,32 @@ static sqlite3_stmt *deleteStmt = nil;
 		#endif
 	}
 	
+	// retrieve DeckDetails
 	NSUInteger row = [indexPath row];
-	NSLog([NSString stringWithFormat:@"%d", row]);
 	DeckDetails *currentCellDeck = (DeckDetails *)[localLibraryDetails objectAtIndex:(row)];
 	
-	cell.deckTitle.text = currentCellDeck.title;
-	[cell.leftMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards] forLabel:1];
-	[cell.rightMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards] forLabel:1];
+	// set up title & card counts
+	if (currentCellDeck.fullyDownloaded)
+	{
+		[cell.leftMultipartLabel setText:@"Unknown:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
+		[cell.leftMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards] forLabel:1];
+		[cell.rightMultipartLabel setText:@"Known:  " forLabel:0];
+		[cell.rightMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards] forLabel:1];
+
+		[cell.deckTitle setText:[currentCellDeck title] andColor:[UIColor blackColor] forLabel:0];
+	}
+	else
+	{
+		UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
+		[cell.leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
+		[cell.leftMultipartLabel setText:@"" forLabel:1];
+		[cell.rightMultipartLabel setText:@"" forLabel:0];
+		[cell.rightMultipartLabel setText:@"" forLabel:1];
+
+		[cell.deckTitle setText:[currentCellDeck title] andColor:disabledColor forLabel:0];
+	}
+	
+	// set up first side preview
 	SideViewController *miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;
 	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
@@ -145,6 +164,7 @@ static sqlite3_stmt *deleteStmt = nil;
 	[cell.miniCardView addSubview:miniSideViewController.view];
 	cell.miniCardViewController = miniSideViewController;
 	[miniSideViewController release];
+
 	return cell;
 }
 
@@ -161,22 +181,23 @@ static sqlite3_stmt *deleteStmt = nil;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+{	
 	// find the DB deck id for the selected row
 	int selectedDeckIndex = [indexPath indexAtPosition:([indexPath length]-1)];
 	DeckDetails* selectedDeckDetails = [localLibraryDetails objectAtIndex:selectedDeckIndex];
-	int DBDeckID = selectedDeckDetails.deckID;
-	
-	// instantiate a deck object for this deck ID
-	Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID includeKnownCards:YES];
-	
-	// Push the deck detail view controller onto the navigation stack and reference the new deck object
-	DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
-	deckDetailViewController.title = [deck getDeckTitle];
-	deckDetailViewController.deck = deck;
-	[self.navigationController pushViewController:deckDetailViewController animated:YES];	
-	
-	[deck release];	
+
+	// if the selected deck is fully downloaded, push the deck detail controller with the requested deck
+	if (selectedDeckDetails.fullyDownloaded)
+	{
+		int DBDeckID = selectedDeckDetails.deckID;
+		Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID includeKnownCards:YES];
+		DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
+		deckDetailViewController.title = [deck getDeckTitle];
+		deckDetailViewController.deck = deck;
+		[self.navigationController pushViewController:deckDetailViewController animated:YES];	
+		
+		[deck release];
+	}
 }
 
 #pragma mark -
@@ -345,122 +366,9 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (IBAction)syncDecksWithServer:(id)sender
 {
-	// setup URL
-	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
-	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-	// check for credentials in the keychain
-	NSURLCredential *authenticationCredentials = [ASIHTTPRequest savedCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
-	if (authenticationCredentials) // if credentials exist, request the deck list
-	{
-		// show busy indicator
-		[ProgressViewController startShowingProgress];
-		// send request
-		[request setUsername:[authenticationCredentials user]];
-		[request setPassword:[authenticationCredentials password]];
-		[request setDelegate:self];
-		[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[authenticationCredentials user], @"username", nil]];
-		[request setDidFinishSelector:@selector(deckListRequestFinished:)];
-		[request setDidFailSelector:@selector(deckListRequestFailed:)];
-		[request startAsynchronous];		
-	}
-	else // no credentials exist, so ask for them
-	{
-		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@"" repeatAttempt:NO];
-	}
+	syncButton.enabled = NO;
+	[[Synchroniser sharedInstance] synchronise];
 }
-
-- (void) credentialsEntered
-{
-	// have another go at syncing, using the newly entered credentials
-	[self syncDecksWithServer:self];
-}
-
-- (void) deckListRequestFinished:(ASIHTTPRequest *)request
-{
-	DDXMLDocument *doc;
-	NSString *responseString = [request responseString];
-	doc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:nil];
-	if (doc == nil)	{[doc release];	return;}
-
-	DDXMLElement *rootElement = [doc rootElement];
-	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error...
-	{
-		// remove busy indicator
-		[ProgressViewController stopShowingProgress];		
-		
-		// what are the specifics of the failure?
-		BOOL userRecognised = [[[[rootElement elementsForName:@"logon_succeeded"] objectAtIndex:0] stringValue] boolValue];
-		NSString *username = [request.userInfo valueForKey:@"username"];
-		
-		// if the error was due to a failed logon, show the credentials dialog
-		if (!(userRecognised))
-		{
-			[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:username repeatAttempt:YES];
-		}
-		else // otherwise, just notify the user of the failure
-		{
-			NSString *error_description = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
-			[MindEggUtilities mindEggErrorAlertWithMessage:error_description];
-		}
-	}
-	else // the server returned the deck summary information, so process this and then ask for the full deck
-	{
-		// populate database based on retrieved xml_string
-		int numberDecksReceived = [[doc rootElement] childCount];
-		
-		// remove busy indicator for now (deckparser will put it back on for each individual deck download - the gap shouldn't be noticeable to the user)
-		[ProgressViewController stopShowingProgress];
-		
-		// loop through the decks received
-		for (int i = 0; i <numberDecksReceived; i++)
-		{
-			
-			// find this deck's user_visible_id
-			int userVisibleID = [[[[(DDXMLElement *)[[doc rootElement] childAtIndex:i] elementsForName:@"user_visible_id"] objectAtIndex: 0] stringValue] integerValue];
-			
-			// check if this deck already exists on iphone
-			BOOL deckExistsAlready = NO;
-			const char *sqlStatement = "SELECT user_visible_id FROM Deck WHERE user_visible_id =?;";
-			sqlite3_stmt *compiledStatement;
-			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-			{
-				sqlite3_bind_int(compiledStatement,1,userVisibleID);
-				while(sqlite3_step(compiledStatement) == SQLITE_ROW) // if a row is returned
-				{
-					deckExistsAlready = YES;
-				}
-			}
-			// Release the compiled statement from memory
-			sqlite3_finalize(compiledStatement);
-					
-			// if the deck doesn't already exist, retrieve it
-			if (!(deckExistsAlready))
-			{
-				[[DeckDownloader sharedInstance] downloadDeckID:userVisibleID];
-			}
-		}
-	}
-	
-	// clean up
-	[doc release];
-}
-
-- (void) deckListRequestFailed:(ASIHTTPRequest *)request
-{
-	// remove busy indicator
-	[ProgressViewController stopShowingProgress];
-
-	// tell user that there was a problem and that decks are not being synchronised
- 	UIAlertView *errorAlert = [[UIAlertView alloc]
-							   initWithTitle:  [NSString stringWithFormat:@"Couldn't Synchronize Decks"]
-							   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-							   delegate: nil
-							   cancelButtonTitle: @"OK"
-							   otherButtonTitles: nil];
-	[errorAlert show];
-	[errorAlert release];
-}
-
 
 #pragma mark -
 #pragma mark Other Methods
@@ -472,7 +380,7 @@ static sqlite3_stmt *deleteStmt = nil;
 	localLibraryDetails = [[NSMutableArray alloc] init];
 
 	// retrieve details of each deck from the DB
-	const char *sqlStatement = "SELECT Deck.id, Deck.title, COUNT(DISTINCT all_cards.id), COUNT(DISTINCT known_cards.id), first_sides.first_side_id FROM Deck LEFT OUTER JOIN Card all_cards ON all_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT id as id, deck_id as deck_id FROM Card WHERE Card.known = 1) AS known_cards ON known_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT Side.id AS first_side_id, Card.deck_id AS deck_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.orig_position = 1 AND Side.position = 1) AS first_sides ON first_sides.deck_id = Deck.id GROUP BY Deck.id ORDER BY Deck.position;";
+	const char *sqlStatement = "SELECT Deck.id, Deck.title, COUNT(DISTINCT all_cards.id), COUNT(DISTINCT known_cards.id), first_sides.first_side_id, Deck.fully_downloaded FROM Deck LEFT OUTER JOIN Card all_cards ON all_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT id as id, deck_id as deck_id FROM Card WHERE Card.known = 1) AS known_cards ON known_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT Side.id AS first_side_id, Card.deck_id AS deck_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.orig_position = 1 AND Side.position = 1) AS first_sides ON first_sides.deck_id = Deck.id GROUP BY Deck.id ORDER BY Deck.position;";
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
@@ -490,9 +398,11 @@ static sqlite3_stmt *deleteStmt = nil;
 			int numKnownCards = (int)sqlite3_column_int(compiledStatement, 3);
 			// first side of first card of deck
 			int firstSideID = (int)sqlite3_column_int(compiledStatement, 4);
+			// is deck fully downloaded
+			BOOL fullyDownloaded = (int)sqlite3_column_int(compiledStatement, 5);
 			
 			// Create deck details object with extracted data & add to array
-			DeckDetails *singleDeckDetails = [[DeckDetails alloc] initWithID:deckID firstSideID:firstSideID title:deckTitle numCards:numCards numKnownCards:numKnownCards];
+			DeckDetails *singleDeckDetails = [[DeckDetails alloc] initWithID:deckID firstSideID:firstSideID title:deckTitle numCards:numCards numKnownCards:numKnownCards fullyDownloaded:fullyDownloaded];
 			[localLibraryDetails addObject:singleDeckDetails];
 			[singleDeckDetails release];
 		}

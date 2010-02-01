@@ -16,7 +16,7 @@
 	IBOutlet UIView	*miniCardView;
 	IBOutlet UIView *mainView;
 	// variable text
-	IBOutlet UILabel *deckTitle;
+	IBOutlet MultipartLabel *deckTitle;
 	IBOutlet MultipartLabel *leftMultipartLabel;
 	IBOutlet MultipartLabel *rightMultipartLabel;
 	
@@ -26,7 +26,7 @@
 @property (nonatomic, retain) UIView *miniCardView;
 @property (nonatomic, retain) UIView *mainView;
 
-@property (nonatomic, retain) UILabel *deckTitle;
+@property (nonatomic, retain) MultipartLabel *deckTitle;
 @property (nonatomic, retain) MultipartLabel *leftMultipartLabel;
 @property (nonatomic, retain) MultipartLabel *rightMultipartLabel;
 

@@ -21,6 +21,7 @@ typedef enum {
 }
 
 -(void)updateNumberOfLabels:(int)numLabels fontSize:(int)aFontSize alignment:(MultipartLabelAlignment)anAlignment;
+
 -(void)setText:(NSString *)text andColor:(UIColor*)color forLabel:(int)labelNum;
 -(void)setText:(NSString *)text forLabel:(int)labelNum;
 -(void)setColor:(UIColor*)color forLabel:(int)labelNum;

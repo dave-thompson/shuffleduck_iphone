@@ -68,6 +68,8 @@
 		55CD3CCB0FDC32CA00C4ECB2 /* SideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */; };
 		55CD3EE90FDC593A00C4ECB2 /* CardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3EE80FDC593A00C4ECB2 /* CardViewController.m */; };
 		55CD79E31111627B006A65C4 /* MultipartLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD79E21111627B006A65C4 /* MultipartLabel.m */; };
+		55CE1BC9111701A800530CC4 /* Synchroniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CE1BC7111701A800530CC4 /* Synchroniser.m */; };
+		55CE1C1D1117217900530CC4 /* DeckDownloaderQueueItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CE1C1C1117217900530CC4 /* DeckDownloaderQueueItem.m */; };
 		55CF27BB0FDA9B8700B16DFB /* LibraryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CF27BA0FDA9B8700B16DFB /* LibraryCell.m */; };
 		55CF27BE0FDA9BAF00B16DFB /* LibraryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55CF27BD0FDA9BAF00B16DFB /* LibraryCell.xib */; };
 		55CFB05A10814B03002FF68D /* VariableStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CFB05910814B03002FF68D /* VariableStore.m */; };
@@ -179,6 +181,10 @@
 		55CD3EE80FDC593A00C4ECB2 /* CardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardViewController.m; sourceTree = "<group>"; };
 		55CD79E11111627B006A65C4 /* MultipartLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultipartLabel.h; sourceTree = "<group>"; };
 		55CD79E21111627B006A65C4 /* MultipartLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultipartLabel.m; sourceTree = "<group>"; };
+		55CE1BC7111701A800530CC4 /* Synchroniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Synchroniser.m; sourceTree = "<group>"; };
+		55CE1BC8111701A800530CC4 /* Synchroniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Synchroniser.h; sourceTree = "<group>"; };
+		55CE1C1B1117217900530CC4 /* DeckDownloaderQueueItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDownloaderQueueItem.h; sourceTree = "<group>"; };
+		55CE1C1C1117217900530CC4 /* DeckDownloaderQueueItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDownloaderQueueItem.m; sourceTree = "<group>"; };
 		55CF27B90FDA9B8700B16DFB /* LibraryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryCell.h; sourceTree = "<group>"; };
 		55CF27BA0FDA9B8700B16DFB /* LibraryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryCell.m; sourceTree = "<group>"; };
 		55CF27BD0FDA9BAF00B16DFB /* LibraryCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LibraryCell.xib; sourceTree = "<group>"; };
@@ -364,8 +370,12 @@
 			children = (
 				556138350FAEDEFC00365DF1 /* DownloadViewController.h */,
 				556138360FAEDEFC00365DF1 /* DownloadViewController.m */,
+				55CE1BC7111701A800530CC4 /* Synchroniser.m */,
+				55CE1BC8111701A800530CC4 /* Synchroniser.h */,
 				550E449410FB2E14004B47F4 /* DeckDownloader.h */,
 				550E449510FB2E14004B47F4 /* DeckDownloader.m */,
+				55CE1C1B1117217900530CC4 /* DeckDownloaderQueueItem.h */,
+				55CE1C1C1117217900530CC4 /* DeckDownloaderQueueItem.m */,
 			);
 			name = Download;
 			sourceTree = "<group>";
@@ -614,6 +624,8 @@
 				552BB678110FBA4000793DE3 /* MindEggUtilities.m in Sources */,
 				55CD79E31111627B006A65C4 /* MultipartLabel.m in Sources */,
 				55D3F8DE1112D412003E1688 /* CongratulationsViewController.m in Sources */,
+				55CE1BC9111701A800530CC4 /* Synchroniser.m in Sources */,
+				55CE1C1D1117217900530CC4 /* DeckDownloaderQueueItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

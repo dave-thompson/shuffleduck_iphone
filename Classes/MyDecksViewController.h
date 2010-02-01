@@ -19,6 +19,7 @@
 	IBOutlet UITableView *libraryTableView;
 	TableFooterViewController *tableFooterViewController;
 	UIImageView *noContentImageView;
+	IBOutlet UIBarButtonItem *syncButton;
 }
 
 + (MyDecksViewController *)sharedInstance;
@@ -27,10 +28,8 @@
 - (void) retrieveLocalLibraryDetails;
 - (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
-- (void) credentialsEntered;
-- (void) deckListRequestFailed:(ASIHTTPRequest *)request;
 - (IBAction)pushDownloadScreen:(id)sender;
-- (IBAction)syncDecksWithServer:(id)sender;
 
+@property (nonatomic, retain) UIBarButtonItem *syncButton;
 
 @end

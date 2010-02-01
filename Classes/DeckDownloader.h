@@ -13,18 +13,23 @@
 #import <Foundation/Foundation.h>
 #import "sqlite3.h"
 
-//static int count;
-
 @interface DeckDownloader : NSObject {
 }
 
 + (DeckDownloader *)sharedInstance;
 
 -(void)downloadDeckID:(int)aDeckID;
+-(void)completeDownloadOfDeckID:(int)userVisibleID withIPhoneDeckID:(int)deckID;
+
+-(void)sendMetadataRequestForUserVisibleDeckID:(int)aUserVisibleID;
++ (int)insertNewDeckMetadataToDBWithUserVisibleID:(int)aUserVisibleID title:(NSString *)aTitle author:(NSString *)anAuthor;
+
+-(void)sendFullDeckRequestForUserVisibleDeckID:(int)aUserVisibleID iPhoneDeckID:(int)anIphoneDeckID;
+
 
 -(void) parseXMLDeck:(NSString *)xmlString;
 
-- (void)completeDownload;
 -(void)removePartiallyDownloadedDeckFromDB;
+- (void)completeDownload;
 
 @end
