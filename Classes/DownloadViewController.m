@@ -37,7 +37,7 @@
 	}
 	else // otherwise, create a DeckDownloader which will handle retrieval of the Deck
 	{			
-		[[DeckDownloader alloc] initWithDeckID:[idTextField.text integerValue]];
+		[[DeckDownloader sharedInstance] downloadDeckID:[idTextField.text integerValue]];
 	}
 	
 	// go back to the library screen

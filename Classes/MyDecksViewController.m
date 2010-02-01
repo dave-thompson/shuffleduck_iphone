@@ -436,7 +436,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			// if the deck doesn't already exist, retrieve it
 			if (!(deckExistsAlready))
 			{
-				[[DeckDownloader alloc] initWithDeckID:userVisibleID];
+				[[DeckDownloader sharedInstance] downloadDeckID:userVisibleID];
 			}
 		}
 	}

@@ -18,7 +18,7 @@ const NSString* ERROR_DIALOG_TITLE = @"Oh no....";
 
 //const NSString* CONTEXT_URL = @"http://localhost:3000";
 //const NSString* CONTEXT_URL = @"http://192.168.1.30:3000";
-const NSString* CONTEXT_URL = @"http://mindegg.heroku.com";
+const NSString* CONTEXT_URL = @"http://shuffleduck.heroku.com";
 
 //const NSInteger MyIntegerConstant = 666;
 

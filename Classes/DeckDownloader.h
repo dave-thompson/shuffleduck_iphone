@@ -6,9 +6,9 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 //
-//	DeckParser is designed to be used one time, to download a deck with a specified User Visible Deck ID
-//	Do not use a single instance of DeckParser to download more than a single deck
-
+// DeckDownloader provides a singleton instance which may be used to download decks through the (void)downloadDeckID:(int)aDeckID method.
+// Objects should call this method using [[DeckDownloader sharedInstance] downloadDeckID:30009999];
+// DeckDownloader operates in the background and manages a queue of downloads if necessary. Simply call this function and forget about it.
 
 #import <Foundation/Foundation.h>
 #import "sqlite3.h"
@@ -18,13 +18,13 @@
 @interface DeckDownloader : NSObject {
 }
 
--(id) initWithDeckID:(int)did;
++ (DeckDownloader *)sharedInstance;
 
--(void) parseXMLDeck:(NSString *)xmlString withUserID:(int)userVisibleID;
+-(void)downloadDeckID:(int)aDeckID;
 
--(void) updateUIForParsingCompletion;
--(void) removeDeckWithUserVisibleID:(int)aUserVisibleID;
+-(void) parseXMLDeck:(NSString *)xmlString;
 
-- (void) finalizeStatements;
+- (void)completeDownload;
+-(void)removePartiallyDownloadedDeckFromDB;
 
 @end
