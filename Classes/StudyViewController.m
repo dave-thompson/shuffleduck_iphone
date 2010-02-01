@@ -19,7 +19,7 @@ static StudyViewController *sharedStudyViewController = nil;
 
 @implementation StudyViewController
 
-@synthesize deck, database;
+@synthesize deck;
 
 // Background color variables
 CGFloat red = 0.0;
@@ -87,12 +87,10 @@ InlineScoreViewController *inlineScoreViewController;
 			topCardViewController = [[CardViewController alloc] initWithNibName:@"SideView" bundle:nil];
 			topCardViewController.view.frame = CGRectMake(30, 16, 260, 160);
 			[self.view insertSubview:topCardViewController.view atIndex:4];
-			topCardViewController.database = deck.database;
 	
 			bottomCardViewController = [[CardViewController alloc] initWithNibName:@"SideView" bundle:nil];
 			bottomCardViewController.view.frame = CGRectMake(30, 192, 260, 160);
 			[self.view insertSubview:bottomCardViewController.view atIndex:4];
-			bottomCardViewController.database = deck.database;
 	
 	// Set up the inline score view
 	inlineScoreViewController = [InlineScoreViewController sharedInstance];
@@ -275,7 +273,7 @@ InlineScoreViewController *inlineScoreViewController;
 {
 	/* COLOR CHANGE DISABLED
 	// assign random color to background and store as state
-	UIColor *randomColor = [RandomColor randomColorWithStateUpdate:(database)];
+	UIColor *randomColor = [RandomColor randomColorWithStateUpdate];
 	outerView.backgroundColor = randomColor;
 	topCardViewController.view.backgroundColor = randomColor;
 	bottomCardViewController.view.backgroundColor = randomColor;

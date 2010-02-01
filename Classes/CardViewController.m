@@ -18,7 +18,7 @@
 @implementation CardViewController
 
 @synthesize sideAViewController, sideBViewController;
-@synthesize database, DBDeckID, animationInProgress;
+@synthesize DBDeckID, animationInProgress;
 
 
 - (void)viewDidLoad {
@@ -148,12 +148,12 @@
 	if (sideAViewController.view.superview == nil) // side A is the back side
 	{	
 		// load side B from the DB
-		[sideBViewController replaceSideWithSideID:sideID FromDB:database];
+		[sideBViewController replaceSideWithSideID:sideID];
 	}
 	else
 	{
 		// load side A from the DB
-		[sideAViewController replaceSideWithSideID:sideID FromDB:database];
+		[sideAViewController replaceSideWithSideID:sideID];
 
 	}
 }
@@ -163,12 +163,12 @@
 	if (sideAViewController.view.superview == nil) // side A is the back side
 	{	
 		// load side A from the DB
-		[sideAViewController replaceSideWithSideID:sideID FromDB:database];
+		[sideAViewController replaceSideWithSideID:sideID];
 	}
 	else
 	{
 		// load side B from the DB
-		[sideBViewController replaceSideWithSideID:sideID FromDB:database];
+		[sideBViewController replaceSideWithSideID:sideID];
 	}
 	
 }

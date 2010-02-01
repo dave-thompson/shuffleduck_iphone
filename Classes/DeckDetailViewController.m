@@ -14,7 +14,7 @@ static DeckDetailViewController *sharedDeckDetailViewController = nil;
 
 @implementation DeckDetailViewController
 
-@synthesize deck, database;
+@synthesize deck;
 
 SideViewController *miniSideViewController;
 
@@ -58,7 +58,6 @@ SideViewController *miniSideViewController;
 	// Prepare the study view controller (referencing the new deck object)
 	StudyViewController *studyViewController = [StudyViewController sharedInstance];
 	studyViewController.deck = deck;
-	studyViewController.database = database;
 	[studyViewController setStudyType:type];
 	
 	// Push the study view controller onto the navigation stack
@@ -109,7 +108,7 @@ SideViewController *miniSideViewController;
 	miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;
 	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
-	[miniSideViewController replaceSideWithSideID:firstSideID FromDB:database];
+	[miniSideViewController replaceSideWithSideID:firstSideID];
 	miniSideViewController.view.frame = CGRectMake(1, 1, 104, 64);
 	[firstCardView addSubview:miniSideViewController.view];
 	

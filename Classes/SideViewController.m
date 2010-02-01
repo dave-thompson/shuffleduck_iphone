@@ -7,6 +7,7 @@
 //
 
 #import "SideViewController.h"
+#import "VariableStore.h"
 
 
 @implementation SideViewController
@@ -41,7 +42,7 @@
 	}
 }
 
--(void)replaceSideWithSideID:(int)sideID FromDB:(sqlite3 *)sourceDatabase
+-(void)replaceSideWithSideID:(int)sideID
 {
 	// clear the old side
 	[self clearSide];
@@ -50,7 +51,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT Component.type, Component.x, Component.y, Component.width, Component.height, TextBox.text, TextBox.font_id, TextBox.font_size, TextBox.foreground_red, TextBox.foreground_green, TextBox.foreground_blue, TextBox.foreground_alpha, TextBox.background_red, TextBox.background_green, TextBox.background_blue, TextBox.background_alpha, TextBox.alignment_id, Image.image FROM Component LEFT OUTER JOIN TextBox ON Component.id = TextBox.component_id LEFT OUTER JOIN Image ON Component.id = Image.component_id WHERE Component.side_id = %d ORDER BY Component.display_order ASC;",sideID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(sourceDatabase, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		// Process each returned row (== component) in turn
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -146,7 +147,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(sourceDatabase)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	
 }

@@ -1,5 +1,5 @@
 //
-//  AllDecksViewController.m
+//  DonwloadViewController.m
 //  MindEgg
 //
 //  Created by Dave Thompson on 5/4/09.
@@ -8,21 +8,17 @@
 
 #import "DownloadViewController.h"
 #import "VariableStore.h"
-#import "DeckParser.h"
+#import "DeckDownloader.h"
 #import "ProgressViewController.h"
 
 @implementation DownloadViewController
 
-@synthesize database;
-
 - (void)viewDidLoad {
-
 	// set up background color
-	//UIColor *color = [[VariableStore sharedInstance] backgroundColor];
-	//super.view.backgroundColor = color;
+	UIColor *color = [[VariableStore sharedInstance] backgroundColor];
+	super.view.backgroundColor = color;
 	
 	[idTextField	becomeFirstResponder];
-	
     [super viewDidLoad];	
 }
 
@@ -39,16 +35,13 @@
 		[errorAlert show];
 		[errorAlert release];
 	}
-	else // otherwise, get the requested deck
+	else // otherwise, create a DeckDownloader which will handle retrieval of the Deck
 	{			
-		// get the deck
-		DeckParser *deckParser = [[DeckParser alloc] init];
-		[deckParser getDeckWithUserDeckID:[idTextField.text integerValue] intoDB:database];
+		[[DeckDownloader alloc] initWithDeckID:[idTextField.text integerValue]];
 	}
 	
 	// go back to the library screen
-	[self.navigationController popViewControllerAnimated:YES];
-	
+	[self.navigationController popViewControllerAnimated:YES];	
 }
 
 - (void)didReceiveMemoryWarning {

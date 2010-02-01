@@ -11,17 +11,12 @@
 
 @interface MindEggAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> {
     IBOutlet UIWindow *window;
-	//UITabBarController *tabBarController;
-	NSString *dbPath;
-	sqlite3 *database;
 }
 
 @property (nonatomic, retain) UIWindow *window;
 
-- (void) copyDatabaseIfNeeded;
-- (void) connectToDBAndRetrieveState;
-- (NSString *)getDBPath;
-- (void) connectToDBAndRetrieveState;
+- (NSString *)findDatabase;
+- (void)connectToDB:(NSString *)dbPath;
 - (void) processUserDefaults;
 
 @end

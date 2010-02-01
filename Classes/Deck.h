@@ -11,7 +11,6 @@
 
 @interface Deck : NSObject {
 	int currentDeckID, currentCardID, currentSideID;
-	sqlite3 *database;
 }
 
 typedef enum {
@@ -27,9 +26,8 @@ typedef enum {
 
 
 @property (nonatomic, assign) int currentDeckID, currentCardID, currentSideID;
-@property (nonatomic, assign) sqlite3 *database;
 
--(id)initWithDeckID:(int)deckID Database:(sqlite3 *)database includeKnownCards:(BOOL)includeKnown;
+-(id)initWithDeckID:(int)deckID includeKnownCards:(BOOL)includeKnown;
 -(int)getCurrentSideID;
 -(int)getOriginalFirstSideID;
 -(int)numCards;

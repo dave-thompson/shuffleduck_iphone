@@ -16,6 +16,7 @@
 	UIColor *mindeggRed;
 	UIColor *mindeggGreyText;
 	NSString *contextURL;
+	sqlite3 *database;
 }
 
 @property (nonatomic, retain) UIColor *backgroundColor;
@@ -23,6 +24,7 @@
 @property (nonatomic, retain) UIColor *mindeggRed;
 @property (nonatomic, retain) UIColor *mindeggGreyText;
 @property (nonatomic, retain) NSString *contextURL;
+@property (nonatomic, assign) sqlite3 *database;
 
 + (VariableStore *)sharedInstance;
 

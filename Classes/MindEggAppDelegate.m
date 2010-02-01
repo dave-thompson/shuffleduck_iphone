@@ -13,6 +13,7 @@
 #import "FeedbackViewController.h"
 #import "ReviseViewController.h"
 #import "Constants.h"
+#import "VariableStore.h"
 
 @implementation MindEggAppDelegate
 
@@ -21,67 +22,35 @@
 BOOL referenceMode = NO;
 NSString *dbName = @"MindEgg.sqlite";
 
-UINavigationController *libraryNavController;
+UINavigationController *navigationController;
+
+#pragma mark -
+#pragma mark Main Method
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
-	
+
+	// set Look & Feel
 	[application setStatusBarStyle:UIStatusBarStyleDefault];
-	
-	// process and defaults the user has set in the settings application
+
+	// Handle User Defaults File
 	[self processUserDefaults];
 	
-	// open DB connection and retrieve state data
-	[self connectToDBAndRetrieveState];
+	// Set up DB for use
+	[self connectToDB:[self findDatabase]];
 	
-	// set up the tab bar controller
-	//tabBarController = [[UITabBarController alloc] init];
-	//tabBarController.delegate = self;
-	
-	libraryNavController = [[UINavigationController alloc] init];
-	
+	// Create a navigation controller and push a Library view controller onto it
+	navigationController = [[UINavigationController alloc] init];	
 	MyDecksViewController *myDecksViewController = [MyDecksViewController sharedInstance];
 	myDecksViewController.title = @"MindEgg";
-	myDecksViewController.database = database;
-	[libraryNavController pushViewController:myDecksViewController animated:NO];
-	//libraryNavController.tabBarItem.title = @"Library";
-	//libraryNavController.tabBarItem.image = [UIImage imageNamed:@"library.png"];
-	libraryNavController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
+	[navigationController pushViewController:myDecksViewController animated:NO];
+	navigationController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
 	
-	//FeedbackViewController *feedbackViewController = [[FeedbackViewController alloc] initWithNibName:@"FeedbackView" bundle:nil];
-	//feedbackViewController.title = @"Feedback";
-
-	/* REVISE DESCOPED
-	ReviseViewController *reviseViewController = [[ReviseViewController alloc] initWithNibName:@"ReviseView" bundle:nil];
-	reviseViewController.title = @"Revise";
-	*/
-	
-	// Add the view controllers to the tab bar controller
-	//tabBarController.viewControllers = [NSArray arrayWithObjects:libraryNavController, feedbackViewController, nil];
-		
-    // Add tab bar controller's view to the window
-	//[window addSubview:tabBarController.view];
-    [window addSubview:libraryNavController.view];
+    [window addSubview:navigationController.view];
 	[window makeKeyAndVisible];
-
-	// clean up memory
 }
 
-- (void) connectToDBAndRetrieveState
-{
-	
-	// if this is the first time app has been loaded, copy the database to a writeable file area
-	[self copyDatabaseIfNeeded];
-	
-	// open the database (to be kept open for application lifetime)
-	if (sqlite3_open([dbPath UTF8String], &database) != SQLITE_OK)
-	{
-		sqlite3_close(database);
-		NSLog(@"Failed to open database");
-	}
-	
-	// retrieve application state from DB
-		// Currently no state other than color, which is loaded from the DB locally by the respective view controllers
-}
+#pragma mark -
+#pragma mark User Defaults Methods
 
 - (void) processUserDefaults
 {
@@ -99,44 +68,61 @@ UINavigationController *libraryNavController;
 	}
 }
 
-- (void) copyDatabaseIfNeeded
+#pragma mark -
+#pragma mark Database Methods
+
+- (NSString *)findDatabase
 {
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	NSError *error;
-	dbPath = [self getDBPath];
-	BOOL dbExists = [fileManager fileExistsAtPath:dbPath];
 	
-	if(!dbExists) // if database not yet copied to filestore, then copy it to the filestore
+	// get database file path
+	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES);
+	NSString *documentsDir = [paths objectAtIndex:0];
+	NSString *dbPath = [documentsDir stringByAppendingPathComponent:dbName];	
+	
+	// if database not yet copied to filestore (i.e. this is first application launch), then copy it to the filestore
+	BOOL dbExists = [fileManager fileExistsAtPath:dbPath];
+	if(!dbExists)
 	{
 		NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:dbName];
 		dbExists = [fileManager copyItemAtPath:defaultDBPath toPath:dbPath error:&error];
 		NSLog(defaultDBPath);
 		NSLog(dbPath);
 	}
-		
-	if(!dbExists) // if it still doesn't exist, something went wrong with the copy....
+	
+	if(!dbExists) // if it still doesn't exist, something went wrong with the copy: log the problem
 	{
 		NSLog(@"Failed to create writeable database file with message '%@'.", [error localizedDescription]);
 	}
-
 	
+	return dbPath;
 }
 
-- (NSString *)getDBPath
+- (void)connectToDB:(NSString *)dbPath
 {
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES);
-	NSString *documentsDir = [paths objectAtIndex:0];
-	return [documentsDir stringByAppendingPathComponent:dbName];
+	sqlite3 *db;
+	// open the database (to be kept open for application lifetime)
+	if (sqlite3_open([dbPath UTF8String], &db) != SQLITE_OK)
+	{
+		sqlite3_close(db);
+		NSLog(@"Failed to open database");
+	}
+	
+	// Store the database pointer as a global variable
+	[VariableStore sharedInstance].database = db;
 }
+
+#pragma mark -
+#pragma mark Tidy Up Methods
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-	sqlite3_close(database);
+	sqlite3_close([VariableStore sharedInstance].database);
 }
 
 - (void)dealloc {
-	//[tabBarController release];
-	[libraryNavController release];
+	[navigationController release];
     [window release];
     [super dealloc];
 }

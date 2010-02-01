@@ -24,7 +24,7 @@
 		550E441910FAE1F3004B47F4 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441810FAE1F3004B47F4 /* CFNetwork.framework */; };
 		550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441A10FAE1FD004B47F4 /* SystemConfiguration.framework */; };
 		550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441C10FAE216004B47F4 /* libz.1.2.3.dylib */; };
-		550E449610FB2E14004B47F4 /* DeckParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 550E449510FB2E14004B47F4 /* DeckParser.m */; };
+		550E449610FB2E14004B47F4 /* DeckDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 550E449510FB2E14004B47F4 /* DeckDownloader.m */; };
 		550F4FCF107D7C10002A6662 /* NarrowGreenTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 550F4FCD107D7C10002A6662 /* NarrowGreenTick.png */; };
 		550F4FD0107D7C10002A6662 /* NarrowWhiteTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 550F4FCE107D7C10002A6662 /* NarrowWhiteTick.png */; };
 		5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22B107D1C940074B376 /* FeedbackView.xib */; };
@@ -112,8 +112,8 @@
 		550E441810FAE1F3004B47F4 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		550E441A10FAE1FD004B47F4 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		550E441C10FAE216004B47F4 /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = usr/lib/libz.1.2.3.dylib; sourceTree = SDKROOT; };
-		550E449410FB2E14004B47F4 /* DeckParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckParser.h; sourceTree = "<group>"; };
-		550E449510FB2E14004B47F4 /* DeckParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckParser.m; sourceTree = "<group>"; };
+		550E449410FB2E14004B47F4 /* DeckDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDownloader.h; sourceTree = "<group>"; };
+		550E449510FB2E14004B47F4 /* DeckDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDownloader.m; sourceTree = "<group>"; };
 		550F4FCD107D7C10002A6662 /* NarrowGreenTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NarrowGreenTick.png; sourceTree = "<group>"; };
 		550F4FCE107D7C10002A6662 /* NarrowWhiteTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NarrowWhiteTick.png; sourceTree = "<group>"; };
 		5510E22B107D1C940074B376 /* FeedbackView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeedbackView.xib; sourceTree = "<group>"; };
@@ -335,8 +335,8 @@
 				55CD3EE80FDC593A00C4ECB2 /* CardViewController.m */,
 				55CD3CC90FDC32CA00C4ECB2 /* SideViewController.h */,
 				55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */,
-				55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */,
 				55D3F8DC1112D412003E1688 /* CongratulationsViewController.h */,
+				55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */,
 			);
 			name = Study;
 			sourceTree = "<group>";
@@ -364,8 +364,8 @@
 			children = (
 				556138350FAEDEFC00365DF1 /* DownloadViewController.h */,
 				556138360FAEDEFC00365DF1 /* DownloadViewController.m */,
-				550E449410FB2E14004B47F4 /* DeckParser.h */,
-				550E449510FB2E14004B47F4 /* DeckParser.m */,
+				550E449410FB2E14004B47F4 /* DeckDownloader.h */,
+				550E449510FB2E14004B47F4 /* DeckDownloader.m */,
 			);
 			name = Download;
 			sourceTree = "<group>";
@@ -603,7 +603,7 @@
 				550E440710FAE181004B47F4 /* ASINetworkQueue.m in Sources */,
 				550E440810FAE181004B47F4 /* ASINSStringAdditions.m in Sources */,
 				550E440910FAE181004B47F4 /* Reachability.m in Sources */,
-				550E449610FB2E14004B47F4 /* DeckParser.m in Sources */,
+				550E449610FB2E14004B47F4 /* DeckDownloader.m in Sources */,
 				5576B10A10FC89F600306F4C /* NSStringAdditions.m in Sources */,
 				5576B11510FC8A1D00306F4C /* DDXMLNode.m in Sources */,
 				5576B11610FC8A1D00306F4C /* DDXMLElementAdditions.m in Sources */,

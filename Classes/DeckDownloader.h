@@ -1,5 +1,5 @@
 //
-//  DeckParser.h
+//  DeckDownloader.h
 //  MindEgg
 //
 //  Created by Dave Thompson on 1/11/10.
@@ -13,16 +13,18 @@
 #import <Foundation/Foundation.h>
 #import "sqlite3.h"
 
-@interface DeckParser : NSObject {
-	sqlite3 *database;
+//static int count;
+
+@interface DeckDownloader : NSObject {
 }
 
-@property (nonatomic, assign) sqlite3 *database;
+-(id) initWithDeckID:(int)did;
 
-- (void) getDeckWithUserDeckID:(int)did intoDB:(sqlite3 *)db;
-- (void) parseXMLDeck:(NSString *)xmlString withUserID:(int)userVisibleID;
+-(void) parseXMLDeck:(NSString *)xmlString withUserID:(int)userVisibleID;
+
+-(void) updateUIForParsingCompletion;
 -(void) removeDeckWithUserVisibleID:(int)aUserVisibleID;
+
 - (void) finalizeStatements;
-- (void) updateUIForParsingCompletion;
 
 @end

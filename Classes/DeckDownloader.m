@@ -1,5 +1,5 @@
 //
-//  DeckParser.m
+//  DeckDownloader.m
 //  MindEgg
 //
 //
@@ -7,7 +7,7 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "DeckParser.h"
+#import "DeckDownloader.h"
 #import "DDXML.h"
 #import "ASIHTTPRequest.h"
 #import "VariableStore.h"
@@ -15,11 +15,7 @@
 #import "ProgressViewController.h"
 #import "Constants.h"
 
-@implementation DeckParser
-
-@synthesize database;
-
-//NSString *xmlFileName = @"xmlFile.xml";
+@implementation DeckDownloader
 
 BOOL inCardsDefinition; // is XML parser currently looking at cards (rather than template)
 
@@ -51,15 +47,19 @@ NSDate *startTime;
 
 sqlite3_stmt *addStmt;
 
-- (void) getDeckWithUserDeckID:(int)did intoDB:(sqlite3 *)db
+#pragma mark -
+#pragma mark Web Service Methods
+
+-(id) initWithDeckID:(int)aDeckID
 {
+	[super init];
+	
 	// show busy indicator
 	[ProgressViewController startShowingProgress];
 	
 	// store source and destination information
-	database = db;
-	int userVisibleID = did;
-		
+	int userVisibleID = aDeckID;
+	
 	// retrieve deck metadata
 	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", userVisibleID]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
@@ -70,6 +70,8 @@ sqlite3_stmt *addStmt;
 	[request setDidFinishSelector:@selector(metadataRequestFinished:)];
 	[request setDidFailSelector:@selector(metadataRequestFailed:)];
 	[request startAsynchronous];
+	
+	return self;
 }
 
 - (void) metadataRequestFinished:(ASIHTTPRequest *)request
@@ -106,8 +108,8 @@ sqlite3_stmt *addStmt;
 			if(updateStmt == nil)
 			{
 				const char *updateSQL = "UPDATE Deck SET position  = position + 1";
-				if(sqlite3_prepare_v2(database, updateSQL, -1, &updateStmt, NULL) != SQLITE_OK)
-					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+				if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
@@ -115,15 +117,15 @@ sqlite3_stmt *addStmt;
 			}
 			
 			if(SQLITE_DONE != sqlite3_step(updateStmt))
-			{NSAssert1(0, @"Error while incrementing DB positions. '%s'", sqlite3_errmsg(database));}
+			{NSAssert1(0, @"Error while incrementing DB positions. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 			sqlite3_reset(updateStmt);
 			updateStmt = nil;
 			
 			// now can actually insert the Deck row
 			const char *sql = "INSERT INTO Deck(title, position, shuffled, user_visible_id, author) VALUES(?,?,?,?,?)";
-			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 			{
-				NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error while creating Deck INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			sqlite3_bind_text(addStmt, 1, [deckTitle UTF8String], -1, SQLITE_TRANSIENT);
 			sqlite3_bind_int(addStmt, 2, 1); // position should always be 1 (i.e. at top of list)
@@ -132,12 +134,12 @@ sqlite3_stmt *addStmt;
 			sqlite3_bind_text(addStmt, 5, [author UTF8String], -1, SQLITE_TRANSIENT);	
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{
-				NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error running Deck INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
 				// store the autoincremented primary key to reference from future inserts
-				//deckID = sqlite3_last_insert_rowid(database);
+				//deckID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
 			}
 			addStmt = nil;
 		
@@ -181,6 +183,7 @@ sqlite3_stmt *addStmt;
 	// parsing has finished - refresh the UI
 	[self updateUIForParsingCompletion];
 }
+
 
 - (void) fullDeckRequestFinished:(ASIHTTPRequest *)request
 {
@@ -233,6 +236,8 @@ sqlite3_stmt *addStmt;
 	[self updateUIForParsingCompletion];
 }
 
+#pragma mark -
+#pragma mark Parsing Methods
 
 - (void) parseXMLDeck:(NSString *)xmlString withUserID:(int)userVisibleID
 {
@@ -305,7 +310,7 @@ sqlite3_stmt *addStmt;
 			// find out what iPhone deck_id the current userVisibleDeckID corresponds to
 				const char *sqlStatement = "SELECT id FROM Deck WHERE user_visible_id =?;";
 				sqlite3_stmt *compiledStatement;
-				if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+				if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 				{
 					sqlite3_bind_int(compiledStatement,1,userVisibleDeckID);
 					while(sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -322,9 +327,9 @@ sqlite3_stmt *addStmt;
 			currentSidePosition = 0; // will be incremented to 1 before addition of 1st side
 			// insert a Card row into the db to represent the incoming card
 			const char *sql = "INSERT INTO Card(deck_id, orig_position, position, known) VALUES(?,?,?,?)";
-			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 			{
-				NSLog(@"Error while creating Card INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error while creating Card INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			sqlite3_bind_int(addStmt, 1, deckID);
 			sqlite3_bind_int(addStmt, 2, currentCardPosition);
@@ -333,12 +338,12 @@ sqlite3_stmt *addStmt;
 			
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{
-				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
 				// store the autoincremented primary key to reference from future inserts
-				cardID = sqlite3_last_insert_rowid(database);
+				cardID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
 			}
 			addStmt = nil;
 		}
@@ -349,21 +354,21 @@ sqlite3_stmt *addStmt;
 			currentComponentPosition = 0;
 			// insert a Side row into the db to represent the incoming Side
 			const char *sql = "INSERT INTO Side(card_id, position) VALUES(?,?)";
-			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 			{
-				NSLog(@"Error while creating Side INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error while creating Side INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			sqlite3_bind_int(addStmt, 1, cardID);
 			sqlite3_bind_int(addStmt, 2, currentSidePosition);
 			
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{
-				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
 				// store the autoincremented primary key to reference from future inserts
-				sideID = sqlite3_last_insert_rowid(database);
+				sideID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
 			}
 			addStmt = nil;
 		}
@@ -381,9 +386,9 @@ sqlite3_stmt *addStmt;
 			
 			// insert a Component row into the db to represent the incoming Component
 			const char *sql = "INSERT INTO Component(side_id, display_order,x,y,width,height,type) VALUES(?,?,?,?,?,?,?)";
-			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 			{
-				NSLog(@"Error while creating Component INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error while creating Component INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			sqlite3_bind_int(addStmt, 1, sideID);
 			sqlite3_bind_int(addStmt, 2, currentComponentPosition);
@@ -395,12 +400,12 @@ sqlite3_stmt *addStmt;
 			
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{
-				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error running Card INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
 				// store the autoincremented primary key to reference from future inserts
-				componentID = sqlite3_last_insert_rowid(database);
+				componentID = sqlite3_last_insert_rowid([VariableStore sharedInstance].database);
 			}
 			addStmt = nil;
 		}
@@ -446,9 +451,9 @@ sqlite3_stmt *addStmt;
 		{
 			// insert a TextBox row into the db to represent the incoming TextBox
 			const char *sql = "INSERT INTO TextBox(component_id, text, font_id, font_size, foreground_red, foreground_green, foreground_blue, foreground_alpha, background_red, background_green, background_blue, background_alpha, alignment_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
-			if(sqlite3_prepare_v2(database, sql, -1, &addStmt, NULL) != SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &addStmt, NULL) != SQLITE_OK)
 			{
-				NSLog(@"Error while creating TextBox INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error while creating TextBox INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			sqlite3_bind_int(addStmt, 1, componentID);
 			sqlite3_bind_text(addStmt, 2, [text UTF8String], -1, SQLITE_TRANSIENT);
@@ -466,7 +471,7 @@ sqlite3_stmt *addStmt;
 			
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{
-				NSLog(@"Error running TextBox INSERT statement. '%s'", sqlite3_errmsg(database));
+				NSLog(@"Error running TextBox INSERT statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			
 			addStmt = nil;
@@ -522,6 +527,9 @@ sqlite3_stmt *addStmt;
 	currentText = [currentText stringByAppendingString:string];	
 }
 
+#pragma mark -
+#pragma mark Clean Up & Completion Methods
+
 -(void)removeDeckWithUserVisibleID:(int)aUserVisibleID
 {
 	// remove deck row from DB
@@ -530,14 +538,14 @@ sqlite3_stmt *addStmt;
 	if(deleteStmt == nil)
 	{
 		const char *sql = [deletionString UTF8String];
-		if(sqlite3_prepare_v2(database, sql, -1, &deleteStmt, NULL) != SQLITE_OK)
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &deleteStmt, NULL) != SQLITE_OK)
 		{
-			NSLog(@"Error while creating delete statement while cleaning up partially downloaded deck. '%s'", sqlite3_errmsg(database));
+			NSLog(@"Error while creating delete statement while cleaning up partially downloaded deck. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 		}
 	}
 	
 	if (SQLITE_DONE != sqlite3_step(deleteStmt))
-		NSLog(@"Error while deleting while cleaning up partically downloaded deck. '%s'", sqlite3_errmsg(database));
+		NSLog(@"Error while deleting while cleaning up partically downloaded deck. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	
 	sqlite3_reset(deleteStmt);
 	deleteStmt = nil;

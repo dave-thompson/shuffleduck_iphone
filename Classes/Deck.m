@@ -7,21 +7,20 @@
 //
 
 #import "Deck.h"
+#import "VariableStore.h"
 
 
 @implementation Deck
 
-@synthesize database, currentDeckID, currentCardID, currentSideID;
+@synthesize currentDeckID, currentCardID, currentSideID;
 
 #pragma mark Iniatialiser
 
--(id)initWithDeckID:(int)deckID Database:(sqlite3 *)deckDatabase includeKnownCards:(BOOL)includeKnown
-// Initiates the Deck using the specified database and DeckID.
+-(id)initWithDeckID:(int)deckID includeKnownCards:(BOOL)includeKnown
 // Sets the deck pointer to the first side of the first card.
 {
-	// populate the database, currentDeckID
+	// populate the currentDeckID
 	self.currentDeckID = deckID;
-	self.database = deckDatabase;
 	
 	[self moveToCardAtPosition:FirstCard includeKnownCards:includeKnown];
 	
@@ -55,7 +54,7 @@
 	
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -66,7 +65,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return cardsExist;
 }
@@ -101,7 +100,7 @@
 	
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -112,7 +111,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	
 	if (success == NO) // no rows were returned - i.e. already looking at either the last or first card
@@ -136,7 +135,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT next_side.id FROM Side next_side, Side current_side WHERE current_side.id = %d AND next_side.card_id = current_side.card_id AND next_side.position > current_side.position ORDER BY next_side.position ASC LIMIT 1;", currentSideID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -146,7 +145,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return nextSideExists;
 }
@@ -160,7 +159,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -169,7 +168,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return numCardsInDeck;
 }
@@ -181,7 +180,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d AND Card.known = 1;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -190,7 +189,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return numKnownCardsInDeck;
 }
@@ -202,7 +201,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT Side.id AS first_side_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.deck_id = %d AND Card.orig_position = 1 AND Side.position = 1", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -211,7 +210,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return firstSideID;
 	
@@ -228,7 +227,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT known FROM Card WHERE Card.id = %d;", currentCardID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -237,7 +236,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	if (isCurrentCardKnown == 0)
 		{return NO;}
@@ -259,8 +258,8 @@
 	if(updateStmt == nil)
 	{
 		const char *sql = "UPDATE Card SET known = ? WHERE Card.id = ?";
-		if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
 	else
 	{
@@ -271,7 +270,7 @@
 	sqlite3_bind_int(updateStmt, 2, currentCardID);
 		
 	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with card known value. '%s'", sqlite3_errmsg(database));}
+	{NSAssert1(0, @"Error while updating DB with card known value. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 	
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
@@ -283,7 +282,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT title FROM Deck WHERE Deck.id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -292,7 +291,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return title;
 }
@@ -303,7 +302,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -312,7 +311,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return author;
 }
@@ -323,7 +322,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -332,7 +331,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return userVisibleID;
 }
@@ -368,8 +367,8 @@
 		if(updateStmt == nil)
 		{
 			const char *sql = "UPDATE Card SET position = ? WHERE orig_position = ? AND deck_id = ?";
-			if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 		}
 		else
 		{
@@ -380,7 +379,7 @@
 		sqlite3_bind_int(updateStmt, 3, currentDeckID);
 				
 		if(SQLITE_DONE != sqlite3_step(updateStmt))
-		{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg(database));}
+		{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 		
 		sqlite3_reset(updateStmt);
 		updateStmt = nil;
@@ -390,8 +389,8 @@
 	if(updateStmt == nil)
 	{
 		const char *sql = "UPDATE Deck SET shuffled = 1 WHERE Deck.id = ?";
-		if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
 	else
 	{
@@ -400,7 +399,7 @@
 	sqlite3_bind_int(updateStmt, 1, currentDeckID);
 	
 	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg(database));}
+	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 	
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
@@ -418,8 +417,8 @@
 	if(updateStmt == nil)
 	{
 		const char *sql = "UPDATE Card SET position = orig_position WHERE deck_id = ?";
-		if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
 	else
 	{
@@ -429,7 +428,7 @@
 	sqlite3_bind_int(updateStmt, 1, currentDeckID);
 	
 	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with original positions. '%s'", sqlite3_errmsg(database));}
+	{NSAssert1(0, @"Error while updating DB with original positions. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 	
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
@@ -438,8 +437,8 @@
 	if(updateStmt == nil)
 	{
 		const char *sql = "UPDATE Deck SET shuffled = 0 WHERE Deck.id = ?";
-		if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
 	else
 	{
@@ -448,7 +447,7 @@
 	sqlite3_bind_int(updateStmt, 1, currentDeckID);
 	
 	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg(database));}
+	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 	
 	sqlite3_reset(updateStmt);
 	updateStmt = nil;
@@ -464,7 +463,7 @@
 	NSString *sqlString = [NSString stringWithFormat:@"SELECT shuffled FROM Deck WHERE Deck.id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
@@ -473,7 +472,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg(database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	
 	BOOL returnValue;

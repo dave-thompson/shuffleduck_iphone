@@ -16,7 +16,7 @@
 }
 
 -(void)clearSide;
--(void)replaceSideWithSideID:(int)sideID FromDB:(sqlite3 *)sourceDatabase;
+-(void)replaceSideWithSideID:(int)sideID;
 -(void)setCustomSizeByWidth:(uint)widthInPixels;
 
 @end

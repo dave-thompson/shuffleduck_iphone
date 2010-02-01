@@ -28,11 +28,9 @@
 	IBOutlet UILabel *authorLabel;
 	
 	Deck *deck;
-	sqlite3 *database;
 }
 
 @property (nonatomic, retain) Deck *deck;
-@property (nonatomic, assign) sqlite3 *database;
 
 + (DeckDetailViewController *)sharedInstance;
 

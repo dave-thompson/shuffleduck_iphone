@@ -27,7 +27,6 @@
 	IBOutlet UIView *bottomBarView;
 	
 	Deck *deck;
-	sqlite3 *database;
 }
 
 typedef enum {
@@ -37,7 +36,6 @@ typedef enum {
 
 
 @property (nonatomic, retain) Deck *deck;
-@property (nonatomic, assign) sqlite3 *database;
 
 + (StudyViewController *)sharedInstance;
 

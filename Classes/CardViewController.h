@@ -15,7 +15,6 @@
 	SideViewController *sideAViewController;
 	SideViewController *sideBViewController;
 	
-	sqlite3 *database;
 	int DBDeckID;
 
 	BOOL animationInProgress; // YES when there are animations still in progress - do not request changes to the card view if this is YES
@@ -37,7 +36,6 @@ typedef enum {
 
 @property (nonatomic, retain) SideViewController *sideAViewController;
 @property (nonatomic, retain) SideViewController *sideBViewController;
-@property (nonatomic, assign) sqlite3 *database;
 @property (nonatomic, assign) int DBDeckID;
 @property (nonatomic, assign) BOOL animationInProgress;
 

@@ -13,7 +13,7 @@
 #import "ReviseViewController.h"
 #import "SideViewController.h"
 #import "DDXML.h"
-#import "DeckParser.h"
+#import "DeckDownloader.h"
 #import "VariableStore.h"
 #import "ProgressViewController.h"
 #import "Constants.h"
@@ -23,8 +23,6 @@
 static MyDecksViewController *sharedMyDecksViewController = nil;
 
 @implementation MyDecksViewController
-
-@synthesize database;
 
 static sqlite3_stmt *deleteStmt = nil;
 
@@ -142,7 +140,7 @@ static sqlite3_stmt *deleteStmt = nil;
 	SideViewController *miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	miniSideViewController.view.clipsToBounds = YES;
 	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
-	[miniSideViewController replaceSideWithSideID:currentCellDeck.firstSideID FromDB:database];
+	[miniSideViewController replaceSideWithSideID:currentCellDeck.firstSideID];
 	miniSideViewController.view.frame = CGRectMake(0, 0, 104, 64);
 	[cell.miniCardView addSubview:miniSideViewController.view];
 	cell.miniCardViewController = miniSideViewController;
@@ -170,13 +168,12 @@ static sqlite3_stmt *deleteStmt = nil;
 	int DBDeckID = selectedDeckDetails.deckID;
 	
 	// instantiate a deck object for this deck ID
-	Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID Database:database includeKnownCards:YES];
+	Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID includeKnownCards:YES];
 	
 	// Push the deck detail view controller onto the navigation stack and reference the new deck object
 	DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
 	deckDetailViewController.title = [deck getDeckTitle];
 	deckDetailViewController.deck = deck;
-	deckDetailViewController.database = database;
 	[self.navigationController pushViewController:deckDetailViewController animated:YES];	
 	
 	[deck release];	
@@ -239,7 +236,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			// find the DB position of the deck in the destination position (this is necessary as DB positions do not maintain sequential ordering following e.g. deck deletions)
 			const char *sqlStatement = "SELECT MAX(position) FROM (SELECT id, position FROM Deck ORDER BY position ASC LIMIT ?)";
 			sqlite3_stmt *compiledStatement;
-			if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 			{
 				sqlite3_bind_int(compiledStatement, 1, newPosition);
 				while(sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -257,8 +254,8 @@ static sqlite3_stmt *deleteStmt = nil;
 				{sql = "UPDATE Deck SET position = position-1 WHERE position > ? AND position <= ?";}
 				else
 				{sql = "UPDATE Deck SET position = position + 1 WHERE position < ? AND position >= ?";}
-				if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+				if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
@@ -267,7 +264,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			sqlite3_bind_int(updateStmt, 1, oldPosition);
 			sqlite3_bind_int(updateStmt, 2, newPosition);
 			if(SQLITE_DONE != sqlite3_step(updateStmt))
-			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg(database));}
+			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 			sqlite3_reset(updateStmt);
 			updateStmt = nil;
 			
@@ -276,8 +273,8 @@ static sqlite3_stmt *deleteStmt = nil;
 			{
 				const char *sql;
 				sql = "UPDATE Deck SET position = ? WHERE id = ?";
-				if(sqlite3_prepare_v2(database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg(database));
+				if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+					NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 			}
 			else
 			{
@@ -286,7 +283,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			sqlite3_bind_int(updateStmt, 1, newPosition);
 			sqlite3_bind_int(updateStmt, 2, DBDeckID);
 			if(SQLITE_DONE != sqlite3_step(updateStmt))
-			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg(database));}
+			{NSAssert1(0, @"Error while updating DB with new position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 			sqlite3_reset(updateStmt);		
 			updateStmt = nil;
 		
@@ -342,8 +339,6 @@ static sqlite3_stmt *deleteStmt = nil;
 {
 	DownloadViewController *downloadViewController = [[DownloadViewController alloc] initWithNibName:@"DownloadView" bundle:nil];
 	downloadViewController.title = @"Download";
-	downloadViewController.database = database;
-	//downloadViewController.hidesBottomBarWhenPushed = YES;
 	[self.navigationController pushViewController:downloadViewController animated:YES];
 	[downloadViewController release];	
 }
@@ -370,15 +365,13 @@ static sqlite3_stmt *deleteStmt = nil;
 	}
 	else // no credentials exist, so ask for them
 	{
-		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@"" repeatAttempt:NO];		
-		//[ASIAuthenticationDialog performSelectorOnMainThread:@selector(presentAuthenticationDialogForRequest:) withObject:self waitUntilDone:[NSThread isMainThread]];
+		[ASIAuthenticationDialog presentAuthenticationDialogForRequest:request delegate:self username:@"" repeatAttempt:NO];
 	}
 }
 
 - (void) credentialsEntered
 {
 	// have another go at syncing, using the newly entered credentials
-	//[self.navigationController popViewControllerAnimated:YES];
 	[self syncDecksWithServer:self];
 }
 
@@ -429,7 +422,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			BOOL deckExistsAlready = NO;
 			const char *sqlStatement = "SELECT user_visible_id FROM Deck WHERE user_visible_id =?;";
 			sqlite3_stmt *compiledStatement;
-			if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 			{
 				sqlite3_bind_int(compiledStatement,1,userVisibleID);
 				while(sqlite3_step(compiledStatement) == SQLITE_ROW) // if a row is returned
@@ -443,8 +436,7 @@ static sqlite3_stmt *deleteStmt = nil;
 			// if the deck doesn't already exist, retrieve it
 			if (!(deckExistsAlready))
 			{
-				DeckParser *deckParser = [[DeckParser alloc] init];
-				[deckParser getDeckWithUserDeckID:userVisibleID intoDB:database];
+				[[DeckDownloader alloc] initWithDeckID:userVisibleID];
 			}
 		}
 	}
@@ -482,7 +474,7 @@ static sqlite3_stmt *deleteStmt = nil;
 	// retrieve details of each deck from the DB
 	const char *sqlStatement = "SELECT Deck.id, Deck.title, COUNT(DISTINCT all_cards.id), COUNT(DISTINCT known_cards.id), first_sides.first_side_id FROM Deck LEFT OUTER JOIN Card all_cards ON all_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT id as id, deck_id as deck_id FROM Card WHERE Card.known = 1) AS known_cards ON known_cards.deck_id = Deck.id LEFT OUTER JOIN (SELECT Side.id AS first_side_id, Card.deck_id AS deck_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.orig_position = 1 AND Side.position = 1) AS first_sides ON first_sides.deck_id = Deck.id GROUP BY Deck.id ORDER BY Deck.position;";
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		// Process each returned row (== deck) in turn
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -518,7 +510,7 @@ static sqlite3_stmt *deleteStmt = nil;
 	// Setup the SQL Statement and compile it for faster access
 	const char *sqlStatement = "SELECT COUNT(*) FROM Deck;";
 	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		// Process each returned row (== deck) in turn
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -540,14 +532,14 @@ static sqlite3_stmt *deleteStmt = nil;
 	if(deleteStmt == nil)
 	{
 		const char *sql = [sqlString UTF8String];
-		if(sqlite3_prepare_v2(database, sql, -1, &deleteStmt, NULL) != SQLITE_OK)
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &deleteStmt, NULL) != SQLITE_OK)
 		{
-			NSLog(@"Error while creating delete statement. '%s'", sqlite3_errmsg(database));
+			NSLog(@"Error while creating delete statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 		}
 	}
 	
 	if (SQLITE_DONE != sqlite3_step(deleteStmt))
-		NSLog(@"Error while deleting. '%s'", sqlite3_errmsg(database));
+		NSLog(@"Error while deleting. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	
 	sqlite3_reset(deleteStmt);
 	deleteStmt = nil;

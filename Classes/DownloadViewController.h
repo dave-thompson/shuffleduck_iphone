@@ -1,5 +1,5 @@
 //
-//  AllDecksViewController.h
+//  DownloadViewController.h
 //  MindEgg
 //
 //  Created by Dave Thompson on 5/4/09.
@@ -11,10 +11,7 @@
 
 @interface DownloadViewController : UIViewController {
 	IBOutlet UITextField *idTextField;
-	sqlite3 *database;
 }
-
-@property (nonatomic, assign) sqlite3 *database;
 
 - (IBAction) downloadButtonClicked:(id)sender;
 
