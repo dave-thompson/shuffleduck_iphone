@@ -10,7 +10,7 @@
 
 @implementation VariableStore
 
-@synthesize backgroundColor, contextURL, mindeggGreen, mindeggRed, mindeggGreyText, database;
+@synthesize backgroundColor, contextURL, mindeggGreen, mindeggRed, mindeggGreyText, database, queue;
 
 + (VariableStore *)sharedInstance
 {
@@ -29,13 +29,19 @@
 		myInstance.mindeggGreen = [UIColor colorWithRed:(0/255.0) green:(163/255.0) blue:(4/255.0) alpha:1.0]; // #00A304 (green)
 		myInstance.mindeggGreyText = [UIColor colorWithRed:(135/255.0) green:(135/255.0) blue:(135/255.0) alpha:1.0]; // #878787 (grey)
 		myInstance.database = nil;
+		
+		myInstance.queue = [[NSOperationQueue alloc] init];
     }
     // return the instance of this class
     return myInstance;
 }
 
 - (void)dealloc {
+	[queue release], queue = nil;
 	[backgroundColor release];
+	[mindeggRed release];
+	[mindeggGreen release];
+	[mindeggGreyText release];
 	[super dealloc];
 }
 

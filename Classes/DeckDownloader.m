@@ -82,11 +82,10 @@ sqlite3_stmt *addStmt;
 	else
 	{
 		locked = YES;
-		// [ProgressViewController startShowingProgress];
-		
+		[ProgressViewController startShowingProgress];
+
 		// retrieve deck metadata
 		[self sendMetadataRequestForUserVisibleDeckID:userVisibleID];
-
 	}
 }
 
@@ -645,6 +644,7 @@ sqlite3_stmt *addStmt;
 	else // if there are no downloads queued, then any sync that was in progress has finished - re-enable the sync button
 	{
 		[MyDecksViewController sharedInstance].syncButton.enabled = YES;
+		[ProgressViewController stopShowingProgress];
 	}
 }
 

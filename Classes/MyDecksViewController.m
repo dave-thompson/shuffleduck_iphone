@@ -104,6 +104,9 @@ static sqlite3_stmt *deleteStmt = nil;
 	// update table from local library details
 	[libraryTableView reloadData];
 	[self updateTableSettingsBasedOnNumberOfDecks];
+	
+	// place progress view on top of table again
+	[ProgressViewController refresh];
 }
 
 #pragma mark -
@@ -355,6 +358,7 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (IBAction)syncDecksWithServer:(id)sender
 {
+	[ProgressViewController startShowingProgress];
 	[[Synchroniser sharedInstance] synchronise];
 }
 

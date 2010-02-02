@@ -9,12 +9,9 @@
 #import "ProgressViewController.h"
 #import "MindEggAppDelegate.h"
 
-// variable to count the number of current users of the progress view
-static int numberOfOperationsInProgress = 0;
+static BOOL showing = NO;
 
 @implementation ProgressViewController
-
-@synthesize activityIndicator, label;
 
 + (ProgressViewController *)sharedInstance
 {
@@ -30,81 +27,49 @@ static int numberOfOperationsInProgress = 0;
     return myInstance;
 }
 
-// Starts showing progress unless it is already showing
-// Also increments the count of objects using the progress screen
 + (void)startShowingProgress
 {
-	ProgressViewController *progressViewController = [ProgressViewController sharedInstance];
-	
 	// If progress not currently shown, show it
-	if (numberOfOperationsInProgress == 0)
+	if (!(showing))
 	{
 		MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
-		[[appDelegate window] addSubview:[progressViewController view]];
-		//[progressViewController.activityIndicator startAnimating];
-	}	
-	
-	// Keep count of how many operations have requested a progress indicator
-    numberOfOperationsInProgress++;
-	
-	// Update label to show how many decks remain to be downloaded
-	if (numberOfOperationsInProgress == 1)
-	{
-		progressViewController.label.text = [NSString stringWithFormat:@"Downloading 1 deck ..."];
+		[[appDelegate window] addSubview:[[ProgressViewController sharedInstance] view]];
 	}
-	else
-	{
-		progressViewController.label.text = [NSString stringWithFormat:@"Downloading %d decks ...", numberOfOperationsInProgress];
-	}
-	
+	showing = YES;
 }
 
-// Decrements the count of objects using the progress screen
-// If count reaches zero, removes the progress screen
 + (void)stopShowingProgress
 {
-	ProgressViewController *progressViewController = [ProgressViewController sharedInstance];
+	[[ProgressViewController sharedInstance].view removeFromSuperview];
+	showing = NO;
+}
 
-	// Keep count of how many operations have requested a progress indicator
-	if (numberOfOperationsInProgress > 0)
++ (void)refresh
+{
+	if (showing) // move the progress view controller to the top of the view stack UIViewController
 	{
-		numberOfOperationsInProgress--;
-	}
-	// Remove progress indicator if there is nothing remaining in progress
-	if (numberOfOperationsInProgress == 0)
-	{
-		[progressViewController.view removeFromSuperview];
-		//[progressViewController.activityIndicator stopAnimating];
-	}
-	
-	// Update label to show how many decks remain to be downloaded
-	if (numberOfOperationsInProgress == 1)
-	{
-		progressViewController.label.text = [NSString stringWithFormat:@"Downloading 1 deck ..."];
-	}
-	else
-	{
-		progressViewController.label.text = [NSString stringWithFormat:@"Downloading %d decks ...", numberOfOperationsInProgress];
-	}
-	
+		MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
+		[[appDelegate window] bringSubviewToFront:[ProgressViewController sharedInstance].view];
+	}	
 }
 
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	[activityIndicator startAnimating];
+	[super viewWillAppear:animated];
+	//[activityIndicator startAnimating];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-	[activityIndicator stopAnimating];
+	[super viewWillDisappear:animated];
+	//[activityIndicator stopAnimating];
 }
 
+
+
 - (void)didReceiveMemoryWarning {
-	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
-	// Release any cached data, images, etc that aren't in use.
 }
 
 - (void)viewDidUnload {

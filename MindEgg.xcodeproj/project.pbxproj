@@ -59,7 +59,7 @@
 		557C060410804EA200D1F2F2 /* InlineScoreView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 557C060310804EA200D1F2F2 /* InlineScoreView.xib */; };
 		557C060B10804EBF00D1F2F2 /* InlineScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 557C060A10804EBF00D1F2F2 /* InlineScoreViewController.m */; };
 		55814A9410FE483D00B2A625 /* ProgressViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55814A9210FE483D00B2A625 /* ProgressViewController.m */; };
-		55814A9510FE483D00B2A625 /* ProgressViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55814A9310FE483D00B2A625 /* ProgressViewController.xib */; };
+		55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55814A9310FE483D00B2A625 /* ProgressView.xib */; };
 		5591B30D0FD625F9000BECF8 /* library.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30C0FD625F9000BECF8 /* library.png */; };
 		5591B30F0FD62614000BECF8 /* study.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30E0FD62614000BECF8 /* study.png */; };
 		5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5591B4F20FD653BD000BECF8 /* DownloadView.xib */; };
@@ -169,7 +169,7 @@
 		557C060A10804EBF00D1F2F2 /* InlineScoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InlineScoreViewController.m; sourceTree = "<group>"; };
 		55814A9110FE483D00B2A625 /* ProgressViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressViewController.h; sourceTree = "<group>"; };
 		55814A9210FE483D00B2A625 /* ProgressViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressViewController.m; sourceTree = "<group>"; };
-		55814A9310FE483D00B2A625 /* ProgressViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressViewController.xib; path = Classes/ProgressViewController.xib; sourceTree = "<group>"; };
+		55814A9310FE483D00B2A625 /* ProgressView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressView.xib; path = Classes/ProgressView.xib; sourceTree = "<group>"; };
 		5591B30C0FD625F9000BECF8 /* library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = library.png; sourceTree = "<group>"; };
 		5591B30E0FD62614000BECF8 /* study.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = study.png; sourceTree = "<group>"; };
 		5591B4F20FD653BD000BECF8 /* DownloadView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadView.xib; sourceTree = "<group>"; };
@@ -440,7 +440,7 @@
 			isa = PBXGroup;
 			children = (
 				55D3F8DD1112D412003E1688 /* CongratulationsView.xib */,
-				55814A9310FE483D00B2A625 /* ProgressViewController.xib */,
+				55814A9310FE483D00B2A625 /* ProgressView.xib */,
 				552A5A2610DBF39E00A8264B /* FinalScoreView.xib */,
 				555D1ADA108409AF0041DB21 /* TableFooterView.xib */,
 				557C060310804EA200D1F2F2 /* InlineScoreView.xib */,
@@ -577,7 +577,7 @@
 				555D1ADB108409AF0041DB21 /* TableFooterView.xib in Resources */,
 				5565198A10D1ADEC00DD8110 /* NoContent.png in Resources */,
 				552A5A2810DBF39E00A8264B /* FinalScoreView.xib in Resources */,
-				55814A9510FE483D00B2A625 /* ProgressViewController.xib in Resources */,
+				55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */,
 				55D3F8DF1112D412003E1688 /* CongratulationsView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

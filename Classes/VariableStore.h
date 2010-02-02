@@ -17,6 +17,8 @@
 	UIColor *mindeggGreyText;
 	NSString *contextURL;
 	sqlite3 *database;
+	
+	NSOperationQueue *queue; // not currently used
 }
 
 @property (nonatomic, retain) UIColor *backgroundColor;
@@ -24,6 +26,8 @@
 @property (nonatomic, retain) UIColor *mindeggRed;
 @property (nonatomic, retain) UIColor *mindeggGreyText;
 @property (nonatomic, retain) NSString *contextURL;
+@property (nonatomic, retain) NSOperationQueue *queue;
+
 @property (nonatomic, assign) sqlite3 *database;
 
 + (VariableStore *)sharedInstance;
