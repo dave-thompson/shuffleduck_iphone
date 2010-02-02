@@ -60,7 +60,7 @@
 									<object class="IBUIView" id="448781474">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{114, 25}, {85, 21}}</string>
+										<string key="NSFrame">{{114, 28}, {85, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<object class="NSColor" key="IBUIBackgroundColor">
 											<int key="NSColorSpace">3</int>
@@ -74,7 +74,7 @@
 									<object class="IBUIView" id="59819733">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{214, 25}, {85, 21}}</string>
+										<string key="NSFrame">{{214, 28}, {85, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
 										<object class="NSColor" key="IBUIBackgroundColor">
 											<int key="NSColorSpace">3</int>
@@ -83,17 +83,28 @@
 										</object>
 										<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 									</object>
-									<object class="IBUIView" id="311276083">
+									<object class="IBUILabel" id="70165797">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{114, 0}, {181, 32}}</string>
+										<string key="NSFrame">{{114, 7}, {186, 20}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
-										<object class="NSColor" key="IBUIBackgroundColor">
-											<int key="NSColorSpace">3</int>
-											<bytes key="NSWhite">MSAwAA</bytes>
-											<reference key="NSCustomColorSpace" ref="76295647"/>
+										<bool key="IBUIOpaque">NO</bool>
+										<bool key="IBUIClipsSubviews">YES</bool>
+										<bool key="IBUIUserInteractionEnabled">NO</bool>
+										<string key="IBUIText">title_label</string>
+										<object class="NSFont" key="IBUIFont">
+											<string key="NSName">Helvetica</string>
+											<double key="NSSize">1.400000e+01</double>
+											<int key="NSfFlags">16</int>
 										</object>
-										<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
+										<object class="NSColor" key="IBUITextColor">
+											<int key="NSColorSpace">1</int>
+											<bytes key="NSRGB">MCAwIDAAA</bytes>
+										</object>
+										<nil key="IBUIHighlightedColor"/>
+										<int key="IBUIBaselineAdjustment">1</int>
+										<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
+										<float key="IBUIMinimumFontSize">1.000000e+01</float>
 									</object>
 								</object>
 								<string key="NSFrameSize">{320, 64}</string>
@@ -170,11 +181,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">deckTitle</string>
+						<string key="label">titleLabel</string>
 						<reference key="source" ref="473648291"/>
-						<reference key="destination" ref="311276083"/>
+						<reference key="destination" ref="70165797"/>
 					</object>
-					<int key="connectionID">35</int>
+					<int key="connectionID">39</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -216,7 +227,7 @@
 							<reference ref="547543498"/>
 							<reference ref="448781474"/>
 							<reference ref="59819733"/>
-							<reference ref="311276083"/>
+							<reference ref="70165797"/>
 						</object>
 						<reference key="parent" ref="473648291"/>
 					</object>
@@ -236,8 +247,8 @@
 						<reference key="parent" ref="266932538"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">34</int>
-						<reference key="object" ref="311276083"/>
+						<int key="objectID">38</int>
+						<reference key="object" ref="70165797"/>
 						<reference key="parent" ref="266932538"/>
 					</object>
 				</object>
@@ -256,22 +267,20 @@
 					<string>27.CustomClassName</string>
 					<string>27.IBPluginDependency</string>
 					<string>3.IBPluginDependency</string>
-					<string>34.CustomClassName</string>
-					<string>34.IBPluginDependency</string>
+					<string>38.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>UIResponder</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>LibraryCell</string>
-					<string>{{628, 237}, {320, 65}}</string>
+					<string>{{499, 144}, {320, 65}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>MultipartLabel</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>MultipartLabel</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>MultipartLabel</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				</object>
 			</object>
@@ -295,7 +304,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">35</int>
+			<int key="maxID">39</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -307,19 +316,19 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>deckTitle</string>
 							<string>leftMultipartLabel</string>
 							<string>mainView</string>
 							<string>miniCardView</string>
 							<string>rightMultipartLabel</string>
+							<string>titleLabel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>MultipartLabel</string>
-							<string>MultipartLabel</string>
 							<string>UIView</string>
 							<string>UIView</string>
 							<string>MultipartLabel</string>
+							<string>UILabel</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

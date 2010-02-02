@@ -12,8 +12,9 @@
 
 @implementation LibraryCell
 
-@synthesize deckTitle, miniCardView, leftMultipartLabel, rightMultipartLabel, miniCardViewController, mainView;
+@synthesize miniCardView, leftMultipartLabel, rightMultipartLabel, titleLabel, miniCardViewController, mainView;
 
+BOOL isFullyDownloaded;
 
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -29,9 +30,6 @@
 	[super awakeFromNib];
 	
 	// set up multipart labels
-	[deckTitle updateNumberOfLabels:1 fontSize:16 alignment:MultipartLabelLeft];
-	[deckTitle setText:@"<Deck Title>" andColor:[UIColor blackColor] forLabel:0];
-	
 	[leftMultipartLabel updateNumberOfLabels:2 fontSize:12 alignment:MultipartLabelLeft];
 	[leftMultipartLabel setText:@"Unknown:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
 	[leftMultipartLabel setText:@"" andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
@@ -44,33 +42,73 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 
-   //[super setSelected:selected animated:animated];
-
-	if (selected == YES)
+	if (isFullyDownloaded) // selection only allowed on fully downloaded decks
 	{
-		// set background to blue and text to white
-		mainView.backgroundColor = [UIColor blueColor];
-		[deckTitle setColor:[UIColor whiteColor] forLabel:0];
-		[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
-		[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
+		if (selected)
+		{
+			// set background to blue and text to white
+			mainView.backgroundColor = [UIColor blueColor];
+			
+			[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:0];
+			[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
+
+			[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:0];
+			[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
+			
+			titleLabel.textColor = [UIColor whiteColor];
+		}
+		else
+		{
+			// restore to original colors
+			mainView.backgroundColor = [UIColor whiteColor];
+			
+			[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
+			[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
+			
+			[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0];
+			[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];
+			
+			titleLabel.textColor = [UIColor blackColor];
+		}
+	}
+}
+
+- (void)setFullyDownloaded:(BOOL)fullyDownloaded withTitle:(NSString *)theTitle numKnownCards:(int)theNumKnownCards numUnknownCards:(int)theNumUnknownCards
+{
+	isFullyDownloaded = fullyDownloaded;
+	
+	if (isFullyDownloaded)
+	{
+		[leftMultipartLabel setText:@"Remaining:  " andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
+		[leftMultipartLabel setText:[NSString stringWithFormat:@"%d", theNumUnknownCards] forLabel:1];
+
+		[rightMultipartLabel setText:@"Known:  " andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0]; 
+		[rightMultipartLabel setText:[NSString stringWithFormat:@"%d", theNumKnownCards] forLabel:1];
+
+		titleLabel.text = theTitle;
+		titleLabel.textColor = [UIColor blackColor];
 	}
 	else
 	{
-		// restore to original colors
-		mainView.backgroundColor = [UIColor whiteColor];
-		[deckTitle setColor:[UIColor blackColor] forLabel:0];
-		[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
-		[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];
+		UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
+		
+		[leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
+		[leftMultipartLabel setText:@"" forLabel:1];
 
+		[rightMultipartLabel setText:@"" forLabel:0];
+		[rightMultipartLabel setText:@"" forLabel:1];
+
+		titleLabel.text = theTitle;
+		titleLabel.textColor = disabledColor;
 	}
 }
 
 - (void)dealloc {
-	[deckTitle release];
 	[miniCardView release];
 	[miniCardViewController release];
 	[leftMultipartLabel release];
 	[rightMultipartLabel release];
+	[titleLabel release];
     [super dealloc];
 }
 

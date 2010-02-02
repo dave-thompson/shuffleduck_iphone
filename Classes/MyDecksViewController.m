@@ -137,22 +137,11 @@ static sqlite3_stmt *deleteStmt = nil;
 	// set up title & card counts
 	if (currentCellDeck.fullyDownloaded)
 	{
-		[cell.leftMultipartLabel setText:@"Unknown:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
-		[cell.leftMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numCards - currentCellDeck.numKnownCards] forLabel:1];
-		[cell.rightMultipartLabel setText:@"Known:  " forLabel:0];
-		[cell.rightMultipartLabel setText:[NSString stringWithFormat:@"%d", currentCellDeck.numKnownCards] forLabel:1];
-
-		[cell.deckTitle setText:[currentCellDeck title] andColor:[UIColor blackColor] forLabel:0];
+		[cell setFullyDownloaded:YES withTitle:[currentCellDeck title] numKnownCards:currentCellDeck.numKnownCards numUnknownCards:(currentCellDeck.numCards - currentCellDeck.numKnownCards)];
 	}
 	else
 	{
-		UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
-		[cell.leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
-		[cell.leftMultipartLabel setText:@"" forLabel:1];
-		[cell.rightMultipartLabel setText:@"" forLabel:0];
-		[cell.rightMultipartLabel setText:@"" forLabel:1];
-
-		[cell.deckTitle setText:[currentCellDeck title] andColor:disabledColor forLabel:0];
+		[cell setFullyDownloaded:NO withTitle:[currentCellDeck title] numKnownCards:currentCellDeck.numKnownCards numUnknownCards:(currentCellDeck.numCards - currentCellDeck.numKnownCards)];
 	}
 	
 	// set up first side preview
@@ -366,7 +355,6 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (IBAction)syncDecksWithServer:(id)sender
 {
-	syncButton.enabled = NO;
 	[[Synchroniser sharedInstance] synchronise];
 }
 

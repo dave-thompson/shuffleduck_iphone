@@ -14,7 +14,7 @@
 @implementation Constants
 
 const NSString* XML_ERROR_TAG = @"mindegg_error";
-const NSString* ERROR_DIALOG_TITLE = @"Oh no....";
+const NSString* ERROR_DIALOG_TITLE = @"Oh no.";
 
 //const NSString* CONTEXT_URL = @"http://localhost:3000";
 //const NSString* CONTEXT_URL = @"http://192.168.1.30:3000";

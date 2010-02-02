@@ -39,6 +39,9 @@ static Synchroniser *sharedSynchroniser = nil;
 
 -(void)synchronise
 {
+	// disable sync button
+	[MyDecksViewController sharedInstance].syncButton.enabled = NO;
+	
 	// setup URL
 	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
@@ -95,6 +98,9 @@ static Synchroniser *sharedSynchroniser = nil;
 		{
 			NSString *error_description = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
 			[MindEggUtilities mindEggErrorAlertWithMessage:error_description];
+
+			// enable the sync button
+			[MyDecksViewController sharedInstance].syncButton.enabled = YES;
 		}
 	}
 	else // the server returned the deck summary information, so process this and then ask for the full deck
@@ -161,7 +167,7 @@ static Synchroniser *sharedSynchroniser = nil;
 - (void) deckListRequestFailed:(ASIHTTPRequest *)request
 {
 	// remove busy indicator
-	[ProgressViewController stopShowingProgress];
+	// [ProgressViewController stopShowingProgress];
 	
 	// tell user that there was a problem and that decks are not being synchronised
  	UIAlertView *errorAlert = [[UIAlertView alloc]
@@ -172,6 +178,9 @@ static Synchroniser *sharedSynchroniser = nil;
 							   otherButtonTitles: nil];
 	[errorAlert show];
 	[errorAlert release];
+	
+	// enable the sync button
+	[MyDecksViewController sharedInstance].syncButton.enabled = YES;
 }
 
 
