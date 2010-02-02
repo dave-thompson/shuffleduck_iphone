@@ -461,11 +461,11 @@ InlineScoreViewController *inlineScoreViewController;
 		// top label
 		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:2 fontSize:13 alignment:MultipartLabelRight];
 		[[inlineScoreViewController topMultipartLabel] setText:@"Unknown:  " andColor:[UIColor whiteColor] forLabel:0];
-		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", numCards - cardsKnown] andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d", numCards - cardsKnown] andColor:[UIColor whiteColor] forLabel:1];
 		
 		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:2 fontSize:13 alignment:MultipartLabelRight];
 		[[inlineScoreViewController bottomMultipartLabel] setText:@"Known:  " andColor:[UIColor whiteColor] forLabel:0];
-		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsKnown] andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];		
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsKnown] andColor:[UIColor whiteColor] forLabel:1];		
 	}
 	else // is a test
 	{

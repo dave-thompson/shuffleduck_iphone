@@ -20,6 +20,9 @@
 	TableFooterViewController *tableFooterViewController;
 	UIImageView *noContentImageView;
 	IBOutlet UIBarButtonItem *syncButton;
+	
+	IBOutlet UILabel *messageLabel;
+	IBOutlet UIActivityIndicatorView *activityIndicator;
 }
 
 + (MyDecksViewController *)sharedInstance;
@@ -28,7 +31,12 @@
 - (void) retrieveLocalLibraryDetails;
 - (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
+
+- (IBAction)syncDecksWithServer:(id)sender;
 - (IBAction)pushDownloadScreen:(id)sender;
+
+-(void)showMessage:(NSString *)message;
+-(void)hideMessages;
 
 @property (nonatomic, retain) UIBarButtonItem *syncButton;
 

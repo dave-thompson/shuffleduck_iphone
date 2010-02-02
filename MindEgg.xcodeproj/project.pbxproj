@@ -370,12 +370,14 @@
 			children = (
 				556138350FAEDEFC00365DF1 /* DownloadViewController.h */,
 				556138360FAEDEFC00365DF1 /* DownloadViewController.m */,
-				55CE1BC7111701A800530CC4 /* Synchroniser.m */,
 				55CE1BC8111701A800530CC4 /* Synchroniser.h */,
+				55CE1BC7111701A800530CC4 /* Synchroniser.m */,
 				550E449410FB2E14004B47F4 /* DeckDownloader.h */,
 				550E449510FB2E14004B47F4 /* DeckDownloader.m */,
 				55CE1C1B1117217900530CC4 /* DeckDownloaderQueueItem.h */,
 				55CE1C1C1117217900530CC4 /* DeckDownloaderQueueItem.m */,
+				55814A9110FE483D00B2A625 /* ProgressViewController.h */,
+				55814A9210FE483D00B2A625 /* ProgressViewController.m */,
 			);
 			name = Download;
 			sourceTree = "<group>";
@@ -391,8 +393,6 @@
 				55CF27BA0FDA9B8700B16DFB /* LibraryCell.m */,
 				55DAC7F8107EA54200D0C621 /* DeckDetailViewController.h */,
 				55DAC7F9107EA54200D0C621 /* DeckDetailViewController.m */,
-				55814A9110FE483D00B2A625 /* ProgressViewController.h */,
-				55814A9210FE483D00B2A625 /* ProgressViewController.m */,
 				5510E236107D2DC30074B376 /* Download */,
 			);
 			name = Library;
@@ -500,8 +500,8 @@
 		55DB72D30FD93E8700B1A115 /* Application */ = {
 			isa = PBXGroup;
 			children = (
-				1D3623250D0F684500981E51 /* MindEggAppDelegate.m */,
 				1D3623240D0F684500981E51 /* MindEggAppDelegate.h */,
+				1D3623250D0F684500981E51 /* MindEggAppDelegate.m */,
 			);
 			name = Application;
 			sourceTree = "<group>";

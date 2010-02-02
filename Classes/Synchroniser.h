@@ -18,7 +18,8 @@
 
 + (Synchroniser *)sharedInstance;
 
--(void)synchronise;
+-(void) synchronise;
 - (void) credentialsEntered;
+- (void) handleSyncFailure;
 
 @end

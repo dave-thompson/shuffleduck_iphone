@@ -9,6 +9,8 @@
 #import "LibraryCell.h"
 #import "Constants.h"
 #import "VariableStore.h"
+#import "MyDecksViewController.h"
+#import "DeckDownloader.h"
 
 @implementation LibraryCell
 
@@ -77,7 +79,7 @@ BOOL isFullyDownloaded;
 {
 	isFullyDownloaded = fullyDownloaded;
 	
-	if (isFullyDownloaded)
+	if (isFullyDownloaded) // if a deck is fully downloaded, show a normal cell
 	{
 		[leftMultipartLabel setText:@"Remaining:  " andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
 		[leftMultipartLabel setText:[NSString stringWithFormat:@"%d", theNumUnknownCards] forLabel:1];
@@ -88,18 +90,34 @@ BOOL isFullyDownloaded;
 		titleLabel.text = theTitle;
 		titleLabel.textColor = [UIColor blackColor];
 	}
-	else
+	else // if a deck is not fully downloaded, show either a'processing' or 'resume download' cell
 	{
-		UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
-		
-		[leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
-		[leftMultipartLabel setText:@"" forLabel:1];
+		if ((!([MyDecksViewController sharedInstance].syncButton.enabled)) || ([DeckDownloader downloadIsInProgress])) // if either a sync or download is in progress, show cell to be 'processing'
+		{
+			UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
+			
+			[leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
+			[leftMultipartLabel setText:@"" forLabel:1];
 
-		[rightMultipartLabel setText:@"" forLabel:0];
-		[rightMultipartLabel setText:@"" forLabel:1];
+			[rightMultipartLabel setText:@"" forLabel:0];
+			[rightMultipartLabel setText:@"" forLabel:1];
 
-		titleLabel.text = theTitle;
-		titleLabel.textColor = disabledColor;
+			titleLabel.text = theTitle;
+			titleLabel.textColor = disabledColor;
+		}
+		else // a download is not in progress - invite the user to resume it
+		{
+			UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
+			
+			[leftMultipartLabel setText:@"Tap to resume download" andColor:disabledColor forLabel:0];
+			[leftMultipartLabel setText:@"" forLabel:1];
+			
+			[rightMultipartLabel setText:@"" forLabel:0];
+			[rightMultipartLabel setText:@"" forLabel:1];
+			
+			titleLabel.text = theTitle;
+			titleLabel.textColor = disabledColor;
+		}
 	}
 }
 

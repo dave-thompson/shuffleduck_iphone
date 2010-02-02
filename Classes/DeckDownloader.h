@@ -18,8 +18,12 @@
 
 + (DeckDownloader *)sharedInstance;
 
++ (BOOL)downloadIsInProgress;
++ (BOOL)areBrokenDownloads;
+
 -(void)downloadDeckID:(int)aDeckID;
 -(void)completeDownloadOfDeckID:(int)userVisibleID withIPhoneDeckID:(int)deckID;
+-(void)resumeBrokenDownloadswithUserRequested:(BOOL)userRequested;
 
 -(void)sendMetadataRequestForUserVisibleDeckID:(int)aUserVisibleID;
 + (int)insertNewDeckMetadataToDBWithUserVisibleID:(int)aUserVisibleID title:(NSString *)aTitle author:(NSString *)anAuthor;
@@ -29,7 +33,7 @@
 
 -(void) parseXMLDeck:(NSString *)xmlString;
 
--(void)removePartiallyDownloadedDeckFromDB;
-- (void)completeDownload;
+-(void)cleanPartiallyDownloadedDeckInDBUsingDeckID:(int)aDeckID;
+- (void)completeDownloadAfterSuccess:(BOOL)success;
 
 @end

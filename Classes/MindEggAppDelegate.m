@@ -41,7 +41,7 @@ UINavigationController *navigationController;
 	// Create a navigation controller and push a Library view controller onto it
 	navigationController = [[UINavigationController alloc] init];	
 	MyDecksViewController *myDecksViewController = [MyDecksViewController sharedInstance];
-	myDecksViewController.title = @"MindEgg";
+	myDecksViewController.title = @"Quack";
 	[navigationController pushViewController:myDecksViewController animated:NO];
 	navigationController.navigationBar.barStyle = UIBarStyleDefault; //UIBarStyleBlackOpaque;
 	

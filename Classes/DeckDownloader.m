@@ -19,7 +19,8 @@
 static DeckDownloader *sharedDeckDownloader = nil;
 static NSMutableArray *downloadQueue;
 static BOOL locked;
-
+static BOOL fullDeckFailureFlag = NO;
+static BOOL isAResumeRequestAndNotYetReachedShuffleDuck = NO;
 @implementation DeckDownloader
 
 BOOL inCardsDefinition; // is XML parser currently looking at cards (rather than template)
@@ -69,6 +70,34 @@ sqlite3_stmt *addStmt;
 }
 
 #pragma mark -
+#pragma mark State Reporting
+
++ (BOOL)downloadIsInProgress
+{
+	return locked;
+}
+
++ (BOOL)areBrokenDownloads
+{
+	int result;
+	// Find any broken downloads in the DB
+	const char *sqlStatement = "SELECT COUNT(*) FROM Deck WHERE fully_downloaded = 0;";
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			result = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	
+	if (result > 0)
+		{return YES;}
+	else
+		{return NO;}
+}
+
+#pragma mark -
 #pragma mark Top Level Download Request Methods
 
 -(void)downloadDeckID:(int)userVisibleID
@@ -83,7 +112,8 @@ sqlite3_stmt *addStmt;
 	{
 		locked = YES;
 		[ProgressViewController startShowingProgress];
-
+		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
+		
 		// retrieve deck metadata
 		[self sendMetadataRequestForUserVisibleDeckID:userVisibleID];
 	}
@@ -100,11 +130,55 @@ sqlite3_stmt *addStmt;
 	else
 	{
 		locked = YES;
-		// [ProgressViewController startShowingProgress];
 		
 		// retrieve deck
 		[self sendFullDeckRequestForUserVisibleDeckID:userVisibleID iPhoneDeckID:deckID];		
 	}
+}
+
+-(void)resumeBrokenDownloadswithUserRequested:(BOOL)userRequested
+{
+	if (userRequested)
+	{
+		isAResumeRequestAndNotYetReachedShuffleDuck = YES;
+		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
+	}
+	else
+	{
+		[[MyDecksViewController sharedInstance] showMessage:@"Resuming partial downloads"];
+	}
+	
+	[ProgressViewController startShowingProgress];
+		
+	NSMutableArray *brokenDecks = [[NSMutableArray alloc] initWithCapacity:5];
+	
+	// Find any broken downloads in the DB
+	const char *sqlStatement = "SELECT Deck.id, Deck.user_visible_id FROM Deck WHERE fully_downloaded = 0 ORDER BY Deck.position;";
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			int brokenDeckID = (int)sqlite3_column_int(compiledStatement, 0);
+			int brokenUserVisibleID = (int)sqlite3_column_int(compiledStatement, 1);
+
+			[brokenDecks addObject:[NSArray arrayWithObjects: [NSNumber numberWithInt:brokenDeckID], [NSNumber numberWithInt:brokenUserVisibleID]]];
+		}
+	}
+
+	// loop through the broken decks in the DB
+	for (NSArray *brokenDeck in brokenDecks)
+	{
+		// delete any remnants
+		[self cleanPartiallyDownloadedDeckInDBUsingDeckID:[[brokenDeck objectAtIndex:0] intValue]];
+		
+		// start downloading the full deck
+		[[DeckDownloader sharedInstance] completeDownloadOfDeckID:[[brokenDeck objectAtIndex:1] intValue] withIPhoneDeckID:[[brokenDeck objectAtIndex:0] intValue]];
+	}
+	
+	// Release the compiled statement from memory
+	sqlite3_finalize(compiledStatement);
+	[brokenDecks release];
 }
 
 #pragma mark -
@@ -138,7 +212,7 @@ sqlite3_stmt *addStmt;
 		[errorAlert show];
 		
 		// finish up
-		[self completeDownload];
+		[self completeDownloadAfterSuccess:NO];
 	}
 	else // the server returned the deck summary information, so process this and then ask for the full deck
 	{
@@ -213,22 +287,21 @@ sqlite3_stmt *addStmt;
 - (void)metadataRequestFailed:(ASIHTTPRequest *)request
 {
 	// What deck does this failure correspond to?
-	int userVisibleID = [[request.userInfo valueForKey:@"userVisibleID"] integerValue];
+	// int userVisibleID = [[request.userInfo valueForKey:@"userVisibleID"] integerValue];
 	
 	// tell user that there was a problem and their deck is not being downloaded
-	UIAlertView *errorAlert;
-	errorAlert =  [[UIAlertView alloc]
-				   initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with Deck ID %d.", userVisibleID]
-				   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-				   delegate: nil
-				   cancelButtonTitle: @"OK"
-				   otherButtonTitles: nil];
+ 	UIAlertView *errorAlert = [[UIAlertView alloc]
+							   initWithTitle:  [NSString stringWithFormat:@"Couldn't reach ShuffleDuck"]
+							   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
+							   delegate: nil
+							   cancelButtonTitle: @"OK"
+							   otherButtonTitles: nil];
 	
 	[errorAlert show];
 	[errorAlert release];
 	
 	// finish up
-	[self completeDownload];
+	[self completeDownloadAfterSuccess:NO];
 }
 
 
@@ -237,6 +310,8 @@ sqlite3_stmt *addStmt;
 
 -(void)sendFullDeckRequestForUserVisibleDeckID:(int)aUserVisibleID iPhoneDeckID:(int)anIphoneDeckID
 {
+	[[MyDecksViewController sharedInstance] showMessage:@"Downloading cards  "];
+	
 	// store iPhone Deck ID for use by remainder of download process
 	deckID = anIphoneDeckID;
 	
@@ -279,25 +354,11 @@ sqlite3_stmt *addStmt;
 
 - (void) fullDeckRequestFailed:(ASIHTTPRequest *)request
 {
-	// which deck are we talking about?
-		int userVisibleID = [[request.userInfo valueForKey:@"userVisibleID"] integerValue];
-	
-	// tell user that there was a problem and their deck is not being downloaded
-		UIAlertView *errorAlert;
-		errorAlert =  [[UIAlertView alloc]
-				   initWithTitle:  [NSString stringWithFormat:@"Couldn't Download Deck with Deck ID %d.", userVisibleID]
-				   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
-				   delegate: nil
-				   cancelButtonTitle: @"OK"
-				   otherButtonTitles: nil];
-		[errorAlert show];
-		[errorAlert release];	
-
-	// clean up partially populated DB
-	[self removePartiallyDownloadedDeckFromDB];
+	// log failure so that user may be notified of it after end of current sync / download
+	fullDeckFailureFlag = YES;
 	
 	// finish up
-	[self completeDownload];
+	[self completeDownloadAfterSuccess:NO];
 }
 
 #pragma mark -
@@ -322,13 +383,16 @@ sqlite3_stmt *addStmt;
 		NSLog([parser parserError].localizedDescription);
 		
 		// finish up
-		[self removePartiallyDownloadedDeckFromDB];
+		fullDeckFailureFlag = YES; // log failure so that user may be notified of it after end of current sync / download
+		[parser release];
+		[self completeDownloadAfterSuccess:NO];
     }
-
-    [parser release];
-	
-	// finish up
-	[self completeDownload];	
+	else
+	{
+		// finish up
+		[parser release];
+		[self completeDownloadAfterSuccess:YES];	
+	}
 }
 
 - (void) parserDidStartDocument:(NSXMLParser *)parserDidStartDocument
@@ -591,13 +655,11 @@ sqlite3_stmt *addStmt;
 #pragma mark -
 #pragma mark Clean Up & Completion Methods
 
-// Must be called if database inserts have been made during a download which has subsequently failed
-// Make sure that you have set the deckID variable to an iPhone deckID before calling this function
--(void)removePartiallyDownloadedDeckFromDB
+-(void)cleanPartiallyDownloadedDeckInDBUsingDeckID:(int)aDeckID
 {
 	// remove deck row from DB
 	static sqlite3_stmt *deleteStmt = nil;
-	NSString *deletionString = [NSString stringWithFormat:@"DELETE FROM Deck WHERE id = %d", deckID];
+	NSString *deletionString = [NSString stringWithFormat:@"DELETE FROM Card WHERE deck_id = %d", aDeckID];
 	if(deleteStmt == nil)
 	{
 		const char *sql = [deletionString UTF8String];
@@ -615,11 +677,8 @@ sqlite3_stmt *addStmt;
 }
 
 // Must be called at the end of any parsing process - regardless of the result
-- (void)completeDownload
+- (void)completeDownloadAfterSuccess:(BOOL)success
 {
-	// decrement the busy count (for progress indicator management)
-	//[ProgressViewController stopShowingProgress];
-	
 	// refresh the library
 	[[MyDecksViewController sharedInstance] refreshTable];
 
@@ -641,9 +700,49 @@ sqlite3_stmt *addStmt;
 			[self downloadDeckID:[nextItem userVisibleID]];
 		}		
 	}
-	else // if there are no downloads queued, then any sync that was in progress has finished - re-enable the sync button
+	else // if there are no downloads queued, then any sync that was in progress has finished
 	{
+		// if there was sucess, and there are any broken downloads remaining, process those too
+		if (success && ([DeckDownloader areBrokenDownloads]))
+		{
+			fullDeckFailureFlag = NO; // we're about to have another stab at them, so set flag to NO - it will be set back to YES again if necessary
+			[self resumeBrokenDownloadswithUserRequested:NO];
+		}
+		
+		// if there were any decks processed that had metadata downloaded but were not fully downloaded and parsed, notify the user
+		if (fullDeckFailureFlag)
+		{
+			UIAlertView *errorAlert;
+
+			if (isAResumeRequestAndNotYetReachedShuffleDuck)
+			{
+				errorAlert = [[UIAlertView alloc]
+							   initWithTitle:  [NSString stringWithFormat:@"Couldn't reach ShuffleDuck"]
+							   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
+							   delegate: nil
+							   cancelButtonTitle: @"OK"
+							   otherButtonTitles: nil];
+			}
+			else
+			{
+				errorAlert =  [[UIAlertView alloc]
+							   initWithTitle: @"Download interrupted"
+							   message: @"Please check your network connection and tap an incomplete Deck to resume."
+							   delegate: nil
+							   cancelButtonTitle: @"OK"
+							   otherButtonTitles: nil];
+			}
+			[errorAlert show];
+			[errorAlert release];
+		}
+		
+		// reset status flags
+		isAResumeRequestAndNotYetReachedShuffleDuck = NO;
+		fullDeckFailureFlag = NO;
+		
+		// re-enable the sync button and stop showing busy indicator
 		[MyDecksViewController sharedInstance].syncButton.enabled = YES;
+		[[MyDecksViewController sharedInstance] hideMessages];
 		[ProgressViewController stopShowingProgress];
 	}
 }

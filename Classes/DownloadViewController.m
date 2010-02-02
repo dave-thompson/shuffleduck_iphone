@@ -28,7 +28,7 @@
 	{
 		UIAlertView *errorAlert = [[UIAlertView alloc]
 								   initWithTitle:  [NSString stringWithFormat:@"Invalid Deck ID"]
-								   message: [NSString stringWithFormat:@"Deck ID's should be at least 8 digits long."]
+								   message: [NSString stringWithFormat:@"Please check it and try again."]
 								   delegate: nil
 								   cancelButtonTitle: @"OK"
 								   otherButtonTitles: nil];

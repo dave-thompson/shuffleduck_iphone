@@ -39,7 +39,9 @@ static Synchroniser *sharedSynchroniser = nil;
 
 -(void)synchronise
 {
-	// disable sync button
+	// show busy & disable sync button
+	[ProgressViewController startShowingProgress];
+	[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
 	[MyDecksViewController sharedInstance].syncButton.enabled = NO;
 	
 	// setup URL
@@ -49,8 +51,6 @@ static Synchroniser *sharedSynchroniser = nil;
 	NSURLCredential *authenticationCredentials = [ASIHTTPRequest savedCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
 	if (authenticationCredentials) // if credentials exist, request the deck list
 	{
-		// show busy indicator
-		//[ProgressViewController startShowingProgress];
 		// send request
 		[request setUsername:[authenticationCredentials user]];
 		[request setPassword:[authenticationCredentials password]];
@@ -84,6 +84,7 @@ static Synchroniser *sharedSynchroniser = nil;
 	{
 		// remove busy indicator
 		[ProgressViewController stopShowingProgress];		
+		[[MyDecksViewController sharedInstance] hideMessages];
 		
 		// what are the specifics of the failure?
 		BOOL userRecognised = [[[[rootElement elementsForName:@"logon_succeeded"] objectAtIndex:0] stringValue] boolValue];
@@ -99,8 +100,9 @@ static Synchroniser *sharedSynchroniser = nil;
 			NSString *error_description = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
 			[MindEggUtilities mindEggErrorAlertWithMessage:error_description];
 
-			// enable the sync button
-			[MyDecksViewController sharedInstance].syncButton.enabled = YES;
+			// tidy up
+			[self handleSyncFailure];
+
 		}
 	}
 	else // the server returned the deck summary information, so process this and then ask for the full deck
@@ -109,9 +111,6 @@ static Synchroniser *sharedSynchroniser = nil;
 
 		// populate database based on retrieved xml_string
 		int numberDecksReceived = [[[doc rootElement] elementsForName:@"deck"] count];
-		
-		// remove busy indicator for now (deckparser will put it back on for each individual deck download - the gap shouldn't be noticeable to the user)
-		//[ProgressViewController stopShowingProgress];
 		
 		// loop through the decks received, adding them to the screen
 		for (int i = (numberDecksReceived - 1); i >= 0; i--)
@@ -149,14 +148,20 @@ static Synchroniser *sharedSynchroniser = nil;
 				}
 		}
 		
-		// loop through the decks received again in the opposite direction, this time downloading the full deck
-		for (int i = ([downloadQueue count] - 1); i >= 0; i--)
+		// if there are no decks to sync, just tidy up the sync process
+		if ([downloadQueue count] == 0)
 		{
-			// start downloading the full deck
-			DeckDownloaderQueueItem *queueItem = [downloadQueue objectAtIndex:i];
-			[[DeckDownloader sharedInstance] completeDownloadOfDeckID:[queueItem userVisibleID] withIPhoneDeckID:[queueItem iPhoneDeckID]];
+			[[DeckDownloader sharedInstance] completeDownloadAfterSuccess:YES];
 		}
-		
+		else // loop through the decks received again in the opposite direction, this time downloading the full deck
+		{
+			for (int i = ([downloadQueue count] - 1); i >= 0; i--)
+			{
+				// start downloading the full deck
+				DeckDownloaderQueueItem *queueItem = [downloadQueue objectAtIndex:i];
+				[[DeckDownloader sharedInstance] completeDownloadOfDeckID:[queueItem userVisibleID] withIPhoneDeckID:[queueItem iPhoneDeckID]];
+			}
+		}
 		[downloadQueue release];
 	}
 	
@@ -166,23 +171,27 @@ static Synchroniser *sharedSynchroniser = nil;
 
 - (void) deckListRequestFailed:(ASIHTTPRequest *)request
 {
-	// remove busy indicator
-	// [ProgressViewController stopShowingProgress];
-	
 	// tell user that there was a problem and that decks are not being synchronised
  	UIAlertView *errorAlert = [[UIAlertView alloc]
-							   initWithTitle:  [NSString stringWithFormat:@"Couldn't Synchronize Decks"]
+							   initWithTitle:  [NSString stringWithFormat:@"Couldn't reach ShuffleDuck"]
 							   message: [NSString stringWithFormat:@"Please check your network connection and try again."]
 							   delegate: nil
 							   cancelButtonTitle: @"OK"
 							   otherButtonTitles: nil];
 	[errorAlert show];
 	[errorAlert release];
-	
-	// enable the sync button
-	[MyDecksViewController sharedInstance].syncButton.enabled = YES;
+
+	// tidy up
+	[self handleSyncFailure];
 }
 
+- (void) handleSyncFailure
+{
+	// enable the sync button
+	[MyDecksViewController sharedInstance].syncButton.enabled = YES;
+	[ProgressViewController stopShowingProgress];
+	[[MyDecksViewController sharedInstance] hideMessages];
+}
 
 - (void)dealloc {
     [super dealloc];

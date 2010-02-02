@@ -17,6 +17,7 @@
 #import "ProgressViewController.h"
 #import "Constants.h"
 #import "Synchroniser.h"
+#import "DeckDownloader.h"
 
 static MyDecksViewController *sharedMyDecksViewController = nil;
 
@@ -44,6 +45,9 @@ static sqlite3_stmt *deleteStmt = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
+	// hide the progress indicator
+	[self hideMessages];
+	
 	//setup custom back button
 	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
 																		style:UIBarButtonItemStyleDone
@@ -56,19 +60,6 @@ static sqlite3_stmt *deleteStmt = nil;
 	UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(pushFeedbackScreen:)]; 
 	self.navigationItem.rightBarButtonItem = downloadButton;
 	[downloadButton release];
-	
-	// Sync / Download Buttons
-	/*
-		// setup download button
-		UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(pushDownloadScreen:)]; 
-		self.navigationItem.rightBarButtonItem = downloadButton;
-		[downloadButton release];
-		
-		// setup sync button
-		UIBarButtonItem *syncButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(syncDecksWithServer:)]; 
-		self.navigationItem.leftBarButtonItem = syncButton;
-		[syncButton release];
-	*/
 	
 	// create table footer
 	tableFooterViewController = [[TableFooterViewController alloc] initWithNibName:@"TableFooterView" bundle:nil];
@@ -189,6 +180,10 @@ static sqlite3_stmt *deleteStmt = nil;
 		[self.navigationController pushViewController:deckDetailViewController animated:YES];	
 		
 		[deck release];
+	}
+	else // otherwise, resume the broken downloads
+	{
+		[[DeckDownloader sharedInstance] resumeBrokenDownloadswithUserRequested:YES];
 	}
 }
 
@@ -358,7 +353,6 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (IBAction)syncDecksWithServer:(id)sender
 {
-	[ProgressViewController startShowingProgress];
 	[[Synchroniser sharedInstance] synchronise];
 }
 
@@ -495,6 +489,29 @@ static sqlite3_stmt *deleteStmt = nil;
 			libraryTableView.tableFooterView = nil;
 		}
 	}
+}
+
+#pragma mark -
+#pragma mark Busy Indicator Management
+
+-(void)showMessage:(NSString *)message
+{
+	[activityIndicator startAnimating];
+	messageLabel.text = message;
+	messageLabel.alpha = 1.0;
+	activityIndicator.alpha = 1.0;
+	
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+
+-(void)hideMessages
+{
+	[activityIndicator stopAnimating];
+	messageLabel.text = @"";
+	messageLabel.alpha = 0.0;
+	activityIndicator.alpha = 0.0;
+
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 #pragma mark -
