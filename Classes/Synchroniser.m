@@ -41,7 +41,7 @@ static Synchroniser *sharedSynchroniser = nil;
 {
 	// show busy & disable sync button
 	[ProgressViewController startShowingProgress];
-	[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
+	[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuffleDuck"];
 	[MyDecksViewController sharedInstance].syncButton.enabled = NO;
 	
 	// setup URL

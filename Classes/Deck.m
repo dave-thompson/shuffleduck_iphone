@@ -145,7 +145,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog([NSString stringWithFormat:@"SQLite request to find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return nextSideExists;
 }

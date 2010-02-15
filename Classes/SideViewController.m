@@ -9,6 +9,10 @@
 #import "SideViewController.h"
 #import "VariableStore.h"
 
+#define UIColorFromRGB(rgbValue) [UIColor \
+  colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
+         green:((float)((rgbValue & 0xFF00)  >> 8))/255.0 \
+          blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
 @implementation SideViewController
 
@@ -47,10 +51,25 @@
 	// clear the old side
 	[self clearSide];
 	
-	// Retrieve all components on the new side from the DB
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT Component.type, Component.x, Component.y, Component.width, Component.height, TextBox.text, TextBox.font_id, TextBox.font_size, TextBox.foreground_red, TextBox.foreground_green, TextBox.foreground_blue, TextBox.foreground_alpha, TextBox.background_red, TextBox.background_green, TextBox.background_blue, TextBox.background_alpha, TextBox.alignment_id, Image.image FROM Component LEFT OUTER JOIN TextBox ON Component.id = TextBox.component_id LEFT OUTER JOIN Image ON Component.id = Image.component_id WHERE Component.side_id = %d ORDER BY Component.display_order ASC;",sideID];
+	
+	// Set the side background colour
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT background_color FROM Side WHERE id = %d;",sideID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW) // should be just one row
+		{
+			int side_background_color = (int)sqlite3_column_int(compiledStatement, 0);
+			self.view.backgroundColor = UIColorFromRGB(side_background_color);		
+		}
+	}
+	sqlite3_reset(compiledStatement);
+	compiledStatement = nil;
+
+	// Retrieve all components on the new side from the DB
+	sqlString = [NSString stringWithFormat:@"SELECT Component.type, Component.x, Component.y, Component.width, Component.height, TextBox.text, TextBox.font_id, TextBox.font_size, TextBox.foreground_color, TextBox.foreground_alpha, TextBox.background_color, TextBox.background_transparent, TextBox.background_alpha, TextBox.alignment_id, Image.image FROM Component LEFT OUTER JOIN TextBox ON Component.id = TextBox.component_id LEFT OUTER JOIN Image ON Component.id = Image.component_id WHERE Component.side_id = %d ORDER BY Component.display_order ASC;",sideID];
+	sqlStatement = [sqlString UTF8String];
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		// Process each returned row (== component) in turn
@@ -80,15 +99,12 @@
 					NSString *displayText = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 5)];
 					// int font_id = (int)sqlite3_column_int(compiledStatement, 6);
 					CGFloat font_size = (CGFloat)sqlite3_column_double(compiledStatement, 7);					
-					CGFloat foreground_red = (CGFloat)sqlite3_column_double(compiledStatement, 8);
-					CGFloat foreground_green = (CGFloat)sqlite3_column_double(compiledStatement, 9);
-					CGFloat foreground_blue = (CGFloat)sqlite3_column_double(compiledStatement, 10);
-					CGFloat foreground_alpha = (CGFloat)sqlite3_column_double(compiledStatement, 11);					
-					CGFloat background_red = (CGFloat)sqlite3_column_double(compiledStatement, 12);
-					CGFloat background_green = (CGFloat)sqlite3_column_double(compiledStatement, 13);
-					CGFloat background_blue = (CGFloat)sqlite3_column_double(compiledStatement, 14);
-					CGFloat background_alpha = (CGFloat)sqlite3_column_double(compiledStatement, 15);
-					int alignment_id = (int)sqlite3_column_int(compiledStatement, 16);
+					int foreground_color = (int)sqlite3_column_int(compiledStatement, 8);
+					// CGFloat foreground_alpha = (CGFloat)sqlite3_column_double(compiledStatement, 9);
+					int background_color = (int)sqlite3_column_int(compiledStatement, 10);
+					BOOL background_transparent = (BOOL)sqlite3_column_int(compiledStatement, 11);
+					// CGFloat background_alpha = (CGFloat)sqlite3_column_double(compiledStatement, 12);
+					int alignment_id = (int)sqlite3_column_int(compiledStatement, 13);
 					
 					// transform size properties according to side size
 					font_size = font_size * _sizeMultiplier;
@@ -110,8 +126,11 @@
 						label.textAlignment = UITextAlignmentRight;
 						break;
 					}
-					label.textColor = [UIColor colorWithRed:foreground_red green:foreground_green blue:foreground_blue alpha:foreground_alpha];
-					label.backgroundColor = [UIColor colorWithRed:background_red green:background_green blue:background_blue alpha:background_alpha];
+					label.textColor = UIColorFromRGB(foreground_color);
+					if (background_transparent)
+						label.backgroundColor = [UIColor clearColor];
+					else
+						label.backgroundColor = UIColorFromRGB(background_color);
 					label.lineBreakMode = UILineBreakModeClip;
 					[self.view addSubview:label];
 					
