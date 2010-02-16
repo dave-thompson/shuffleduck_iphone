@@ -36,6 +36,9 @@
 
 -(void)clearSide
 {
+	// clear the background color
+	self.view.backgroundColor = [UIColor whiteColor];
+	
 	// for each label or image on the side
 	for (UIView *view in self.view.subviews)
 	{
