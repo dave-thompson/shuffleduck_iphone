@@ -17,6 +17,7 @@
 	IBOutlet UIButton *shuffleButton;
 	IBOutlet UIButton *studyButton;
 	IBOutlet UIButton *testButton;
+	IBOutlet UIButton *viewButton;
 	
 	IBOutlet UILabel *titleLabel;
 	IBOutlet UILabel *totalCardsLabel;	
@@ -38,6 +39,7 @@
 -(IBAction)unshuffleButtonClicked:(id)sender;
 -(IBAction)testButtonClicked:(id)sender;
 -(IBAction)studyButtonClicked:(id)sender;
+-(IBAction)viewButtonClicked:(id)sender;
 -(void)pushStudyViewController:(StudyType)type;
 
 @end

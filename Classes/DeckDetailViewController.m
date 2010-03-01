@@ -53,6 +53,12 @@ SideViewController *miniSideViewController;
 	[self pushStudyViewController:Learn];	
 }
 
+-(IBAction)viewButtonClicked:(id)sender
+{
+	[self pushStudyViewController:View];
+}
+
+
 -(void)pushStudyViewController:(StudyType)type
 {
 	// Prepare the study view controller (referencing the new deck object)
@@ -96,7 +102,6 @@ SideViewController *miniSideViewController;
 	int firstSideID = [deck getOriginalFirstSideID];
 	int userVisibleId = [deck userVisibleID];
 	
-	
 	// Print deck information to screen
 	titleLabel.text = [deck getDeckTitle];
 	totalCardsLabel.text = [NSString stringWithFormat: @"%d", numCards];
@@ -117,9 +122,17 @@ SideViewController *miniSideViewController;
 		if (numUnknownCards == 0)	studyButton.enabled = NO;
 		else						studyButton.enabled = YES;
 
-		// Only enable test button if there's at least 1 card in the deck to be tested on
-		if (numCards == 0)			testButton.enabled = NO;
-		else						testButton.enabled = YES;
+		// Only enable test / view buttons if there's at least 1 card in the deck to be tested on / view
+		if (numCards == 0)
+		{
+			testButton.enabled = NO;
+			viewButton.enabled = NO;
+		}
+		else
+		{
+			testButton.enabled = YES;
+			viewButton.enabled = YES;
+		}
 		
 		// only enable shuffle buttons if there are at least 2 cards in the deck to shuffle; additionaly only enable unshuffle button if the cards are already shuffled
 		if (numCards < 2)

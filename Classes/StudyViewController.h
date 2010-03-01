@@ -30,6 +30,7 @@
 }
 
 typedef enum {
+	View,  // study view being used to view cards
 	Learn, // study view being used to memorize cards
 	Test,  // study view being used to test a deck
 } StudyType;
@@ -42,7 +43,7 @@ typedef enum {
 -(IBAction)bottomButtonClicked:(id)sender;
 //-(void)setBackgroundColor;
 -(void)setStudyType:(StudyType)studyType;
-//-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar;
+-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar;
 //-(IBAction)showSearchBar:(id)sender;
 //-(void)hideSearchBar;
 -(void)showNewCard;

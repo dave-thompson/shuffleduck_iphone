@@ -35,6 +35,7 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 
 	// Both types
 	StudyType _studyType;
+	StudyType _requestedStudyType;
 	int numCards;
 
 	// Study
@@ -76,13 +77,6 @@ InlineScoreViewController *inlineScoreViewController;
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];	
 
-	/* SEARCH FUNCTIONALITY DESCOPED
-	// setup search button
-			UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"MagnifyingGlass.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(showSearchBar:)]; 
-			self.navigationItem.rightBarButtonItem = searchButton;
-			[searchButton release];
-	*/
-	
 	// setup Card Side subviews
 			topCardViewController = [[CardViewController alloc] initWithNibName:@"SideView" bundle:nil];
 			topCardViewController.view.frame = CGRectMake(30, 16, 260, 160);
@@ -98,13 +92,11 @@ InlineScoreViewController *inlineScoreViewController;
 	self.navigationItem.rightBarButtonItem = scoreBarButton; 
 	[scoreBarButton release];
 		
-	/* SEARCH BAR FUNCTIONALITY DESCOPED
 	// reposition search bar on top of cards
 			[searchBarView retain];
 			[searchBarView removeFromSuperview];
 			[self.view insertSubview:searchBarView atIndex:2];
 			[searchBarView release];
-	*/
 	 
 	// set background color
 	UIColor *color = [[VariableStore sharedInstance] backgroundColor];
@@ -134,32 +126,79 @@ InlineScoreViewController *inlineScoreViewController;
 	[self updateInlineScore];
 	
 	// set up StudyType specifics
-	if (_studyType == Learn)
+	
+	if (_requestedStudyType == View)
 	{
-		// if the view is set up for Test, change it
-		if (!(crossButton.superview == nil))
+		if ((_studyType == Test) || (_studyType == Learn))
 		{
-			// remove the cross button, resize the tick button and ensure tick is white
-			[crossButton removeFromSuperview];
-			tickButton.frame = CGRectMake(0, 0, 320, 49);
-			[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];
+			if (_studyType == Learn)
+			{
+				// convert from Learn to Test
+					// add the cross button,  resize the tick button and ensure tick is green
+					[bottomBarView addSubview:crossButton];
+					tickButton.frame = CGRectMake(160, 0, 160, 49);
+					[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];							
+			}
+			// convert from Test to View
+				[bottomBarView removeFromSuperview];
+				searchBarView.frame = CGRectMake(0,0, 320, 44);
+				topCardViewController.view.frame = CGRectMake(30, 60, 260, 160);
+				bottomCardViewController.view.frame = CGRectMake(30, 236, 260, 160);
 		}
+		_studyType = View;
 	}
-	else // is a test
+	else if (_requestedStudyType == Learn)
 	{
-		// if the view is set up for Study, change it
-		if (crossButton.superview == nil)
+		if ((_studyType == View) || (_studyType == Test))
+		{
+			if (_studyType == View)
+			{
+				// convert from View to Test
+				[outerView addSubview:bottomBarView];
+				searchBarView.frame = CGRectMake(0, -44, 320, 44);
+				topCardViewController.view.frame = CGRectMake(30, 16, 260, 160);
+				bottomCardViewController.view.frame = CGRectMake(30, 192, 260, 160);
+			}
+			// convert from Test to Learn
+				// remove the cross button, resize the tick button and ensure tick is white
+				[crossButton removeFromSuperview];
+				tickButton.frame = CGRectMake(0, 0, 320, 49);
+				[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];
+		}
+		_studyType = Learn;
+	}
+	else // _requestedStudyType == Test
+	{
+		if (_studyType == Learn)
 		{
 			// add the cross button,  resize the tick button and ensure tick is green
 			[bottomBarView addSubview:crossButton];
-			//crossButton.frame = CGRectMake(0, 0, 160, 49);
 			tickButton.frame = CGRectMake(160, 0, 160, 49);
 			[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];			
 		}
+		else if (_studyType == View)
+		{
+			[outerView addSubview:bottomBarView];
+			searchBarView.frame = CGRectMake(0, -44, 320, 44);
+			topCardViewController.view.frame = CGRectMake(30, 16, 260, 160);
+			bottomCardViewController.view.frame = CGRectMake(30, 192, 260, 160);
+		}
+		_studyType = Test;
 	}
 	
-	//load first side of first card (incoming deck object already set to first card)
+	//load first side of first card
+	if (_studyType == Learn)
+	{
+		[deck moveToCardAtPosition:FirstCard includeKnownCards:NO];
+	}
+	else
+	{
+		[deck moveToCardAtPosition:FirstCard includeKnownCards:YES];
+	}
 	[self showNewCard];	
+	
+	// update score panel
+	[self updateInlineScore];
 	
 	[super viewWillAppear:animated];
 }
@@ -181,9 +220,11 @@ InlineScoreViewController *inlineScoreViewController;
 	[self navigationController].viewControllers = newVCArray;
 }
 
+// setStudyType must be called before showing the view
+// setStudyType does not have effect until viewWillAppear runs
 -(void)setStudyType:(StudyType)studyType
 {
-	_studyType = studyType;
+	_requestedStudyType = studyType;
 }
 
 // ----- LOGIC METHODS -----
@@ -196,9 +237,19 @@ InlineScoreViewController *inlineScoreViewController;
 	[topCardViewController loadFrontSideWithDBSideID:deck.currentSideID];
 	[topCardViewController setBackSideBlank];
 	
-	// Bottom card: Leave empty pending user action
-	[bottomCardViewController setFrontSideBlank];
-	[bottomCardViewController setBackSideBlank];
+	if ((_studyType == Learn) || (_studyType == Test))
+	{
+		// Bottom card: Leave empty pending user action
+		[bottomCardViewController setFrontSideBlank];
+		[bottomCardViewController setBackSideBlank];
+	}
+	else // _studyType == View
+	{
+		// Bottom Card: Show the second side of the current card
+		[deck nextSide];
+		[bottomCardViewController loadFrontSideWithDBSideID:deck.currentSideID];
+		[bottomCardViewController setBackSideBlank];
+	}
 	
 	// Reset the bottom tick to white if in study mode
 	if (_studyType == Learn)
@@ -213,7 +264,13 @@ InlineScoreViewController *inlineScoreViewController;
 {
 	// Load new card onto hidden side views
 	[topCardViewController loadBackSideWithDBSideID:[deck getCurrentSideID]];
-	[bottomCardViewController setBackSideBlank];
+	if (_studyType == View)
+	{
+		[deck nextSide];
+		[bottomCardViewController loadBackSideWithDBSideID:[deck getCurrentSideID]];
+	}
+	else
+		[bottomCardViewController setBackSideBlank];
 	
 	// transition to hidden sides
 	[topCardViewController revealHiddenSide:direction];
@@ -223,7 +280,6 @@ InlineScoreViewController *inlineScoreViewController;
 	if (_studyType == Learn)
 	{
 		[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];
-		//[crossButton setImage:[UIImage imageNamed:@"WhiteCross.png"] forState:UIControlStateNormal];
 	}
 }
 
@@ -232,69 +288,61 @@ InlineScoreViewController *inlineScoreViewController;
 -(void)processRightSwipe
 {
 	// ignore swipes in Test mode
-	if (_studyType == Learn)
+	// && only process swipe if not already done so
+	// && ignore swipe if the last swipe animation hasn't finished
+	if ((((_studyType == Learn) || (_studyType == View)) && (processedCurrentSwipe == NO)) && ((topCardViewController.animationInProgress == NO) && (bottomCardViewController.animationInProgress == NO)))
 	{
-		if (processedCurrentSwipe == NO) // only process if not already done so
+		BOOL additionalCardExists;
+		if (_studyType == Learn)
+			{additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:NO];}
+		else // _studyType == View
+			{additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:YES];}
+		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 		{
-			if ((topCardViewController.animationInProgress == NO) && (bottomCardViewController.animationInProgress == NO)) // ignore swipe if the last swipe animation hasn't finished
-			{
-				BOOL additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:NO];
-				if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
-				{
-					[self showNewCardWithAnimation:CardViewAnimationSlideRight];
-				}
-				processedCurrentSwipe = YES;
-			}
+			[self showNewCardWithAnimation:CardViewAnimationSlideRight];
 		}
+		processedCurrentSwipe = YES;
 	}
 }
 
 -(void)processLeftSwipe
 {
 	// ignore swipes in Test mode
-	if (_studyType == Learn)
+	// && only process swipe if not already done so
+	// && ignore swipe if the last swipe animation hasn't finished
+	if ((((_studyType == Learn) || (_studyType == View)) && (processedCurrentSwipe == NO)) && ((topCardViewController.animationInProgress == NO) && (bottomCardViewController.animationInProgress == NO)))
 	{
-		if (processedCurrentSwipe == NO) // only process if not already done so
-		{		
-			if ((topCardViewController.animationInProgress == NO) && (bottomCardViewController.animationInProgress == NO)) // ignore swipe if the last swipe animation hasn't finished
-			{
-				BOOL additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:NO];
-				if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
-				{
-					[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
-				}				
-				processedCurrentSwipe = YES;
-			}
-		}
+		BOOL additionalCardExists;
+		if (_studyType == Learn)
+			{additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:NO];}
+		else // _studyType == View
+			{additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:YES];}
+		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
+		{
+			[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
+		}				
+		processedCurrentSwipe = YES;
 	}
 }
 
 -(void)processUpSwipe
 {
-	/* COLOR CHANGE DISABLED
-	// assign random color to background and store as state
-	UIColor *randomColor = [RandomColor randomColorWithStateUpdate];
-	outerView.backgroundColor = randomColor;
-	topCardViewController.view.backgroundColor = randomColor;
-	bottomCardViewController.view.backgroundColor = randomColor;
-	 */
+	// no action
 }
 
 -(void)processDownSwipe
 {
-	[self processUpSwipe];
+	// no action 
 }
 
 -(void)processSingleTap
 {
-	/* SEARCH FUNCTIONALITY DESCOPED
-	if (searchBar.isFirstResponder) // if search bar is on then dismiss it
+	if (searchBar.isFirstResponder)
 	{
-		[self hideSearchBar];			
-	}
-	else // else show next side on current card
+		[searchBar resignFirstResponder];
+	}	
+	else
 	{
-	 */
 		int oldSide = deck.getCurrentSideID;
 		BOOL nextSideExists = [deck nextSide]; // update deck pointer to next side
 		if ((nextSideExists) == YES) // if there is a next side (i.e. current side has successfully updated)
@@ -306,12 +354,12 @@ InlineScoreViewController *inlineScoreViewController;
 			[topCardViewController revealHiddenSide:CardViewAnimationReveal];
 			[bottomCardViewController revealHiddenSide:CardViewAnimationReveal];	
 		}
-	/*}*/
+	}
 }
 
 -(void)processDoubleTap
 {
-	// DOUBLE TAP TO BACK UP THROUGH CARD SIDES
+	// no action
 }
 
 
@@ -467,7 +515,7 @@ InlineScoreViewController *inlineScoreViewController;
 		[[inlineScoreViewController bottomMultipartLabel] setText:@"Known:  " andColor:[UIColor whiteColor] forLabel:0];
 		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d", cardsKnown] andColor:[UIColor whiteColor] forLabel:1];		
 	}
-	else // is a test
+	else if (_studyType == Test)
 	{
 		// top label
 		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:3 fontSize:13 alignment:MultipartLabelRight];
@@ -479,14 +527,21 @@ InlineScoreViewController *inlineScoreViewController;
 		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
 		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d left", numCards - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
 	}
+	else // _studyType == View
+	{
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:0 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:0 fontSize:13 alignment:MultipartLabelRight];
+	}
 }
 
-/* SEARCH FUNCTIONALITY DESCOPED
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)sender
 {
-	[self hideSearchBar];
+	// TO IMPLEMENT
 }
+
+
+/* SEARCH BAR ANIMATIONS DESCOPED
 
 -(IBAction)showSearchBar:(id)sender
 {	
