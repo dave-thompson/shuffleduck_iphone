@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="29"/>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -52,7 +52,12 @@
 								<int key="IBBarStyle">1</int>
 								<string key="IBText"/>
 								<string key="IBPlaceholder"/>
-								<object class="IBUITextInputTraits" key="IBTextInputTraits"/>
+								<object class="IBUITextInputTraits" key="IBTextInputTraits">
+									<int key="IBUIAutocorrectionType">1</int>
+								</object>
+								<object class="NSArray" key="IBScopeButtonTitles">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+								</object>
 							</object>
 						</object>
 						<string key="NSFrame">{{0, -44}, {320, 44}}</string>

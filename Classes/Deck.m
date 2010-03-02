@@ -70,6 +70,43 @@
 	return cardsExist;
 }
 
+-(BOOL)moveToCardAtPosition:(CardIndex)position withSearchTerm:(NSString *)searchTerm
+// Updates the card / side state to point to the first side of either the first or last card that matches the given search term
+// Returns true iff there are > 0 cards in the current deck.
+{
+	// if no search term was supplied, move to the card at the requested position
+	if (searchTerm.length == 0)
+	{
+		return [self moveToCardAtPosition:position includeKnownCards:YES];
+	}
+	
+	// otherwise, use the search term...
+	BOOL cardsExist = NO;
+	NSString *sqlString;
+	
+	if (position == FirstCard)
+		{sqlString = [NSString stringWithFormat:@"SELECT Side.card_id AS CurrentCardID, Side.id AS CurrentSideID FROM (SELECT DISTINCT Card.id, Card.position FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%') AS LimitedCard, Side WHERE Side.card_id = LimitedCard.id ORDER BY LimitedCard.position ASC, Side.position ASC LIMIT 1;", currentDeckID, searchTerm];}
+	else // last card is requested
+		{sqlString = [NSString stringWithFormat:@"SELECT Side.card_id AS CurrentCardID, Side.id AS CurrentSideID FROM (SELECT DISTINCT Card.id, Card.position FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%') AS LimitedCard, Side WHERE Side.card_id = LimitedCard.id ORDER BY LimitedCard.position DESC, Side.position ASC LIMIT 1;", currentDeckID, searchTerm];}
+	
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			currentCardID = (int)sqlite3_column_int(compiledStatement, 0);
+			currentSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			cardsExist = YES;
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return cardsExist;
+}
+
 
 -(BOOL)moveToCardInDirection:(ChangeCardDirection)direction includeKnownCards:(BOOL)includeKnown
 // Updates state to point to the first side of the requested card. Decks are treated as continuous - i.e. the first card is after the last card; the last card is before the first card.
@@ -126,6 +163,118 @@
 		{return success;}
 }
 
+-(BOOL)moveToCardInDirection:(ChangeCardDirection)direction withSearchTerm:(NSString *)searchTerm
+// Updates state to point to the first side of the requested card. Decks are treated as continuous - i.e. the first card is after the last card; the last card is before the first card.
+// Returns NO iff there are < 2 cards that match the given search term.
+{
+	// if no search term was supplied, move to the card in requested direction
+	if (searchTerm.length == 0)
+	{
+		return [self moveToCardInDirection:direction includeKnownCards:YES];
+	}	
+	
+	BOOL success = NO;
+	NSString *sqlString;
+	
+	if (direction == NextCard)
+		{sqlString = [NSString stringWithFormat:@"SELECT next_card.id AS next_card_id, next_side.id AS next_side_id FROM Card current_card, (SELECT DISTINCT Card.id, Card.position FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%') AS next_card, Side next_side WHERE current_card.id = %d AND next_card.position >  current_card.position AND next_card.id = next_side.card_id ORDER BY next_card.position ASC, next_side.position ASC LIMIT 1;", currentDeckID, searchTerm, currentCardID, currentDeckID];}
+	else // direction is PreviousCard
+		{sqlString = [NSString stringWithFormat:@"SELECT previous_card.id AS previous_card_id, previous_side.id AS previous_side_id FROM Card current_card, (SELECT DISTINCT Card.id, Card.position FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%') AS previous_card, Side previous_side WHERE current_card.id = %d AND previous_card.position <  current_card.position AND previous_card.id = previous_side.card_id ORDER BY previous_card.position DESC, previous_side.position ASC LIMIT 1;", currentDeckID, searchTerm, currentCardID, currentDeckID];}
+	
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			currentCardID = (int)sqlite3_column_int(compiledStatement, 0);
+			currentSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			success = YES;
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	
+	if (success == NO) // no rows were returned - i.e. already looking at either the last or first card
+		
+	{
+		if (direction == NextCard)
+			{return [self moveToCardAtPosition:FirstCard withSearchTerm:searchTerm];}
+		else // direction is ChangeCard Previous
+			{return [self moveToCardAtPosition:LastCard withSearchTerm:searchTerm];}
+	}	
+	else
+	{return success;}
+}
+
+-(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
+{
+	// find last sessions card
+	int lastSessionsCardID, firstSideID;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			lastSessionsCardID = (int)sqlite3_column_int(compiledStatement, 0);
+			firstSideID = (int)sqlite3_column_int(compiledStatement, 1);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	
+	if (lastSessionsCardID >= 0)
+	{
+		// if there was a last session, and therefore there was a real card ID, point the deck to that ID
+		currentCardID = lastSessionsCardID;
+		currentSideID = firstSideID;
+	}
+	else
+	{
+		// this is the first time the user has viewed this deck using this StudyType
+		// we can safely assume that there is no text in the searchBar
+		[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
+	}
+	
+}
+
+-(void)rememberCardForStudyType:(StudyType)studyType
+// Serializes the currently viewed card ID so it may be reloaded when the user comes back to the given StudyType
+{
+	sqlite3_stmt *updateStmt = nil;	
+	if(updateStmt == nil)
+	{
+		const char *sql;
+		if (studyType == View)
+			{sql = "UPDATE DeckStatus SET view_card_id = ? WHERE deck_id = ?";}
+		else if (studyType == Test)
+			{sql = "UPDATE DeckStatus SET test_card_id = ? WHERE deck_id = ?";}
+		else if (studyType == Learn)
+			{sql = "UPDATE DeckStatus SET learn_card_id = ? WHERE deck_id = ?";}
+
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	else
+	{
+		NSLog(@"Error: updatestmt not nil");
+	}
+	sqlite3_bind_int(updateStmt, 1, currentCardID);
+	sqlite3_bind_int(updateStmt, 2, currentDeckID);
+	
+	if(SQLITE_DONE != sqlite3_step(updateStmt))
+	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
+	
+	sqlite3_reset(updateStmt);
+	updateStmt = nil;
+}
+
 -(BOOL)nextSide
 // Updates state to point to the next side of the current card.
 // Returns NO iff there are no more sides to display for the current card (i.e. last side already displayed).
@@ -171,6 +320,52 @@
 		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return numCardsInDeck;
+}
+
+-(int)numCardsWithSearchTerm:(NSString *)searchTerm
+// returns the number of cards in the current deck
+{
+	if (searchTerm.length == 0)	return [self numCards];
+	
+	int numCardsFound;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(DISTINCT Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%'", currentDeckID, searchTerm];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			numCardsFound = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return numCardsFound;
+}
+
+-(BOOL)currentCardFitsFilter:(NSString *)searchTerm
+{
+	int countOfCurrentCardInFilteredCards;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%' AND Card.id = %d", currentDeckID, searchTerm, currentCardID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			countOfCurrentCardInFilteredCards = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	
+	if (countOfCurrentCardInFilteredCards > 0)	return YES;  // count may be greater than 1, as we do not use the DISTINCT keyword
+	else										return NO;
+	
 }
 
 -(int)numKnownCards
@@ -314,6 +509,49 @@
 		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return author;
+}
+
+-(NSString *)searchBarText
+{
+	NSString *searchBarText;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT search_text FROM DeckStatus WHERE deck_id = %d;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			searchBarText = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 0)];
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return searchBarText;
+}
+
+-(void)setSearchBarText:(NSString *)searchBarText
+{
+	sqlite3_stmt *updateStmt = nil;	
+	if(updateStmt == nil)
+	{
+		const char *sql = "UPDATE DeckStatus SET search_text = ? WHERE deck_id = ?";
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	else
+	{
+		NSLog(@"Error: updatestmt not nil");
+	}
+	sqlite3_bind_text(updateStmt, 1, [searchBarText UTF8String], -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int(updateStmt, 2, currentDeckID);
+	
+	if(SQLITE_DONE != sqlite3_step(updateStmt))
+	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
+	
+	sqlite3_reset(updateStmt);
+	updateStmt = nil;
 }
 
 -(int)userVisibleID

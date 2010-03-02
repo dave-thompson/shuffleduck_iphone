@@ -34,7 +34,7 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 // score tracking
 
 	// Both types
-	StudyType _studyType;
+	StudyType _studyType = Test; // xib is initially set up for Test
 	StudyType _requestedStudyType;
 	int numCards;
 
@@ -44,6 +44,12 @@ CGPoint gestureStartPoint; // Point the current gesture started at
 	// Test
 	int cardsCompleted = 0;
 	int cardsCorrect = 0;
+
+	// View
+	int numFilteredCards = 0;
+
+BOOL searchTextExists; // whether there was any text in the search bar after text was last edited
+BOOL cardHidden = NO; // whether the card is shown or not
 
 CardViewController *topCardViewController, *bottomCardViewController;
 InlineScoreViewController *inlineScoreViewController;
@@ -92,11 +98,16 @@ InlineScoreViewController *inlineScoreViewController;
 	self.navigationItem.rightBarButtonItem = scoreBarButton; 
 	[scoreBarButton release];
 		
-	// reposition search bar on top of cards
-			[searchBarView retain];
-			[searchBarView removeFromSuperview];
-			[self.view insertSubview:searchBarView atIndex:2];
-			[searchBarView release];
+	// set up search bar
+		// reposition on top of cards
+		[searchBarView retain];
+		[searchBarView removeFromSuperview];
+		[self.view insertSubview:searchBarView atIndex:2];
+		[searchBarView release];
+	
+		// do not 'fix' input text
+		searchBar.autocorrectionType = UITextAutocorrectionTypeNo;
+		searchBar.autocapitalizationType = UITextAutocapitalizationTypeNone;
 	 
 	// set background color
 	UIColor *color = [[VariableStore sharedInstance] backgroundColor];
@@ -120,12 +131,12 @@ InlineScoreViewController *inlineScoreViewController;
 	// initiate state data
 	processedCurrentSwipe = NO;
 	numCards = deck.numCards;
+	numFilteredCards = numCards;
 	cardsKnown = deck.numKnownCards;
 	cardsCompleted = 0;
 	cardsCorrect = 0;
-	[self updateInlineScore];
 	
-	// set up StudyType specifics
+	// reconfigure screen components to suit StudyType
 	
 	if (_requestedStudyType == View)
 	{
@@ -186,18 +197,33 @@ InlineScoreViewController *inlineScoreViewController;
 		_studyType = Test;
 	}
 	
-	//load first side of first card
-	if (_studyType == Learn)
+	// Point deck at appropriate card, dependent on StudyType
+	if (_studyType == View)
+	{
+		[deck moveToLastSessionsCardForStudyType:_studyType];
+		// for View, also populate search bar with text from last time
+		searchBar.text = deck.searchBarText;
+		if (searchBar.text.length > 0)
+		{
+			searchTextExists = YES;
+		}
+		else
+		{
+			searchTextExists = NO;
+		}
+	}
+	else if (_studyType == Learn)
 	{
 		[deck moveToCardAtPosition:FirstCard includeKnownCards:NO];
 	}
-	else
+	else if (_studyType == Test)
 	{
 		[deck moveToCardAtPosition:FirstCard includeKnownCards:YES];
 	}
-	[self showNewCard];	
 	
-	// update score panel
+	
+	// show the selected card and update the score panel
+	[self showNewCard];	
 	[self updateInlineScore];
 	
 	[super viewWillAppear:animated];
@@ -220,6 +246,24 @@ InlineScoreViewController *inlineScoreViewController;
 	[self navigationController].viewControllers = newVCArray;
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+	// dismiss the keyboard
+	if ([searchBar isFirstResponder])
+	{
+		[searchBar resignFirstResponder];
+	}
+	
+	//remember the card currently viewed
+	[deck rememberCardForStudyType:_studyType];
+
+	// if there's a search bar, remember the text in it
+	if (_studyType == View)
+	{
+		deck.searchBarText = searchBar.text;
+	}
+}
+
 // setStudyType must be called before showing the view
 // setStudyType does not have effect until viewWillAppear runs
 -(void)setStudyType:(StudyType)studyType
@@ -233,6 +277,13 @@ InlineScoreViewController *inlineScoreViewController;
 // Display a new card
 // Before calling this method, call deck.nextCard to increment the card pointer (unless the deck is new; Deck instantiation automatically points to the first card).
 {	
+	if (cardHidden)
+	{
+		[self.view addSubview:topCardViewController.view];
+		[self.view addSubview:bottomCardViewController.view];	
+		cardHidden = NO;
+	}
+	
 	// Top Card: Display the the current side of the current card
 	[topCardViewController loadFrontSideWithDBSideID:deck.currentSideID];
 	[topCardViewController setBackSideBlank];
@@ -256,6 +307,13 @@ InlineScoreViewController *inlineScoreViewController;
 	{
 		[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];
 	}
+}
+
+-(void)hideCard
+{
+	[topCardViewController.view removeFromSuperview];
+	[bottomCardViewController.view removeFromSuperview];
+	cardHidden = YES;
 }
 
 -(void)showNewCardWithAnimation:(CardViewAnimation)direction
@@ -296,7 +354,7 @@ InlineScoreViewController *inlineScoreViewController;
 		if (_studyType == Learn)
 			{additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:NO];}
 		else // _studyType == View
-			{additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:YES];}
+			{additionalCardExists = [deck moveToCardInDirection:PreviousCard withSearchTerm:[searchBar text]];}
 		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 		{
 			[self showNewCardWithAnimation:CardViewAnimationSlideRight];
@@ -316,7 +374,7 @@ InlineScoreViewController *inlineScoreViewController;
 		if (_studyType == Learn)
 			{additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:NO];}
 		else // _studyType == View
-			{additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:YES];}
+			{additionalCardExists = [deck moveToCardInDirection:NextCard withSearchTerm:[searchBar text]];}
 		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 		{
 			[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
@@ -529,17 +587,73 @@ InlineScoreViewController *inlineScoreViewController;
 	}
 	else // _studyType == View
 	{
-		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:0 fontSize:13 alignment:MultipartLabelRight];
-		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:0 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d found", numFilteredCards] andColor:[UIColor whiteColor] forLabel:0];
+
+		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d total", numCards] andColor:[UIColor whiteColor] forLabel:0];
 	}
 }
 
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)sender
 {
-	// TO IMPLEMENT
+	[searchBar resignFirstResponder];
 }
 
+- (void)searchBar:(UISearchBar *)aSearchBar textDidChange:(NSString *)searchText
+{
+	// Update number of cards found
+		numFilteredCards = [deck numCardsWithSearchTerm:searchText];
+		[self updateInlineScore];
+	
+	if (numFilteredCards > 0)
+	{
+	// Do search
+		NSString *searchTerm = [searchBar text];
+		// if the new filter invalidates the currently shown card (or there is no currently shown card), replace it with the first card that matches the new filter
+		if ((![deck currentCardFitsFilter:searchText]) || (cardHidden))
+		{
+			[deck moveToCardAtPosition:FirstCard withSearchTerm:searchTerm];
+			[self showNewCard];
+		}
+	}
+	else
+	{
+		[self hideCard];
+	}
+	
+	// Logic for searchBarShouldBeginEditing method
+		// remember whether the edit left the search bar with any text in or not
+		if ([searchBar isFirstResponder])
+		// only handle changes that occur when the search bar is in edit mode (this excludes only changes arising when the user clicks x on the search bar when it is not in edit mode - such changes are handled by searchBarShoudBeginEditing below)
+		{
+			if (searchText.length == 0)
+			{
+				searchTextExists = NO;
+			}
+			else
+			{
+				searchTextExists = YES;
+			}
+		}		
+}
+
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)aSearchBar
+{
+	// if the search bar had text in it the last time the keyboard was present, but does not have text in it now....
+	// ... it is because the user just pressed the x button while the keyboard was not present
+	// .. therefore do not start editing text
+	if (searchTextExists && (searchBar.text.length == 0))
+	{
+		searchTextExists = NO; // search text no longer exists - the next time the user presses on the search bar, it should begin editing, even though no text exists in it
+		return NO;
+	}
+	else
+	{
+		return YES;
+	}
+}
 
 /* SEARCH BAR ANIMATIONS DESCOPED
 

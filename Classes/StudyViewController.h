@@ -29,23 +29,14 @@
 	Deck *deck;
 }
 
-typedef enum {
-	View,  // study view being used to view cards
-	Learn, // study view being used to memorize cards
-	Test,  // study view being used to test a deck
-} StudyType;
-
 
 @property (nonatomic, retain) Deck *deck;
 
 + (StudyViewController *)sharedInstance;
 
 -(IBAction)bottomButtonClicked:(id)sender;
-//-(void)setBackgroundColor;
 -(void)setStudyType:(StudyType)studyType;
 -(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar;
-//-(IBAction)showSearchBar:(id)sender;
-//-(void)hideSearchBar;
 -(void)showNewCard;
 -(void)updateInlineScore;
 

@@ -142,7 +142,7 @@ sqlite3_stmt *addStmt;
 	if (userRequested)
 	{
 		isAResumeRequestAndNotYetReachedShuffleDuck = YES;
-		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
+		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuffleDuck"];
 	}
 	else
 	{
@@ -400,6 +400,9 @@ sqlite3_stmt *addStmt;
 {
 	//NSLog(@"Started parsing XML document");
 	inCardsDefinition = NO;
+	
+	// open transaction
+	sqlite3_exec([VariableStore sharedInstance].database, "BEGIN", 0, 0, 0);
 }
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parserError
@@ -687,6 +690,9 @@ sqlite3_stmt *addStmt;
 // Must be called at the end of any parsing process - regardless of the result
 - (void)completeDownloadAfterSuccess:(BOOL)success
 {
+	// complete the transaction
+	sqlite3_exec([VariableStore sharedInstance].database, "COMMIT", 0, 0, 0);
+	
 	// refresh the library
 	[[MyDecksViewController sharedInstance] refreshTable];
 
