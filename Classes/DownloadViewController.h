@@ -13,6 +13,11 @@
 	IBOutlet UITextField *idTextField;
 }
 
++ (DownloadViewController *)sharedInstance;
+
 - (IBAction) downloadButtonClicked:(id)sender;
+
+- (int)deckID;
+- (void)setDeckID:(int)deckID;
 
 @end

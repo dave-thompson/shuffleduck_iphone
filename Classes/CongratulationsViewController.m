@@ -47,7 +47,7 @@ static CongratulationsViewController *sharedCongratulationsViewController = nil;
 
 -(IBAction)testButtonPressed:(id)sender
 {
-	[[DeckDetailViewController sharedInstance] pushStudyViewController:Test];
+	[[DeckDetailViewController sharedInstance] pushStudyViewController:Test asPartOfApplicationLoadProcess:NO];
 }
 
 - (void)viewWillAppear:(BOOL)animated

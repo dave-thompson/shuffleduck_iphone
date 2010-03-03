@@ -46,7 +46,7 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 
 -(IBAction)studyButtonPressed:(id)sender
 {
-	[[DeckDetailViewController sharedInstance] pushStudyViewController:Learn];
+	[[DeckDetailViewController sharedInstance] pushStudyViewController:Learn asPartOfApplicationLoadProcess:NO];
 }
 
 - (void)viewWillAppear:(BOOL)animated

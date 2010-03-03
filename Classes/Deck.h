@@ -92,5 +92,5 @@ typedef enum {
 	-(void)rememberCardForStudyType:(StudyType)studyType;
 	-(void)setSearchBarText:(NSString *)searchBarText;
 	-(NSString *)searchBarText;
-
+	-(int)lastSessionsSideIDForStudyType:(StudyType)studyType;
 @end

@@ -36,8 +36,13 @@
 
 -(IBAction)bottomButtonClicked:(id)sender;
 -(void)setStudyType:(StudyType)studyType;
+-(StudyType)getStudyType;
 -(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar;
 -(void)showNewCard;
 -(void)updateInlineScore;
+-(void)showNextSide;
+
+-(void)pushCongratulationsViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess;
+-(void)pushFinalScoreViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess;
 
 @end

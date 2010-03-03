@@ -216,7 +216,7 @@
 	BOOL success = NO;
 	NSString *sqlString;
 	
-	sqlString = [NSString stringWithFormat:@"SELECT TestInProgress.card_id, Side.id FROM TestInProgress, Side WHERE TestInProgress.deck_id = %d AND TestInProgress.completed = 0 AND TestInProgress.card_id = Side.card_id ORDER BY TestInProgress.question_number ASC, Side.position ASC LIMIT 1;", currentDeckID];
+	sqlString = [NSString stringWithFormat:@"SELECT TestStatus.card_id, Side.id FROM TestStatus, Side WHERE TestStatus.deck_id = %d AND TestStatus.completed = 0 AND TestStatus.card_id = Side.card_id ORDER BY TestStatus.question_number ASC, Side.position ASC LIMIT 1;", currentDeckID];
 		
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
@@ -236,6 +236,30 @@
 	return success;
 }
 
+-(int)lastSessionsSideIDForStudyType:(StudyType)studyType
+{
+	int lastSessionsSideID;
+	NSString *sqlString;
+	if (studyType == Test)
+		sqlString = [NSString stringWithFormat:@"SELECT test_side_id FROM DeckStatus WHERE deck_id = %d;", currentDeckID];
+	else if (studyType == Learn)
+		sqlString = [NSString stringWithFormat:@"SELECT learn_side_id FROM DeckStatus WHERE deck_id = %d;", currentDeckID];		
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			lastSessionsSideID = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return lastSessionsSideID;
+}
+
 -(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
 {
 	if (studyType == Test)
@@ -248,11 +272,12 @@
 	{
 		// find last sessions card
 		NSString *sqlString;
-		int lastSessionsCardID, firstSideID;
+		int lastSessionsCardID = -1;
+		int firstSideID = -1;
 		
 		if (studyType == View)
 			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
-		else if (studyType == Learn)
+		else // studyType == Learn
 			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.learn_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
 		const char *sqlStatement = [sqlString UTF8String];
 		sqlite3_stmt *compiledStatement;
@@ -314,7 +339,7 @@
 	// Clear any existing test
 	if(stmt == nil)
 	{
-		const char *updateSQL = "DELETE FROM TestInProgress WHERE deck_id = ?";
+		const char *updateSQL = "DELETE FROM TestStatus WHERE deck_id = ?";
 		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
 			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
@@ -331,7 +356,7 @@
 	// Set up new test
 	if(stmt == nil)
 	{
-		const char *updateSQL = "INSERT INTO TestInProgress (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = ? ORDER BY Card.position";
+		const char *updateSQL = "INSERT INTO TestStatus (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = ? ORDER BY Card.position";
 		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
 			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
@@ -356,9 +381,9 @@
 		if (studyType == View)
 			{sql = "UPDATE DeckStatus SET view_card_id = ? WHERE deck_id = ?";}
 		else if (studyType == Test)
-			{sql = "UPDATE DeckStatus SET test_card_id = ? WHERE deck_id = ?";}
+			{sql = "UPDATE DeckStatus SET test_card_id = ?, test_side_id = ? WHERE deck_id = ?";}
 		else if (studyType == Learn)
-			{sql = "UPDATE DeckStatus SET learn_card_id = ? WHERE deck_id = ?";}
+			{sql = "UPDATE DeckStatus SET learn_card_id = ?, learn_side_id = ? WHERE deck_id = ?";}
 
 		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
 			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
@@ -368,8 +393,13 @@
 		NSLog(@"Error: updatestmt not nil");
 	}
 	sqlite3_bind_int(updateStmt, 1, currentCardID);
-	sqlite3_bind_int(updateStmt, 2, currentDeckID);
-	
+	if (studyType == View)
+		sqlite3_bind_int(updateStmt, 2, currentDeckID);
+	else // studyType == Test or Learn
+	{
+		sqlite3_bind_int(updateStmt, 2, currentSideID);
+		sqlite3_bind_int(updateStmt, 3, currentDeckID);		
+	}
 	if(SQLITE_DONE != sqlite3_step(updateStmt))
 	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
 	
@@ -428,7 +458,7 @@
 // returns the number of questions answered in any current test run
 {
 	int cardsCompleted;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND completed = 1;", currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 1;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
@@ -448,7 +478,7 @@
 -(int)cardsCorrect;
 {
 	int cardsCorrect;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND correct = 1;", currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND correct = 1;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
@@ -468,7 +498,7 @@
 -(int)cardsInTestSet;
 {
 	int cardsInTestSet;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d;", currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
@@ -488,7 +518,7 @@
 -(int)testQuestionsRemaining
 {
 	int questionsRemaining;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND completed = 0;", currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 0;", currentDeckID];
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
@@ -668,7 +698,7 @@
 		sqlite3_stmt *updateStmt = nil;
 		if(updateStmt == nil)
 		{
-			const char *sql = "UPDATE TestInProgress SET completed = 1, correct = ? WHERE deck_id = ? AND card_id = ?";
+			const char *sql = "UPDATE TestStatus SET completed = 1, correct = ? WHERE deck_id = ? AND card_id = ?";
 			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
 				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 		}

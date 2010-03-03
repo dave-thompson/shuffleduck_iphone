@@ -48,13 +48,10 @@ static sqlite3_stmt *deleteStmt = nil;
 	// hide the progress indicator
 	[self hideMessages];
 	
-	//setup custom back button
-	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"]
-																		style:UIBarButtonItemStyleDone
-																	   target:nil
-																	   action:nil];
+	// set up back button (viewDidLoad will not have fired yet)
+	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
 	self.navigationItem.backBarButtonItem = backArrowButton;
-	[backArrowButton release];
+	[backArrowButton release];	
 	
 	// setup feedback button
 	UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(pushFeedbackScreen:)]; 
@@ -64,8 +61,6 @@ static sqlite3_stmt *deleteStmt = nil;
 	// create table footer
 	tableFooterViewController = [[TableFooterViewController alloc] initWithNibName:@"TableFooterView" bundle:nil];
 	
-	 // SEE http[colon]//adeem.me/blog/2009/05/29/iphone-sdk-tutorial-add-delete-reorder-uitableview-row/
-	 // POSSIBLE USE OF EDIT FUNCTIONALITY TO REPLACE DOWNLOAD BUTTON, WITH GREEN ADD ROW OPTION....
 	// setup edit button
 	UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editTable:)];
 	[self.navigationItem setLeftBarButtonItem:editButton];
@@ -173,18 +168,32 @@ static sqlite3_stmt *deleteStmt = nil;
 	if (selectedDeckDetails.fullyDownloaded)
 	{
 		int DBDeckID = selectedDeckDetails.deckID;
-		Deck *deck = [[Deck alloc] initWithDeckID:DBDeckID includeKnownCards:YES];
-		DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
-		deckDetailViewController.title = [deck getDeckTitle];
-		deckDetailViewController.deck = deck;
-		[self.navigationController pushViewController:deckDetailViewController animated:YES];	
-		
-		[deck release];
+		[self pushDeckDetailViewControllerWithDeckID:DBDeckID asPartOfLoadProcess:NO];
 	}
 	else // otherwise, resume the broken downloads
 	{
 		[[DeckDownloader sharedInstance] resumeBrokenDownloadswithUserRequested:YES];
 	}
+}
+
+- (void)pushDeckDetailViewControllerWithDeckID:(int)deckID asPartOfLoadProcess:(BOOL)partOfLoadProcess
+{
+	Deck *deck = [[Deck alloc] initWithDeckID:deckID includeKnownCards:YES];
+	DeckDetailViewController *deckDetailViewController = [DeckDetailViewController sharedInstance];
+	deckDetailViewController.title = [deck getDeckTitle];
+	deckDetailViewController.deck = deck;
+	if (partOfLoadProcess)
+	{
+		// set up back button (viewDidLoad will not have fired yet)
+		UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
+		self.navigationItem.backBarButtonItem = backArrowButton;
+		[backArrowButton release];	
+		// push view controller
+		[self.navigationController pushViewController:deckDetailViewController animated:NO];
+	}
+	else
+		[self.navigationController pushViewController:deckDetailViewController animated:YES];
+	[deck release];	
 }
 
 #pragma mark -
@@ -345,10 +354,7 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (IBAction)pushDownloadScreen:(id)sender
 {
-	DownloadViewController *downloadViewController = [[DownloadViewController alloc] initWithNibName:@"DownloadView" bundle:nil];
-	downloadViewController.title = @"Download";
-	[self.navigationController pushViewController:downloadViewController animated:YES];
-	[downloadViewController release];	
+	[self.navigationController pushViewController:[DownloadViewController sharedInstance] animated:YES];
 }
 
 - (IBAction)syncDecksWithServer:(id)sender

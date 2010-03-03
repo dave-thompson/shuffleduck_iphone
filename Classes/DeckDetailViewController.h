@@ -40,6 +40,6 @@
 -(IBAction)testButtonClicked:(id)sender;
 -(IBAction)studyButtonClicked:(id)sender;
 -(IBAction)viewButtonClicked:(id)sender;
--(void)pushStudyViewController:(StudyType)type;
+-(void)pushStudyViewController:(StudyType)type asPartOfApplicationLoadProcess:(BOOL)fromLoadProcess;
 
 @end

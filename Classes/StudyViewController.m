@@ -81,7 +81,6 @@ InlineScoreViewController *inlineScoreViewController;
 	kMaximumVariance = tan(kMaximumVarianceInDegrees);
 
 	// set up custom back button (going back to this screen will never be allowed, but this back button will allow subsequent screens to go back to DeckDetails)
-	//setup custom back button
 	UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];	
@@ -137,7 +136,6 @@ InlineScoreViewController *inlineScoreViewController;
 	cardsKnown = deck.numKnownCards;
 	
 	// reconfigure screen components to suit StudyType
-	
 	if (_requestedStudyType == View)
 	{
 		if ((_studyType == Test) || (_studyType == Learn))
@@ -223,8 +221,20 @@ InlineScoreViewController *inlineScoreViewController;
 		cardsInTestSet = deck.cardsInTestSet;
 	}
 	
-	// show the selected card and update the score panel
-	[self showNewCard];	
+	// show the selected card
+	[self showNewCard];
+	
+	// if in Study or Test mode, check to see how many sides should be showing
+	if ((_studyType == Learn) || (_studyType == Test))
+	{
+		int sideIDToShow = [deck lastSessionsSideIDForStudyType:_studyType];
+		if ((sideIDToShow >= 0) &&(deck.currentSideID != sideIDToShow))
+		{
+			[self showNextSide];
+		}
+	}
+
+	// update the score panel
 	[self updateInlineScore];
 	
 	[super viewWillAppear:animated];
@@ -270,6 +280,11 @@ InlineScoreViewController *inlineScoreViewController;
 -(void)setStudyType:(StudyType)studyType
 {
 	_requestedStudyType = studyType;
+}
+
+-(StudyType)getStudyType
+{
+	return _studyType;
 }
 
 // ----- LOGIC METHODS -----
@@ -402,18 +417,23 @@ InlineScoreViewController *inlineScoreViewController;
 	}	
 	else
 	{
-		int oldSide = deck.getCurrentSideID;
-		BOOL nextSideExists = [deck nextSide]; // update deck pointer to next side
-		if ((nextSideExists) == YES) // if there is a next side (i.e. current side has successfully updated)
-		{
-			// load old side onto top card & new side onto bottom card
-			[topCardViewController loadBackSideWithDBSideID:oldSide];
-			[bottomCardViewController loadBackSideWithDBSideID:deck.getCurrentSideID];
-			// turn over both cards
-			[topCardViewController revealHiddenSide:CardViewAnimationReveal];
-			[bottomCardViewController revealHiddenSide:CardViewAnimationReveal];	
-		}
+		[self showNextSide];
 	}
+}
+
+-(void)showNextSide
+{
+	int oldSide = deck.getCurrentSideID;
+	BOOL nextSideExists = [deck nextSide]; // update deck pointer to next side
+	if ((nextSideExists) == YES) // if there is a next side (i.e. current side has successfully updated)
+	{
+		// load old side onto top card & new side onto bottom card
+		[topCardViewController loadBackSideWithDBSideID:oldSide];
+		[bottomCardViewController loadBackSideWithDBSideID:deck.getCurrentSideID];
+		// turn over both cards
+		[topCardViewController revealHiddenSide:CardViewAnimationReveal];
+		[bottomCardViewController revealHiddenSide:CardViewAnimationReveal];	
+	}	
 }
 
 -(void)processDoubleTap
@@ -508,14 +528,7 @@ InlineScoreViewController *inlineScoreViewController;
 			if (cardsCompleted == numCards) // if all cards have been tested
 			{
 				// Push the FinalScoreViewController onto the navigation stack
-					FinalScoreViewController *finalScoreViewController = [FinalScoreViewController sharedInstance];
-					// set the scores
-					float percent = ((float)cardsCorrect / (float)cardsCompleted) * 100.0;
-					finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
-					finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
-					finalScoreViewController.correctScore = cardsCorrect;
-					// push to stack
-					[self.navigationController pushViewController:finalScoreViewController animated:YES];
+				[self pushFinalScoreViewControllerAsPartofApplicationLoadProcess:NO];
 			}
 			else // move to the next card
 			{
@@ -553,15 +566,67 @@ InlineScoreViewController *inlineScoreViewController;
 		if (cardsKnown == numCards) // if all cards have been tested
 		{
 			// Push the CongratulationsViewController onto the navigation stack
-				CongratulationsViewController *congratulationsViewController = [CongratulationsViewController sharedInstance];
-				// set the scores
-				congratulationsViewController.totalCards = numCards;
-				// push to stack
-				[self.navigationController pushViewController:congratulationsViewController animated:YES];
+			[self pushCongratulationsViewControllerAsPartofApplicationLoadProcess:NO];
 		}
 	}
 }
 
+-(void)pushCongratulationsViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess
+{
+	CongratulationsViewController *congratulationsViewController = [CongratulationsViewController sharedInstance];
+	// set the scores
+	congratulationsViewController.totalCards = deck.numCards;
+	// push to stack
+	if (partOfLoadProcess)
+	{
+		// set up back button (viewDidLoad will not have fired yet)
+		UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
+		self.navigationItem.backBarButtonItem = backArrowButton;
+		[backArrowButton release];	
+		// push view controller		
+		[self.navigationController pushViewController:congratulationsViewController animated:NO];
+	}
+	else
+		[self.navigationController pushViewController:congratulationsViewController animated:YES];	
+}
+
+-(void)pushFinalScoreViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess
+{
+	FinalScoreViewController *finalScoreViewController = [FinalScoreViewController sharedInstance];
+	
+	if (partOfLoadProcess)
+	{
+		// set up back button (viewDidLoad will not have fired yet)
+		UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
+		self.navigationItem.backBarButtonItem = backArrowButton;
+		[backArrowButton release];
+		
+		// set the scores
+		float percent = ((float)deck.cardsCorrect / (float)cardsCompleted) * 100.0;
+		finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
+		finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
+		finalScoreViewController.correctScore = cardsCorrect;
+		
+		// push view controller
+		[self.navigationController pushViewController:finalScoreViewController animated:NO];
+	}
+	else
+	{
+		// retrieve scores from DB
+		cardsCompleted = deck.cardsCompleted;
+		cardsCorrect = deck.cardsCorrect;
+		cardsInTestSet = deck.cardsInTestSet;
+		
+		// set the scores
+		float percent = ((float)cardsCorrect / (float)cardsCompleted) * 100.0;
+		finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
+		finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
+		finalScoreViewController.correctScore = cardsCorrect;
+		
+		// push view controller
+		[self.navigationController pushViewController:finalScoreViewController animated:YES];
+	}
+}
 
 -(void)updateInlineScore
 {
@@ -666,38 +731,6 @@ InlineScoreViewController *inlineScoreViewController;
 		return YES;
 	}
 }
-
-/* SEARCH BAR ANIMATIONS DESCOPED
-
--(IBAction)showSearchBar:(id)sender
-{	
-	
-	[UIView beginAnimations:@"searchBarIn" context:nil];
-	[UIView setAnimationDuration:0.3];
-	[UIView setAnimationBeginsFromCurrentState:YES];
-	
-	searchBarView.center = CGPointMake(160, 22);
-	[UIView commitAnimations];
-	
-	[searchBar becomeFirstResponder];
-}
- 
-
--(void)hideSearchBar
-{
-	
-	[UIView beginAnimations:@"searchBarOut" context:nil];
-	[UIView setAnimationDuration:0.3];
-	[UIView setAnimationBeginsFromCurrentState:YES];
-	
-	// Move the rectangle to the location of the touch
-	searchBarView.center = CGPointMake(160, -22);
-	[UIView commitAnimations];
-	
-	[searchBar resignFirstResponder];
-
-}
-*/
 
 // ---- MEMORY HANDLING METHODS -----
 

@@ -32,6 +32,8 @@
 - (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
 
+- (void)pushDeckDetailViewControllerWithDeckID:(int)deckID asPartOfLoadProcess:(BOOL)partOfLoadProcess;
+
 - (IBAction)syncDecksWithServer:(id)sender;
 - (IBAction)pushDownloadScreen:(id)sender;
 

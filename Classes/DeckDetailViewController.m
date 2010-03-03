@@ -46,25 +46,25 @@ SideViewController *miniSideViewController;
 
 -(IBAction)testButtonClicked:(id)sender
 {
-	[self pushStudyViewController:Test];	
+	[self pushStudyViewController:Test asPartOfApplicationLoadProcess:NO];
 }
 
 -(IBAction)studyButtonClicked:(id)sender
 {
-	[self pushStudyViewController:Learn];	
+	[self pushStudyViewController:Learn asPartOfApplicationLoadProcess:NO];
 }
 
 -(IBAction)viewButtonClicked:(id)sender
 {
-	[self pushStudyViewController:View];
+	[self pushStudyViewController:View asPartOfApplicationLoadProcess:NO];
 }
 
 
--(void)pushStudyViewController:(StudyType)type
+-(void)pushStudyViewController:(StudyType)type asPartOfApplicationLoadProcess:(BOOL)fromLoadProcess
 {
 	int questionNumber;
-	// if starting a test and a test is already in progress, check with the user to see if they want to resume or start a new test
-	if ((type == Test) && ([deck testIsInProgress]) && ((questionNumber = (deck.numCards - deck.testQuestionsRemaining) + 1) > 1))
+	// if user just selected to start a test and a test is already in progress, check with the user to see if they want to resume or start a new test
+	if ((!fromLoadProcess) && ((type == Test) && ([deck testIsInProgress]) && ((questionNumber = (deck.numCards - deck.testQuestionsRemaining) + 1) > 1)))
 	{
 		// push screen to ask if user wants to resume
 		ContinueTestViewController *continueTestViewController = [ContinueTestViewController sharedInstance];
@@ -74,19 +74,30 @@ SideViewController *miniSideViewController;
 	}
 	else
 	{
-		if (type == Test)
+		if ((type == Test) && (!fromLoadProcess)) // no test in progress, therefore start a new one
 		{
 			// prepare deck for new test
 			[deck prepareTest];
 		}
+
 		// Prepare the study view controller (referencing the new deck object)
 		StudyViewController *studyViewController = [StudyViewController sharedInstance];
 		studyViewController.deck = deck;
 		[studyViewController setStudyType:type];
 		
 		// Push the study view controller onto the navigation stack
-		[self.navigationController pushViewController:studyViewController animated:YES];		
-	}	
+		if (!fromLoadProcess)
+			[self.navigationController pushViewController:studyViewController animated:YES];
+		else
+		{
+			// set up back button (viewDidLoad will not have fired yet)
+			UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
+			self.navigationItem.backBarButtonItem = backArrowButton;
+			[backArrowButton release];	
+			// push view controller
+			[self.navigationController pushViewController:studyViewController animated:NO];
+		}
+	}
 }
 
 - (void)didReceiveMemoryWarning {
