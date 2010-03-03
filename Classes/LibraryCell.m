@@ -14,7 +14,7 @@
 
 @implementation LibraryCell
 
-@synthesize miniCardView, leftMultipartLabel, rightMultipartLabel, titleLabel, miniCardViewController, mainView;
+@synthesize miniCardView, remainLabel, titleLabel, miniCardViewController, mainView;
 
 BOOL isFullyDownloaded;
 
@@ -29,16 +29,7 @@ BOOL isFullyDownloaded;
 
 - (void)awakeFromNib
 {
-	[super awakeFromNib];
-	
-	// set up multipart labels
-	[leftMultipartLabel updateNumberOfLabels:2 fontSize:12 alignment:MultipartLabelLeft];
-	[leftMultipartLabel setText:@"Unknown:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
-	[leftMultipartLabel setText:@"" andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
-	
-	[rightMultipartLabel  updateNumberOfLabels:2 fontSize:12 alignment:MultipartLabelLeft];
-	[rightMultipartLabel setText:@"Known:  " andColor:[[VariableStore sharedInstance] mindeggGreyText] forLabel:0];
-	[rightMultipartLabel setText:@"" andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];	
+	[super awakeFromNib];	
 }
 
 
@@ -50,27 +41,15 @@ BOOL isFullyDownloaded;
 		{
 			// set background to blue and text to white
 			mainView.backgroundColor = [UIColor blueColor];
-			
-			[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:0];
-			[leftMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
-
-			[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:0];
-			[rightMultipartLabel setColor:[UIColor whiteColor] forLabel:1];
-			
 			titleLabel.textColor = [UIColor whiteColor];
+			remainLabel.textColor = [UIColor whiteColor];
 		}
 		else
 		{
 			// restore to original colors
-			mainView.backgroundColor = [UIColor whiteColor];
-			
-			[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
-			[leftMultipartLabel setColor:[[VariableStore sharedInstance] mindeggRed] forLabel:1];
-			
-			[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0];
-			[rightMultipartLabel setColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:1];
-			
+			mainView.backgroundColor = [UIColor whiteColor];			
 			titleLabel.textColor = [UIColor blackColor];
+			remainLabel.textColor = [[VariableStore sharedInstance] mindeggGreyText];
 		}
 	}
 }
@@ -81,11 +60,8 @@ BOOL isFullyDownloaded;
 	
 	if (isFullyDownloaded) // if a deck is fully downloaded, show a normal cell
 	{
-		[leftMultipartLabel setText:@"Remaining:  " andColor:[[VariableStore sharedInstance] mindeggRed] forLabel:0];
-		[leftMultipartLabel setText:[NSString stringWithFormat:@"%d", theNumUnknownCards] forLabel:1];
-
-		[rightMultipartLabel setText:@"Known:  " andColor:[[VariableStore sharedInstance] mindeggGreen] forLabel:0]; 
-		[rightMultipartLabel setText:[NSString stringWithFormat:@"%d", theNumKnownCards] forLabel:1];
+		remainLabel.text = [NSString stringWithFormat:@"%d left", theNumUnknownCards];
+		remainLabel.textColor = [[VariableStore sharedInstance] mindeggGreyText];
 
 		titleLabel.text = theTitle;
 		titleLabel.textColor = [UIColor blackColor];
@@ -96,24 +72,18 @@ BOOL isFullyDownloaded;
 		{
 			UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
 			
-			[leftMultipartLabel setText:@"Processing...." andColor:disabledColor forLabel:0];
-			[leftMultipartLabel setText:@"" forLabel:1];
-
-			[rightMultipartLabel setText:@"" forLabel:0];
-			[rightMultipartLabel setText:@"" forLabel:1];
-
+			remainLabel.text = @"Processing....";
+			remainLabel.textColor = disabledColor;
+			
 			titleLabel.text = theTitle;
 			titleLabel.textColor = disabledColor;
 		}
 		else // a download is not in progress - invite the user to resume it
 		{
 			UIColor *disabledColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:204/255.0 alpha:1.0];
-			
-			[leftMultipartLabel setText:@"Tap to resume download" andColor:disabledColor forLabel:0];
-			[leftMultipartLabel setText:@"" forLabel:1];
-			
-			[rightMultipartLabel setText:@"" forLabel:0];
-			[rightMultipartLabel setText:@"" forLabel:1];
+
+			remainLabel.text = @"Tap to resume download";
+			remainLabel.textColor = disabledColor;
 			
 			titleLabel.text = theTitle;
 			titleLabel.textColor = disabledColor;
@@ -124,8 +94,7 @@ BOOL isFullyDownloaded;
 - (void)dealloc {
 	[miniCardView release];
 	[miniCardViewController release];
-	[leftMultipartLabel release];
-	[rightMultipartLabel release];
+	[remainLabel release];
 	[titleLabel release];
     [super dealloc];
 }
