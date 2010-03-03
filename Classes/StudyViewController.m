@@ -10,6 +10,7 @@
 #import "SideViewController.h"
 #import "CardViewController.h"
 #import "InlineScoreViewController.h"
+#import "ContinueTestViewController.h"
 #import "VariableStore.h"
 #import "FinalScoreViewController.h"
 #import "CongratulationsViewController.h"
@@ -31,22 +32,24 @@ BOOL processedCurrentSwipe; // YES iff swipe completed but touch not yet complet
 float kMaximumVariance; // As delta x / delta y
 CGPoint gestureStartPoint; // Point the current gesture started at
 
-// score tracking
+// Type management
+StudyType _studyType = Test; // xib is initially set up for Test
+StudyType _requestedStudyType;
 
-	// Both types
-	StudyType _studyType = Test; // xib is initially set up for Test
-	StudyType _requestedStudyType;
+// Score tracking
+
+	// Study / View
 	int numCards;
-
-	// Study
-	int cardsKnown = 0;
+		// Study
+		int cardsKnown = 0;
+		// View
+		int numFilteredCards = 0;
 
 	// Test
 	int cardsCompleted = 0;
 	int cardsCorrect = 0;
+	int cardsInTestSet = 0;
 
-	// View
-	int numFilteredCards = 0;
 
 BOOL searchTextExists; // whether there was any text in the search bar after text was last edited
 BOOL cardHidden = NO; // whether the card is shown or not
@@ -131,10 +134,7 @@ InlineScoreViewController *inlineScoreViewController;
 	// initiate state data
 	processedCurrentSwipe = NO;
 	numCards = deck.numCards;
-	numFilteredCards = numCards;
 	cardsKnown = deck.numKnownCards;
-	cardsCompleted = 0;
-	cardsCorrect = 0;
 	
 	// reconfigure screen components to suit StudyType
 	
@@ -198,10 +198,11 @@ InlineScoreViewController *inlineScoreViewController;
 	}
 	
 	// Point deck at appropriate card, dependent on StudyType
+	[deck moveToLastSessionsCardForStudyType:_studyType];
+
+	// for View, also populate search bar with text from last time
 	if (_studyType == View)
 	{
-		[deck moveToLastSessionsCardForStudyType:_studyType];
-		// for View, also populate search bar with text from last time
 		searchBar.text = deck.searchBarText;
 		if (searchBar.text.length > 0)
 		{
@@ -211,16 +212,16 @@ InlineScoreViewController *inlineScoreViewController;
 		{
 			searchTextExists = NO;
 		}
-	}
-	else if (_studyType == Learn)
-	{
-		[deck moveToCardAtPosition:FirstCard includeKnownCards:NO];
-	}
-	else if (_studyType == Test)
-	{
-		[deck moveToCardAtPosition:FirstCard includeKnownCards:YES];
+		numFilteredCards = [deck numCardsWithSearchTerm:searchBar.text];
 	}
 	
+	// for Test, set up scores
+	if (_studyType == Test)
+	{
+		cardsCompleted = deck.cardsCompleted;
+		cardsCorrect = deck.cardsCorrect;
+		cardsInTestSet = deck.cardsInTestSet;
+	}
 	
 	// show the selected card and update the score panel
 	[self showNewCard];	
@@ -238,7 +239,7 @@ InlineScoreViewController *inlineScoreViewController;
 	NSMutableArray *newVCArray = [[NSMutableArray alloc] init];
 	for (UIViewController *vc in oldVCArray)
 	{
-		if ((!(vc == [FinalScoreViewController sharedInstance])) && (!(vc == [CongratulationsViewController sharedInstance])))
+		if ((!(vc == [FinalScoreViewController sharedInstance])) && (!(vc == [CongratulationsViewController sharedInstance])) && (!(vc == [ContinueTestViewController sharedInstance])))
 		{
 			[newVCArray addObject:vc];
 		}
@@ -490,22 +491,14 @@ InlineScoreViewController *inlineScoreViewController;
 		// update known status & tick colours
 			if (sender == tickButton) // tick was pressed
 			{
-				// set card to known; increment score
-				[deck setCurrentCardKnown:YES];
+				// update test & card data; increment score
+				[deck setTestQuestionCorrect:YES];
 				cardsCorrect++;
-				
-				// set tick to green, cross to white
-				//[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];
-				//[crossButton setImage:[UIImage imageNamed:@"WhiteCross.png"] forState:UIControlStateNormal];
 			}
 			else // cross was pressed
 			{
-				// set card to unknown
-				[deck setCurrentCardKnown:NO];
-				
-				//set cross to red, tick to white
-				//[crossButton setImage:[UIImage imageNamed:@"RedCross.png"] forState:UIControlStateNormal];		
-				//[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];		
+				// update test & card data; increment score
+				[deck setTestQuestionCorrect:NO];
 			}
 		
 		// update score display
@@ -526,7 +519,7 @@ InlineScoreViewController *inlineScoreViewController;
 			}
 			else // move to the next card
 			{
-				BOOL additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:YES];
+				BOOL additionalCardExists = [deck moveToFirstUnansweredTestQuestion];
 				if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 				{
 					[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
@@ -535,12 +528,24 @@ InlineScoreViewController *inlineScoreViewController;
 	}
 	else // study type is Learn
 	{
-		// set card to known; increment score
-		[deck setCurrentCardKnown:YES];
-		cardsKnown++;
-		
-		// set tick to green
-		[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];
+		if ([deck isCurrentCardKnown])
+		{
+			// set card to unknown; decrement score
+			[deck setCurrentCardKnown:NO];
+			cardsKnown--;
+			
+			// set tick to white
+			[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];			
+		}
+		else
+		{
+			// set card to known; increment score
+			[deck setCurrentCardKnown:YES];
+			cardsKnown++;
+			
+			// set tick to green
+			[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];
+		}
 		
 		// update score display
 		[self updateInlineScore];
@@ -554,8 +559,6 @@ InlineScoreViewController *inlineScoreViewController;
 				// push to stack
 				[self.navigationController pushViewController:congratulationsViewController animated:YES];
 		}
-		
-		
 	}
 }
 
@@ -583,15 +586,24 @@ InlineScoreViewController *inlineScoreViewController;
 		
 		// bottom label
 		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
-		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d left", numCards - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
+		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d left", cardsInTestSet - cardsCompleted] andColor:[UIColor whiteColor] forLabel:0];
 	}
 	else // _studyType == View
 	{
-		[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
-		[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d found", numFilteredCards] andColor:[UIColor whiteColor] forLabel:0];
-
-		[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
-		[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d total", numCards] andColor:[UIColor whiteColor] forLabel:0];
+		if (searchBar.text.length == 0)
+		{
+			[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:0 fontSize:13 alignment:MultipartLabelRight];
+			[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+			[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d cards", numCards] andColor:[UIColor whiteColor] forLabel:0];
+		}
+		else
+		{
+			[[inlineScoreViewController topMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+			[[inlineScoreViewController topMultipartLabel] setText:[NSString stringWithFormat: @"%d matches", numFilteredCards] andColor:[UIColor whiteColor] forLabel:0];
+			[[inlineScoreViewController bottomMultipartLabel]  updateNumberOfLabels:1 fontSize:13 alignment:MultipartLabelRight];
+			[[inlineScoreViewController bottomMultipartLabel] setText:[NSString stringWithFormat: @"%d cards", numCards] andColor:[UIColor whiteColor] forLabel:0];
+		}
+		
 	}
 }
 

@@ -82,6 +82,8 @@
 		55DB727C0FD9214200B1A115 /* InternalSettings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55DB727B0FD9214200B1A115 /* InternalSettings.plist */; };
 		55DB72890FD9287400B1A115 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 55DB72880FD9287400B1A115 /* libsqlite3.dylib */; };
 		55E97CEB0FAD03C900E6BD7C /* MindEgg Snowflake.png in Resources */ = {isa = PBXBuildFile; fileRef = 55E97CEA0FAD03C900E6BD7C /* MindEgg Snowflake.png */; };
+		55F79D19113E520000375C47 /* ContinueTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55F79D17113E520000375C47 /* ContinueTestViewController.m */; };
+		55F79D1A113E520000375C47 /* ContinueTestView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55F79D18113E520000375C47 /* ContinueTestView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -201,6 +203,9 @@
 		55DB727B0FD9214200B1A115 /* InternalSettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = InternalSettings.plist; sourceTree = "<group>"; };
 		55DB72880FD9287400B1A115 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		55E97CEA0FAD03C900E6BD7C /* MindEgg Snowflake.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MindEgg Snowflake.png"; sourceTree = "<group>"; };
+		55F79D16113E520000375C47 /* ContinueTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContinueTestViewController.h; sourceTree = "<group>"; };
+		55F79D17113E520000375C47 /* ContinueTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContinueTestViewController.m; sourceTree = "<group>"; };
+		55F79D18113E520000375C47 /* ContinueTestView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ContinueTestView.xib; path = Classes/ContinueTestView.xib; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -343,6 +348,8 @@
 				55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */,
 				55D3F8DC1112D412003E1688 /* CongratulationsViewController.h */,
 				55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */,
+				55F79D16113E520000375C47 /* ContinueTestViewController.h */,
+				55F79D17113E520000375C47 /* ContinueTestViewController.m */,
 			);
 			name = Study;
 			sourceTree = "<group>";
@@ -439,6 +446,7 @@
 		556138390FAEDF1C00365DF1 /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				55F79D18113E520000375C47 /* ContinueTestView.xib */,
 				55D3F8DD1112D412003E1688 /* CongratulationsView.xib */,
 				55814A9310FE483D00B2A625 /* ProgressView.xib */,
 				552A5A2610DBF39E00A8264B /* FinalScoreView.xib */,
@@ -579,6 +587,7 @@
 				552A5A2810DBF39E00A8264B /* FinalScoreView.xib in Resources */,
 				55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */,
 				55D3F8DF1112D412003E1688 /* CongratulationsView.xib in Resources */,
+				55F79D1A113E520000375C47 /* ContinueTestView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,6 +635,7 @@
 				55D3F8DE1112D412003E1688 /* CongratulationsViewController.m in Sources */,
 				55CE1BC9111701A800530CC4 /* Synchroniser.m in Sources */,
 				55CE1C1D1117217900530CC4 /* DeckDownloaderQueueItem.m in Sources */,
+				55F79D19113E520000375C47 /* ContinueTestViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

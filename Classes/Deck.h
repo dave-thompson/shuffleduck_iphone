@@ -32,36 +32,65 @@ typedef enum {
 
 @property (nonatomic, assign) int currentDeckID, currentCardID, currentSideID;
 
--(id)initWithDeckID:(int)deckID includeKnownCards:(BOOL)includeKnown;
--(int)getCurrentSideID;
--(int)getOriginalFirstSideID;
--(int)numCards;
--(BOOL)currentCardFitsFilter:(NSString *)searchTerm;
--(int)numCardsWithSearchTerm:(NSString *)searchTerm;
--(int)numKnownCards;
--(NSString *)author;
+/* Instantiation */
 
--(void)setSearchBarText:(NSString *)searchBarText;
--(NSString *)searchBarText;
--(int)userVisibleID;
+	-(id)initWithDeckID:(int)deckID includeKnownCards:(BOOL)includeKnown;
 
--(BOOL)moveToCardInDirection:(ChangeCardDirection)direction includeKnownCards:(BOOL)includeKnown;
--(BOOL)moveToCardInDirection:(ChangeCardDirection)direction withSearchTerm:(NSString *)searchTerm;
--(BOOL)moveToCardAtPosition:(CardIndex)position includeKnownCards:(BOOL)includeKnown;
--(BOOL)moveToCardAtPosition:(CardIndex)position withSearchTerm:(NSString *)searchTerm;
--(void)moveToLastSessionsCardForStudyType:(StudyType)studyType;
+/* Navigation */
 
--(BOOL)nextSide;
+	// cards
+	-(BOOL)moveToCardInDirection:(ChangeCardDirection)direction includeKnownCards:(BOOL)includeKnown;
+	-(BOOL)moveToCardInDirection:(ChangeCardDirection)direction withSearchTerm:(NSString *)searchTerm;
+	-(BOOL)moveToCardAtPosition:(CardIndex)position includeKnownCards:(BOOL)includeKnown;
+	-(BOOL)moveToCardAtPosition:(CardIndex)position withSearchTerm:(NSString *)searchTerm;
+	-(void)moveToLastSessionsCardForStudyType:(StudyType)studyType;
+	-(BOOL)moveToFirstUnansweredTestQuestion;
 
--(BOOL)isCurrentCardKnown;
--(void)setCurrentCardKnown:(BOOL)known;
+	// sides
+	-(BOOL)nextSide;
 
--(NSString *)getDeckTitle;
+/* Common setters / getters */
 
--(void)rememberCardForStudyType:(StudyType)studyType;
+	// Getters
+	-(int)getOriginalFirstSideID;
+	-(int)getCurrentSideID;
+	-(int)numCards;
+	-(int)numKnownCards;
+	-(NSString *)getDeckTitle;
+	-(NSString *)author;
+	-(int)userVisibleID;
+	-(BOOL)isCurrentCardKnown;
+	-(BOOL)isShuffled;
 
--(void)shuffle;
--(void)unshuffle;
--(BOOL)isShuffled;
+	// Setters
+	-(void)setCurrentCardKnown:(BOOL)known;
+	-(void)shuffle;
+	-(void)unshuffle;
+
+/* View Mode setters / getters */
+
+	// Getters
+	-(BOOL)currentCardFitsFilter:(NSString *)searchTerm;
+	-(int)numCardsWithSearchTerm:(NSString *)searchTerm;
+
+/* Test Mode setters / getters */
+
+	// Setters
+	-(void)prepareTest;
+	-(void)setTestQuestionCorrect:(BOOL)correct;
+
+	// Getters
+	-(BOOL)testIsInProgress;
+	-(int)testQuestionsRemaining;
+	-(int)cardsCompleted;
+	-(int)cardsCorrect;
+	-(int)cardsInTestSet;
+
+
+/* Application State Persistence */
+
+	-(void)rememberCardForStudyType:(StudyType)studyType;
+	-(void)setSearchBarText:(NSString *)searchBarText;
+	-(NSString *)searchBarText;
 
 @end

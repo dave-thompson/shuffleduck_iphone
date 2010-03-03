@@ -152,12 +152,11 @@
 	}
 	
 	if (success == NO) // no rows were returned - i.e. already looking at either the last or first card
-	
 		{
 			if (direction == NextCard)
-			{return [self moveToCardAtPosition:FirstCard includeKnownCards:includeKnown];}
+				return [self moveToCardAtPosition:FirstCard includeKnownCards:includeKnown];
 			else // direction is ChangeCard Previous
-			{return [self moveToCardAtPosition:LastCard includeKnownCards:includeKnown];}
+				return [self moveToCardAtPosition:LastCard includeKnownCards:includeKnown];
 		}	
 	else
 		{return success;}
@@ -209,39 +208,142 @@
 	{return success;}
 }
 
--(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
+-(BOOL)moveToFirstUnansweredTestQuestion
+// moves the card & side pointers to the first unanswered test question
+// returns false if there are no remaining unanswered questions
 {
-	// find last sessions card
-	int lastSessionsCardID, firstSideID;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
+	// Retrieve the next or previous card & side ids
+	BOOL success = NO;
+	NSString *sqlString;
+	
+	sqlString = [NSString stringWithFormat:@"SELECT TestInProgress.card_id, Side.id FROM TestInProgress, Side WHERE TestInProgress.deck_id = %d AND TestInProgress.completed = 0 AND TestInProgress.card_id = Side.card_id ORDER BY TestInProgress.question_number ASC, Side.position ASC LIMIT 1;", currentDeckID];
+		
 	const char *sqlStatement = [sqlString UTF8String];
 	sqlite3_stmt *compiledStatement;
 	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
 	{
 		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
 		{
-			lastSessionsCardID = (int)sqlite3_column_int(compiledStatement, 0);
-			firstSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			currentCardID = (int)sqlite3_column_int(compiledStatement, 0);
+			currentSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			success = YES;
 		}
 	}
 	else
 	{
 		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
-	
-	if (lastSessionsCardID >= 0)
+	return success;
+}
+
+-(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
+{
+	if (studyType == Test)
 	{
-		// if there was a last session, and therefore there was a real card ID, point the deck to that ID
-		currentCardID = lastSessionsCardID;
-		currentSideID = firstSideID;
+		// just move to the first unanswered test question
+		[self moveToFirstUnansweredTestQuestion];
+	}
+
+	if ((studyType == View) || (studyType == Learn))
+	{
+		// find last sessions card
+		NSString *sqlString;
+		int lastSessionsCardID, firstSideID;
+		
+		if (studyType == View)
+			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
+		else if (studyType == Learn)
+			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.learn_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
+		const char *sqlStatement = [sqlString UTF8String];
+		sqlite3_stmt *compiledStatement;
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+		{
+			while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+			{
+				lastSessionsCardID = (int)sqlite3_column_int(compiledStatement, 0);
+				firstSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			}
+		}
+		else
+		{
+			NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		}
+		
+		if (lastSessionsCardID >= 0)
+		{
+			// if there was a last session, and therefore there was a real card ID, point the deck to that ID
+			currentCardID = lastSessionsCardID;
+			currentSideID = firstSideID;
+			
+			// if we're in learn mode, it's possible that the user has marked the last viewed card as known
+			// in this case, go to the next unknown card after it
+			if (studyType == Learn)
+			{
+				if ([self isCurrentCardKnown])
+					[self moveToCardInDirection:NextCard includeKnownCards:NO];
+			}
+		}
+		else
+		{
+			// this is the first time the user has viewed this deck using this StudyType
+			if (studyType == Learn)
+			{
+				[self moveToCardAtPosition:FirstCard includeKnownCards:NO];
+			}
+			else // _studyType == View
+			{
+				[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
+				// (we can safely assume that there is no text in the searchBar)
+			}		
+		}
+	}
+}
+
+-(BOOL)testIsInProgress
+// checks to see if there is a test already in progress for the current deck
+{	
+	if ([self testQuestionsRemaining] > 0)	return YES;
+	else									return NO;
+}
+
+-(void)prepareTest
+// prepares a new test for the current deck
+{
+	sqlite3_stmt *stmt = nil;
+	
+	// Clear any existing test
+	if(stmt == nil)
+	{
+		const char *updateSQL = "DELETE FROM TestInProgress WHERE deck_id = ?";
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
+			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
 	}
 	else
-	{
-		// this is the first time the user has viewed this deck using this StudyType
-		// we can safely assume that there is no text in the searchBar
-		[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
-	}
+		NSLog(@"Error: stmt not nil");
 	
+	sqlite3_bind_int(stmt, 1, currentDeckID);
+	
+	if(SQLITE_DONE != sqlite3_step(stmt))
+		NSAssert1(0, @"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	sqlite3_reset(stmt);
+	stmt = nil;	
+	
+	// Set up new test
+	if(stmt == nil)
+	{
+		const char *updateSQL = "INSERT INTO TestInProgress (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = ? ORDER BY Card.position";
+		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
+			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	}
+	else
+		NSLog(@"Error: stmt not nil");
+	
+	sqlite3_bind_int(stmt, 1, currentDeckID);
+	
+	if(SQLITE_DONE != sqlite3_step(stmt))
+		NSAssert1(0, @"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+	sqlite3_reset(stmt);
+	stmt = nil;
 }
 
 -(void)rememberCardForStudyType:(StudyType)studyType
@@ -320,6 +422,87 @@
 		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
 	}
 	return numCardsInDeck;
+}
+
+-(int)cardsCompleted;
+// returns the number of questions answered in any current test run
+{
+	int cardsCompleted;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND completed = 1;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			cardsCompleted = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return cardsCompleted;
+}
+
+-(int)cardsCorrect;
+{
+	int cardsCorrect;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND correct = 1;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			cardsCorrect = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return cardsCorrect;	
+}
+
+-(int)cardsInTestSet;
+{
+	int cardsInTestSet;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			cardsInTestSet = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return cardsInTestSet;
+}
+
+-(int)testQuestionsRemaining
+{
+	int questionsRemaining;
+	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestInProgress WHERE deck_id = %d AND completed = 0;", currentDeckID];
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			questionsRemaining = (int)sqlite3_column_int(compiledStatement, 0);
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return questionsRemaining;
 }
 
 -(int)numCardsWithSearchTerm:(NSString *)searchTerm
@@ -471,6 +654,43 @@
 	updateStmt = nil;
 }
 
+-(void)setTestQuestionCorrect:(BOOL)correct
+{
+	// update test data
+		// derive sqlite3 friendly boolean
+		int isCorrect;
+		if (correct == YES)
+			isCorrect = 1;
+		else
+			isCorrect = 0;
+		
+		// write value to database
+		sqlite3_stmt *updateStmt = nil;
+		if(updateStmt == nil)
+		{
+			const char *sql = "UPDATE TestInProgress SET completed = 1, correct = ? WHERE deck_id = ? AND card_id = ?";
+			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
+				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+		}
+		else
+		{
+			NSLog(@"Error: updatestmt not nil");
+		}
+		
+		sqlite3_bind_int(updateStmt, 1, isCorrect);	
+		sqlite3_bind_int(updateStmt, 2, currentDeckID);
+		sqlite3_bind_int(updateStmt, 3, currentCardID);
+		
+		if(SQLITE_DONE != sqlite3_step(updateStmt))
+		{NSAssert1(0, @"Error while updating DB with card known value. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
+		
+		sqlite3_reset(updateStmt);
+		updateStmt = nil;
+	
+	// also update known flag
+	[self setCurrentCardKnown:correct];
+}
+
 -(NSString *)getDeckTitle
 {
 	NSString *title;
@@ -573,7 +793,6 @@
 	}
 	return userVisibleID;
 }
-
 
 -(void)shuffle
 {

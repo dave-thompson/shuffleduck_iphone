@@ -9,6 +9,7 @@
 #import "DeckDetailViewController.h"
 #import "VariableStore.h"
 #import "SideViewController.h"
+#import "ContinueTestViewController.h"
 
 static DeckDetailViewController *sharedDeckDetailViewController = nil;
 
@@ -61,13 +62,31 @@ SideViewController *miniSideViewController;
 
 -(void)pushStudyViewController:(StudyType)type
 {
-	// Prepare the study view controller (referencing the new deck object)
-	StudyViewController *studyViewController = [StudyViewController sharedInstance];
-	studyViewController.deck = deck;
-	[studyViewController setStudyType:type];
-	
-	// Push the study view controller onto the navigation stack
-	[self.navigationController pushViewController:studyViewController animated:YES];
+	int questionNumber;
+	// if starting a test and a test is already in progress, check with the user to see if they want to resume or start a new test
+	if ((type == Test) && ([deck testIsInProgress]) && ((questionNumber = (deck.numCards - deck.testQuestionsRemaining) + 1) > 1))
+	{
+		// push screen to ask if user wants to resume
+		ContinueTestViewController *continueTestViewController = [ContinueTestViewController sharedInstance];
+		continueTestViewController.deck = deck;
+		[continueTestViewController setScoreString:[NSString stringWithFormat:@"Q%d of %d", questionNumber, deck.numCards]];
+		[self.navigationController pushViewController:continueTestViewController animated:YES];				
+	}
+	else
+	{
+		if (type == Test)
+		{
+			// prepare deck for new test
+			[deck prepareTest];
+		}
+		// Prepare the study view controller (referencing the new deck object)
+		StudyViewController *studyViewController = [StudyViewController sharedInstance];
+		studyViewController.deck = deck;
+		[studyViewController setStudyType:type];
+		
+		// Push the study view controller onto the navigation stack
+		[self.navigationController pushViewController:studyViewController animated:YES];		
+	}	
 }
 
 - (void)didReceiveMemoryWarning {
