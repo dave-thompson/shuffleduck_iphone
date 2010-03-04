@@ -10,7 +10,7 @@
 
 @implementation DeckDetails
 
-@synthesize title, deckID, firstSideID, numCards, numKnownCards, fullyDownloaded;
+@synthesize title, deckID, firstSideID, numCards, numKnownCards, fullyDownloaded, sideViewController;
 
 -(id)initWithID:(int)aDeckID firstSideID:(int)aFirstSideID title:(NSString *)aTitle numCards:(int)theNumCards numKnownCards:(int)theNumKnownCards fullyDownloaded:(BOOL)downloaded
 {
@@ -22,5 +22,31 @@
 	fullyDownloaded = downloaded;
 	return self;
 }
+
+-(void)setupSidePreview
+{
+	// create a view controller for the mini side & set its dimensions
+	sideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
+	sideViewController.view.clipsToBounds = YES;
+	[sideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
+	sideViewController.view.frame = CGRectMake(0, 0, 104, 64);
+	
+	// draw the side
+	[sideViewController replaceSideWithSideID:firstSideID];	
+}
+
+-(void)dropSideViewController
+{
+	[sideViewController release];
+	sideViewController = nil;
+}
+
+
+- (void)dealloc {
+	[title release];
+	[sideViewController release];
+    [super dealloc];
+}
+
 
 @end

@@ -106,8 +106,8 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	// Create cell, reloading if available
 	static NSString *libraryCellIdentifier = @"LibraryCell";
-	
 	LibraryCell *cell = (LibraryCell *)[tableView dequeueReusableCellWithIdentifier:libraryCellIdentifier];
 	if (cell == nil)
 	{
@@ -121,29 +121,47 @@ static sqlite3_stmt *deleteStmt = nil;
 	
 	// retrieve DeckDetails
 	NSUInteger row = [indexPath row];
-	DeckDetails *currentCellDeck = (DeckDetails *)[localLibraryDetails objectAtIndex:(row)];
+	DeckDetails *deckDetails = (DeckDetails *)[localLibraryDetails objectAtIndex:(row)];
 	
 	// set up title & card counts
-	if (currentCellDeck.fullyDownloaded)
+	if (deckDetails.fullyDownloaded)
 	{
-		[cell setFullyDownloaded:YES withTitle:[currentCellDeck title] numKnownCards:currentCellDeck.numKnownCards numUnknownCards:(currentCellDeck.numCards - currentCellDeck.numKnownCards)];
+		[cell setFullyDownloaded:YES withTitle:[deckDetails title] numKnownCards:deckDetails.numKnownCards numUnknownCards:(deckDetails.numCards - deckDetails.numKnownCards)];
 	}
 	else
 	{
-		[cell setFullyDownloaded:NO withTitle:[currentCellDeck title] numKnownCards:currentCellDeck.numKnownCards numUnknownCards:(currentCellDeck.numCards - currentCellDeck.numKnownCards)];
+		[cell setFullyDownloaded:NO withTitle:[deckDetails title] numKnownCards:deckDetails.numKnownCards numUnknownCards:(deckDetails.numCards - deckDetails.numKnownCards)];
 	}
-	
-	// set up first side preview
-	SideViewController *miniSideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
-	miniSideViewController.view.clipsToBounds = YES;
-	[miniSideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
-	[miniSideViewController replaceSideWithSideID:currentCellDeck.firstSideID];
-	miniSideViewController.view.frame = CGRectMake(0, 0, 104, 64);
-	[cell.miniCardView addSubview:miniSideViewController.view];
-	cell.miniCardViewController = miniSideViewController;
-	[miniSideViewController release];
 
 	return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	int selectedDeckIndex = [indexPath indexAtPosition:([indexPath length]-1)];
+	DeckDetails* selectedDeckDetails = [localLibraryDetails objectAtIndex:selectedDeckIndex];
+
+	// Only load cached side previews; defer creating new side previews until scrolling ends
+	if (!selectedDeckDetails.sideViewController)
+	{
+		if (tableView.dragging == NO && tableView.decelerating == NO)
+		{
+			// set up first side preview	
+				// load to DeckDetails
+				[selectedDeckDetails setupSidePreview];
+				// add view to library cell
+				LibraryCell *libraryCell = (LibraryCell *)cell;
+				[libraryCell.sideView addSubview:selectedDeckDetails.sideViewController.view];
+		}
+		// placeholder image
+		//cell.imageView.image = [UIImage imageNamed:@"Placeholder.png"];                
+	}
+	else
+	{
+		// add view to library cell
+		LibraryCell *libraryCell = (LibraryCell *)cell;
+		[libraryCell.sideView addSubview:selectedDeckDetails.sideViewController.view];
+	}	
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -174,6 +192,42 @@ static sqlite3_stmt *deleteStmt = nil;
 	{
 		[[DeckDownloader sharedInstance] resumeBrokenDownloadswithUserRequested:YES];
 	}
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate)
+	{
+        [self loadSidesForOnscreenRows];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    [self loadSidesForOnscreenRows];
+}
+
+- (void)loadSidesForOnscreenRows
+{
+    if ([localLibraryDetails count] > 0)
+    {
+        NSArray *visiblePaths = [libraryTableView indexPathsForVisibleRows];
+        for (NSIndexPath *indexPath in visiblePaths)
+        {			
+			DeckDetails* selectedDeckDetails = [localLibraryDetails objectAtIndex:indexPath.row];				
+
+            if (!selectedDeckDetails.sideViewController)
+            {
+				// set up first side preview
+					// load to DeckDetails
+					[selectedDeckDetails setupSidePreview];
+					// add view to library cell
+					UITableViewCell *cell = [libraryTableView cellForRowAtIndexPath:indexPath];
+					LibraryCell *libraryCell = (LibraryCell *)cell;
+					[libraryCell.sideView addSubview:selectedDeckDetails.sideViewController.view];
+            }
+        }
+    }
 }
 
 - (void)pushDeckDetailViewControllerWithDeckID:(int)deckID asPartOfLoadProcess:(BOOL)partOfLoadProcess
@@ -402,7 +456,6 @@ static sqlite3_stmt *deleteStmt = nil;
 	
 	// Release the compiled statement from memory
 	sqlite3_finalize(compiledStatement);
-	
 }
 
 - (NSInteger)numDecks
@@ -525,6 +578,13 @@ static sqlite3_stmt *deleteStmt = nil;
 
 - (void)didReceiveMemoryWarning {
 	NSLog (@"MyDecksViewController received memory warning");
+
+	// Drop all cached side preview ViewControllers
+	for (int i = 0; i < localLibraryDetails.count; i ++)
+	{
+		[[localLibraryDetails objectAtIndex:i] dropSideViewController];
+	}
+	
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
 }

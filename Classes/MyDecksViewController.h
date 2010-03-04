@@ -31,6 +31,7 @@
 - (void) retrieveLocalLibraryDetails;
 - (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
+- (void)loadSidesForOnscreenRows;
 
 - (void)pushDeckDetailViewControllerWithDeckID:(int)deckID asPartOfLoadProcess:(BOOL)partOfLoadProcess;
 

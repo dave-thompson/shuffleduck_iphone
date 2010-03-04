@@ -60,15 +60,19 @@
 									<object class="IBUILabel" id="70165797">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{114, 7}, {186, 20}}</string>
+										<string key="NSFrame">{{114, 7}, {186, 22}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
+										<object class="NSColor" key="IBUIBackgroundColor" id="600603238">
+											<int key="NSColorSpace">1</int>
+											<bytes key="NSRGB">MSAxIDEAA</bytes>
+										</object>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
 										<bool key="IBUIUserInteractionEnabled">NO</bool>
-										<string key="IBUIText">title_label</string>
+										<string key="IBUIText">ALL-IN-1 GAMEBOX</string>
 										<object class="NSFont" key="IBUIFont">
-											<string key="NSName">Helvetica</string>
-											<double key="NSSize">1.400000e+01</double>
+											<string key="NSName">Helvetica-Bold</string>
+											<double key="NSSize">2.000000e+01</double>
 											<int key="NSfFlags">16</int>
 										</object>
 										<object class="NSColor" key="IBUITextColor">
@@ -83,15 +87,16 @@
 									<object class="IBUILabel" id="257588819">
 										<reference key="NSNextResponder" ref="266932538"/>
 										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{114, 25}, {186, 21}}</string>
+										<string key="NSFrame">{{114, 30}, {186, 21}}</string>
 										<reference key="NSSuperview" ref="266932538"/>
+										<reference key="IBUIBackgroundColor" ref="600603238"/>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
 										<bool key="IBUIUserInteractionEnabled">NO</bool>
-										<string key="IBUIText">785 left to learn</string>
+										<string key="IBUIText">785 left</string>
 										<object class="NSFont" key="IBUIFont">
 											<string key="NSName">Helvetica</string>
-											<double key="NSSize">1.200000e+01</double>
+											<double key="NSSize">1.600000e+01</double>
 											<int key="NSfFlags">16</int>
 										</object>
 										<object class="NSColor" key="IBUITextColor">
@@ -106,10 +111,7 @@
 								</object>
 								<string key="NSFrameSize">{320, 64}</string>
 								<reference key="NSSuperview" ref="121617878"/>
-								<object class="NSColor" key="IBUIBackgroundColor" id="600603238">
-									<int key="NSColorSpace">1</int>
-									<bytes key="NSRGB">MSAxIDEAA</bytes>
-								</object>
+								<reference key="IBUIBackgroundColor" ref="600603238"/>
 								<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 							</object>
 						</object>
@@ -155,14 +157,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">miniCardView</string>
-						<reference key="source" ref="473648291"/>
-						<reference key="destination" ref="547543498"/>
-					</object>
-					<int key="connectionID">23</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">titleLabel</string>
 						<reference key="source" ref="473648291"/>
 						<reference key="destination" ref="70165797"/>
@@ -176,6 +170,14 @@
 						<reference key="destination" ref="257588819"/>
 					</object>
 					<int key="connectionID">41</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">sideView</string>
+						<reference key="source" ref="473648291"/>
+						<reference key="destination" ref="547543498"/>
+					</object>
+					<int key="connectionID">43</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -255,7 +257,7 @@
 					<string>UIResponder</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>LibraryCell</string>
-					<string>{{499, 144}, {320, 65}}</string>
+					<string>{{439, 394}, {320, 65}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -282,7 +284,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">41</int>
+			<int key="maxID">43</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -295,15 +297,15 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>mainView</string>
-							<string>miniCardView</string>
 							<string>remainLabel</string>
+							<string>sideView</string>
 							<string>titleLabel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UIView</string>
-							<string>UIView</string>
 							<string>UILabel</string>
+							<string>UIView</string>
 							<string>UILabel</string>
 						</object>
 					</object>

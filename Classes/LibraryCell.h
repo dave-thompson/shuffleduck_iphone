@@ -13,23 +13,21 @@
 @interface LibraryCell : UITableViewCell {
 
 	// views
-	IBOutlet UIView	*miniCardView;
+	IBOutlet UIView	*sideView;
 	IBOutlet UIView *mainView;
 	// variable text
 	IBOutlet UILabel *remainLabel;
 	IBOutlet UILabel *titleLabel;
 	
-	SideViewController *miniCardViewController;
+	SideViewController *sideViewController;
 }
 
 - (void)setFullyDownloaded:(BOOL)isFullyDownloaded withTitle:(NSString *)theTitle numKnownCards:(int)theNumKnownCards numUnknownCards:(int)theNumUnknownCards;
 
-@property (nonatomic, retain) UIView *miniCardView;
+@property (nonatomic, retain) UIView *sideView;
 @property (nonatomic, retain) UIView *mainView;
 
 @property (nonatomic, retain) UILabel *titleLabel;
 @property (nonatomic, retain) UILabel *remainLabel;
-
-@property (nonatomic, retain) SideViewController *miniCardViewController;
 
 @end

@@ -14,7 +14,7 @@
 
 @implementation LibraryCell
 
-@synthesize miniCardView, remainLabel, titleLabel, miniCardViewController, mainView;
+@synthesize sideView, remainLabel, titleLabel, mainView;
 
 BOOL isFullyDownloaded;
 
@@ -29,9 +29,8 @@ BOOL isFullyDownloaded;
 
 - (void)awakeFromNib
 {
-	[super awakeFromNib];	
+	[super awakeFromNib];
 }
-
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 
@@ -41,13 +40,19 @@ BOOL isFullyDownloaded;
 		{
 			// set background to blue and text to white
 			mainView.backgroundColor = [UIColor blueColor];
+			titleLabel.backgroundColor = [UIColor blueColor];
+			remainLabel.backgroundColor = [UIColor blueColor];
+			
 			titleLabel.textColor = [UIColor whiteColor];
 			remainLabel.textColor = [UIColor whiteColor];
 		}
 		else
 		{
 			// restore to original colors
-			mainView.backgroundColor = [UIColor whiteColor];			
+			mainView.backgroundColor = [UIColor whiteColor];
+			titleLabel.backgroundColor = [UIColor whiteColor];
+			remainLabel.backgroundColor = [UIColor whiteColor];
+			
 			titleLabel.textColor = [UIColor blackColor];
 			remainLabel.textColor = [[VariableStore sharedInstance] mindeggGreyText];
 		}
@@ -92,8 +97,8 @@ BOOL isFullyDownloaded;
 }
 
 - (void)dealloc {
-	[miniCardView release];
-	[miniCardViewController release];
+	[sideView release];
+	[sideViewController release];
 	[remainLabel release];
 	[titleLabel release];
     [super dealloc];
