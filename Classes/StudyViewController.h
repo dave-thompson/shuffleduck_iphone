@@ -29,7 +29,6 @@
 	Deck *deck;
 }
 
-
 @property (nonatomic, retain) Deck *deck;
 
 + (StudyViewController *)sharedInstance;
@@ -41,6 +40,7 @@
 -(void)showNewCard;
 -(void)updateInlineScore;
 -(void)showNextSide;
+-(void)hideCard;
 
 -(void)pushCongratulationsViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess;
 -(void)pushFinalScoreViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess;

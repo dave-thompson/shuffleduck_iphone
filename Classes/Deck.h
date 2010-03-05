@@ -52,20 +52,26 @@ typedef enum {
 /* Common setters / getters */
 
 	// Getters
-	-(int)getOriginalFirstSideID;
-	-(int)getCurrentSideID;
-	-(int)numCards;
-	-(int)numKnownCards;
-	-(NSString *)getDeckTitle;
-	-(NSString *)author;
-	-(int)userVisibleID;
-	-(BOOL)isCurrentCardKnown;
-	-(BOOL)isShuffled;
+		// deck description
+		-(NSString *)getDeckTitle;
+		-(NSString *)author;
+		-(int)userVisibleID;
+
+		// deck data
+		-(int)numCards;
+		-(int)numKnownCards;
+		-(BOOL)isShuffled;
+
+		// current card / side data
+		-(int)getOriginalFirstSideID;
+		-(int)getCurrentSideID;
+		-(BOOL)isCurrentCardKnown;
+
 
 	// Setters
-	-(void)setCurrentCardKnown:(BOOL)known;
-	-(void)shuffle;
-	-(void)unshuffle;
+		-(void)setCurrentCardKnown:(BOOL)known;
+		-(void)shuffle;
+		-(void)unshuffle;
 
 /* View Mode setters / getters */
 
@@ -86,6 +92,23 @@ typedef enum {
 	-(int)cardsCorrect;
 	-(int)cardsInTestSet;
 
+/* Study mode setters / getters */
+
+	// Setters
+		// setting / cleaning up before starting
+		-(void)prepareStudySession;
+		// changing the user's hand
+		-(BOOL)addCardAtEndOfStudySession;
+		-(BOOL)addCardToStudySessionAtIndex:(int)index;
+		-(BOOL)replaceLastCardInStudySession;
+		-(BOOL)replaceCardInStudySessionAtIndex:(int)index;
+		// moving within the user's hand
+		-(BOOL)moveToNextCardInStudySession;
+		-(BOOL)moveToPreviousCardInStudySession;
+		-(BOOL)pointToUsersStudySession;
+
+	// Getters
+		-(int)numCardsInStudySession;
 
 /* Application State Persistence */
 

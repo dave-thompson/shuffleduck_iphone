@@ -14,5 +14,8 @@
 }
 
 + (void)mindEggErrorAlertWithMessage:(NSString *)aMessage;
++ (void)runSQLUpdate:(NSString *)sqlString;
++(int)getIntUsingSQL:(NSString *)sqlString;
++(NSString *)getStringUsingSQL:(NSString *)sqlString;
 
 @end

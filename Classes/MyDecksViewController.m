@@ -18,14 +18,13 @@
 #import "Constants.h"
 #import "Synchroniser.h"
 #import "DeckDownloader.h"
+#import "MindEggUtilities.h"
 
 static MyDecksViewController *sharedMyDecksViewController = nil;
 
 @implementation MyDecksViewController
 
 @synthesize syncButton;
-
-static sqlite3_stmt *deleteStmt = nil;
 
 // manage the shared instance of this singleton View Controller
 + (MyDecksViewController *)sharedInstance
@@ -168,7 +167,7 @@ static sqlite3_stmt *deleteStmt = nil;
 {
 	// return same height as that of LibraryCell...
 	// .. but 1 greater than the height of LibraryCell's view
-	return 65;
+	return 57;
 }
 
 -(BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
@@ -388,7 +387,7 @@ static sqlite3_stmt *deleteStmt = nil;
 		
 		// delete the deck from the database (DB cascades deletions)
 		NSString *deletionString = [NSString stringWithFormat:@"DELETE FROM Deck WHERE id = %d", deckIDToDelete];
-		[self runDeletionWithSQL:deletionString];
+		[MindEggUtilities runSQLUpdate:deletionString];
 				
 		// Animate the deletion from the table.
 		[libraryTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -479,25 +478,6 @@ static sqlite3_stmt *deleteStmt = nil;
 	sqlite3_finalize(compiledStatement);
 	
 	return numberOfDecks;	
-}
-
-
--(void)runDeletionWithSQL:(NSString *)sqlString
-{	
-	if(deleteStmt == nil)
-	{
-		const char *sql = [sqlString UTF8String];
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &deleteStmt, NULL) != SQLITE_OK)
-		{
-			NSLog(@"Error while creating delete statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-		}
-	}
-	
-	if (SQLITE_DONE != sqlite3_step(deleteStmt))
-		NSLog(@"Error while deleting. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	
-	sqlite3_reset(deleteStmt);
-	deleteStmt = nil;
 }
 
 

@@ -7,8 +7,10 @@
 //
 
 #import "Deck.h"
+#import "MindEggUtilities.h"
 #import "VariableStore.h"
 
+#define MAX_NO_CARDS_IN_HAND 10
 
 @implementation Deck
 
@@ -106,7 +108,6 @@
 	}
 	return cardsExist;
 }
-
 
 -(BOOL)moveToCardInDirection:(ChangeCardDirection)direction includeKnownCards:(BOOL)includeKnown
 // Updates state to point to the first side of the requested card. Decks are treated as continuous - i.e. the first card is after the last card; the last card is before the first card.
@@ -238,26 +239,14 @@
 
 -(int)lastSessionsSideIDForStudyType:(StudyType)studyType
 {
-	int lastSessionsSideID;
 	NSString *sqlString;
+
 	if (studyType == Test)
 		sqlString = [NSString stringWithFormat:@"SELECT test_side_id FROM DeckStatus WHERE deck_id = %d;", currentDeckID];
 	else if (studyType == Learn)
 		sqlString = [NSString stringWithFormat:@"SELECT learn_side_id FROM DeckStatus WHERE deck_id = %d;", currentDeckID];		
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			lastSessionsSideID = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return lastSessionsSideID;
+
+	return [MindEggUtilities getIntUsingSQL:sqlString];
 }
 
 -(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
@@ -267,18 +256,19 @@
 		// just move to the first unanswered test question
 		[self moveToFirstUnansweredTestQuestion];
 	}
-
-	if ((studyType == View) || (studyType == Learn))
+	else if (studyType == Learn)
+	{
+		// just move to the first card in the user's hand
+		[self pointToUsersStudySession];
+	}
+	else if (studyType == View)
 	{
 		// find last sessions card
 		NSString *sqlString;
 		int lastSessionsCardID = -1;
 		int firstSideID = -1;
 		
-		if (studyType == View)
-			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
-		else // studyType == Learn
-			sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.learn_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
+		sqlString = [NSString stringWithFormat:@"SELECT Side.card_id, Side.id FROM DeckStatus, Side WHERE DeckStatus.deck_id = %d AND DeckStatus.view_card_id = Side.card_id ORDER BY Side.position ASC LIMIT 1;", currentDeckID];
 		const char *sqlStatement = [sqlString UTF8String];
 		sqlite3_stmt *compiledStatement;
 		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
@@ -298,28 +288,12 @@
 		{
 			// if there was a last session, and therefore there was a real card ID, point the deck to that ID
 			currentCardID = lastSessionsCardID;
-			currentSideID = firstSideID;
-			
-			// if we're in learn mode, it's possible that the user has marked the last viewed card as known
-			// in this case, go to the next unknown card after it
-			if (studyType == Learn)
-			{
-				if ([self isCurrentCardKnown])
-					[self moveToCardInDirection:NextCard includeKnownCards:NO];
-			}
+			currentSideID = firstSideID;			
 		}
-		else
+		else // this is the first time the user has viewed this deck using this StudyType
 		{
-			// this is the first time the user has viewed this deck using this StudyType
-			if (studyType == Learn)
-			{
-				[self moveToCardAtPosition:FirstCard includeKnownCards:NO];
-			}
-			else // _studyType == View
-			{
-				[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
-				// (we can safely assume that there is no text in the searchBar)
-			}		
+			[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
+			// (we can safely assume that there is no text in the searchBar)
 		}
 	}
 }
@@ -334,42 +308,163 @@
 -(void)prepareTest
 // prepares a new test for the current deck
 {
-	sqlite3_stmt *stmt = nil;
-	
 	// Clear any existing test
-	if(stmt == nil)
-	{
-		const char *updateSQL = "DELETE FROM TestStatus WHERE deck_id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
-			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-		NSLog(@"Error: stmt not nil");
-	
-	sqlite3_bind_int(stmt, 1, currentDeckID);
-	
-	if(SQLITE_DONE != sqlite3_step(stmt))
-		NSAssert1(0, @"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	sqlite3_reset(stmt);
-	stmt = nil;	
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM TestStatus WHERE deck_id = %d", currentDeckID]];
 	
 	// Set up new test
-	if(stmt == nil)
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO TestStatus (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = %d ORDER BY Card.position", currentDeckID]];
+}
+
+-(void)prepareStudySession
+{
+	// remove any cards from the hand that are already known (a DB trigger updates the positions of the remaining cards)
+	NSString *sqlString = [NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d AND card_id IN (SELECT card_id FROM Card WHERE deck_id = %d AND known = 0)", currentDeckID, currentDeckID];
+	[MindEggUtilities runSQLUpdate:sqlString];
+
+	// if there are more cards in the hand than the MAX_NO_CARDS_IN_HAND, truncate the hand
+	int numCardsInHand = [self numCardsInStudySession];
+	int numCardsToRemove = numCardsInHand - MAX_NO_CARDS_IN_HAND;
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT %d)", currentDeckID, numCardsToRemove]];
+		
+	// if there are less cards in the hand than the MAX_NO_CARDS_IN_HAND, add cards to end of hand until there are enough or until there are no cards left
+	int numCardsToAdd = MAX_NO_CARDS_IN_HAND - numCardsInHand;
+	BOOL cardsRemain = YES;
+	for (int i = 0; i < numCardsToAdd && cardsRemain; i ++)
 	{
-		const char *updateSQL = "INSERT INTO TestStatus (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = ? ORDER BY Card.position";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, updateSQL, -1, &stmt, NULL) != SQLITE_OK)
-			NSLog(@"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
+		sqlite3_exec([VariableStore sharedInstance].database, "BEGIN", 0, 0, 0); // wrapping in transaction provides huge performance boost
+		cardsRemain = [self addCardAtEndOfStudySession];
+		sqlite3_exec([VariableStore sharedInstance].database, "COMMIT", 0, 0, 0);
+	}
+}
+
+-(int)numCardsInStudySession
+{
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
+}
+
+-(BOOL)addCardAtEndOfStudySession
+{
+	return [self addCardToStudySessionAtIndex:[self numCardsInStudySession]];
+}
+
+-(BOOL)addCardToStudySessionAtIndex:(int)index
+// adds an unknown card to the given index of a user's hand during Study mode
+// if adding to anywhere other than the end, it is the caller's responsibility to free up the requested index in the DB before calling this method
+// returns YES iff there was an unknown card to add, or NO if no card was added
+{
+	// find the first card in the deck that is not already in the hand
+	int cardIDToAdd = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT id FROM Card WHERE deck_id = %d AND known = 0 AND id NOT IN ( SELECT card_id FROM StudyStatus WHERE deck_id = %d ) ORDER BY position LIMIT 1;", currentDeckID, currentDeckID]];
+	if (cardIDToAdd != -1) // if there is an unknown card left to add
+	{
+		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, cardIDToAdd, index]];
+		return YES;
 	}
 	else
-		NSLog(@"Error: stmt not nil");
-	
-	sqlite3_bind_int(stmt, 1, currentDeckID);
-	
-	if(SQLITE_DONE != sqlite3_step(stmt))
-		NSAssert1(0, @"sqlite error: '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	sqlite3_reset(stmt);
-	stmt = nil;
+	{
+		return NO;
+	}
 }
+
+-(BOOL)replaceLastCardInStudySession
+// replaces the card at the bottom of the user's hand with an unknown card
+// returns YES iff there was an unknown card to add, or NO if the first card was removed but no card was added in its place
+{
+	// remove the bottom card
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT 1)", currentDeckID]];
+	// add the new card in its place
+	return [self addCardAtEndOfStudySession];
+}
+
+-(BOOL)replaceCardInStudySessionAtIndex:(int)index
+// replaces the card at the requested index of a user's hand with an unknown card
+// returns YES iff there was an unknown card to add, or NO if the first card was removed but no card was added in its place
+{
+	// remove the card at index
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d AND POSITION = %d", currentDeckID, index]];
+	if ([self numCardsInStudySession] < ([self numCards] - [self numKnownCards]))
+	{
+		// make space at the requested index
+		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d AND position > %d", currentDeckID, index - 1]];
+		// add the new card at index
+		return [self addCardToStudySessionAtIndex:index];
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+-(BOOL)moveToNextCardInStudySession
+{
+	if ([self numCardsInStudySession] > 1)
+	{
+		// move the current card to the back
+			// remove it from the front
+			int movingCardID = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = 0", currentDeckID]];
+			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
+			// add it to the back
+			int numCardsInHand = [self numCardsInStudySession]; // this is actually one less than is usually in the hand, as we have deleted but not yet re-added
+			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, numCardsInHand]];
+		// move card & side pointers to show the front card
+		[self pointToUsersStudySession];
+		return YES;
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+-(BOOL)moveToPreviousCardInStudySession
+{
+	if ([self numCardsInStudySession] > 1)
+	{
+		// move the back card to the front
+			// increment all positions
+			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d", currentDeckID]];
+			// remove the back card
+			int numCardsInHand = [self numCardsInStudySession];
+			int movingCardID = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = %d", currentDeckID, numCardsInHand]];
+			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
+			// add it to the front
+			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, 0]];
+		// move card & side pointers to show the front card
+		[self pointToUsersStudySession];
+		return YES;
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+-(BOOL)pointToUsersStudySession
+// moves the card & side pointers to the top card in the user's hand
+// returns false if there are no cards in the user's hand
+{
+	// Retrieve the next or previous card & side ids
+	BOOL success = NO;
+	NSString *sqlString;
+	
+	sqlString = [NSString stringWithFormat:@"SELECT StudyStatus.card_id, Side.id FROM StudyStatus, Side WHERE StudyStatus.deck_id = %d AND StudyStatus.card_id = Side.card_id ORDER BY StudyStatus.position ASC, Side.position ASC LIMIT 1;", currentDeckID];
+	
+	const char *sqlStatement = [sqlString UTF8String];
+	sqlite3_stmt *compiledStatement;
+	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	{
+		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
+		{
+			currentCardID = (int)sqlite3_column_int(compiledStatement, 0);
+			currentSideID = (int)sqlite3_column_int(compiledStatement, 1);
+			success = YES;
+		}
+	}
+	else
+	{
+		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+	}
+	return success;
+}		
 
 -(void)rememberCardForStudyType:(StudyType)studyType
 // Serializes the currently viewed card ID so it may be reloaded when the user comes back to the given StudyType
@@ -436,192 +531,60 @@
 -(int)numCards
 // returns the number of cards in the current deck
 {
-	int numCardsInDeck;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			numCardsInDeck = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return numCardsInDeck;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d;", currentDeckID]];
 }
 
 -(int)cardsCompleted;
 // returns the number of questions answered in any current test run
 {
-	int cardsCompleted;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 1;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			cardsCompleted = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return cardsCompleted;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 1;", currentDeckID]];
 }
 
 -(int)cardsCorrect;
 {
-	int cardsCorrect;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND correct = 1;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			cardsCorrect = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return cardsCorrect;	
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND correct = 1;", currentDeckID]];
 }
 
 -(int)cardsInTestSet;
 {
-	int cardsInTestSet;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			cardsInTestSet = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return cardsInTestSet;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d;", currentDeckID]];
 }
 
 -(int)testQuestionsRemaining
 {
-	int questionsRemaining;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 0;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			questionsRemaining = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return questionsRemaining;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 0;", currentDeckID]];
 }
 
 -(int)numCardsWithSearchTerm:(NSString *)searchTerm
-// returns the number of cards in the current deck
 {
-	if (searchTerm.length == 0)	return [self numCards];
-	
-	int numCardsFound;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(DISTINCT Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%'", currentDeckID, searchTerm];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+	if (searchTerm.length == 0)
 	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			numCardsFound = (int)sqlite3_column_int(compiledStatement, 0);
-		}
+		return [self numCards];
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(DISTINCT Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%'", currentDeckID, searchTerm]];
 	}
-	return numCardsFound;
 }
 
 -(BOOL)currentCardFitsFilter:(NSString *)searchTerm
 {
-	int countOfCurrentCardInFilteredCards;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%' AND Card.id = %d", currentDeckID, searchTerm, currentCardID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			countOfCurrentCardInFilteredCards = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
+	int countOfCurrentCardInFilteredCards = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%' AND Card.id = %d", currentDeckID, searchTerm, currentCardID]];
 	
 	if (countOfCurrentCardInFilteredCards > 0)	return YES;  // count may be greater than 1, as we do not use the DISTINCT keyword
-	else										return NO;
-	
+	else										return NO;	
 }
 
 -(int)numKnownCards
 // returns the number of known cards in the current deck
 {
-	int numKnownCardsInDeck;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d AND Card.known = 1;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			numKnownCardsInDeck = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return numKnownCardsInDeck;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d AND Card.known = 1;", currentDeckID]];	
 }
 
 -(int)getOriginalFirstSideID
 // returns the ID of the first side of the first card (and ignores shuffling)
 {
-	int firstSideID;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT Side.id AS first_side_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.deck_id = %d AND Card.orig_position = 1 AND Side.position = 1", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			firstSideID = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return firstSideID;
-	
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT Side.id AS first_side_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.deck_id = %d AND Card.orig_position = 1 AND Side.position = 1", currentDeckID]];	
 }
 
 -(int)getCurrentSideID
@@ -631,21 +594,8 @@
 
 -(BOOL)isCurrentCardKnown
 {
-	int isCurrentCardKnown;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT known FROM Card WHERE Card.id = %d;", currentCardID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			isCurrentCardKnown = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
+	int isCurrentCardKnown = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT known FROM Card WHERE Card.id = %d;", currentCardID]];
+
 	if (isCurrentCardKnown == 0)
 		{return NO;}
 	else
@@ -661,27 +611,7 @@
 	else
 		{isCurrentCardKnown = 0;}
 		
-	// write value to database
-	sqlite3_stmt *updateStmt = nil;
-	if(updateStmt == nil)
-	{
-		const char *sql = "UPDATE Card SET known = ? WHERE Card.id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-	{
-		NSLog(@"Error: updatestmt not nil");
-	}
-	
-	sqlite3_bind_int(updateStmt, 1, isCurrentCardKnown);
-	sqlite3_bind_int(updateStmt, 2, currentCardID);
-		
-	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with card known value. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-	
-	sqlite3_reset(updateStmt);
-	updateStmt = nil;
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET known = %d WHERE Card.id = %d", isCurrentCardKnown, currentCardID]];
 }
 
 -(void)setTestQuestionCorrect:(BOOL)correct
@@ -693,29 +623,8 @@
 			isCorrect = 1;
 		else
 			isCorrect = 0;
-		
 		// write value to database
-		sqlite3_stmt *updateStmt = nil;
-		if(updateStmt == nil)
-		{
-			const char *sql = "UPDATE TestStatus SET completed = 1, correct = ? WHERE deck_id = ? AND card_id = ?";
-			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-		}
-		else
-		{
-			NSLog(@"Error: updatestmt not nil");
-		}
-		
-		sqlite3_bind_int(updateStmt, 1, isCorrect);	
-		sqlite3_bind_int(updateStmt, 2, currentDeckID);
-		sqlite3_bind_int(updateStmt, 3, currentCardID);
-		
-		if(SQLITE_DONE != sqlite3_step(updateStmt))
-		{NSAssert1(0, @"Error while updating DB with card known value. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-		
-		sqlite3_reset(updateStmt);
-		updateStmt = nil;
+		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE TestStatus SET completed = 1, correct = %d WHERE deck_id = %d AND card_id = %d", isCorrect, currentDeckID, currentCardID]];
 	
 	// also update known flag
 	[self setCurrentCardKnown:correct];
@@ -723,105 +632,28 @@
 
 -(NSString *)getDeckTitle
 {
-	NSString *title;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT title FROM Deck WHERE Deck.id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			title = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 0)];
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return title;
+	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT title FROM Deck WHERE Deck.id = %d;", currentDeckID]];	
 }
 
 -(NSString *)author
 {
-	NSString *author;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			author = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 0)];
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return author;
+	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 }
 
 -(NSString *)searchBarText
 {
-	NSString *searchBarText;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT search_text FROM DeckStatus WHERE deck_id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			searchBarText = [NSString stringWithUTF8String:(char *)sqlite3_column_text(compiledStatement, 0)];
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return searchBarText;
+	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT search_text FROM DeckStatus WHERE deck_id = %d;", currentDeckID]];
 }
 
 -(void)setSearchBarText:(NSString *)searchBarText
 {
-	sqlite3_stmt *updateStmt = nil;	
-	if(updateStmt == nil)
-	{
-		const char *sql = "UPDATE DeckStatus SET search_text = ? WHERE deck_id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-	{
-		NSLog(@"Error: updatestmt not nil");
-	}
-	sqlite3_bind_text(updateStmt, 1, [searchBarText UTF8String], -1, SQLITE_TRANSIENT);
-	sqlite3_bind_int(updateStmt, 2, currentDeckID);
-	
-	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-	
-	sqlite3_reset(updateStmt);
-	updateStmt = nil;
+	NSString *sqlString = [NSString stringWithFormat:@"UPDATE DeckStatus SET search_text = %d WHERE deck_id = %d", searchBarText, currentDeckID];
+	[MindEggUtilities runSQLUpdate:sqlString];	
 }
 
 -(int)userVisibleID
 {
-	int userVisibleID;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			userVisibleID = sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
-	return userVisibleID;
+	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 }
 
 -(void)shuffle
@@ -946,21 +778,7 @@
 
 -(BOOL)isShuffled
 {
-	int shuffled;
-	NSString *sqlString = [NSString stringWithFormat:@"SELECT shuffled FROM Deck WHERE Deck.id = %d;", currentDeckID];
-	const char *sqlStatement = [sqlString UTF8String];
-	sqlite3_stmt *compiledStatement;
-	if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
-	{
-		while(sqlite3_step(compiledStatement) == SQLITE_ROW)
-		{
-			shuffled = (int)sqlite3_column_int(compiledStatement, 0);
-		}
-	}
-	else
-	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
-	}
+	int shuffled = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT shuffled FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 	
 	BOOL returnValue;
 	if (shuffled == 1)

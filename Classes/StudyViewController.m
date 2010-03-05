@@ -222,7 +222,17 @@ InlineScoreViewController *inlineScoreViewController;
 	}
 	
 	// show the selected card
-	[self showNewCard];
+	if (_studyType == Learn || _studyType == Test)
+	{
+		[self showNewCard];
+	}
+	else // _studyType == View
+	{
+		if (numFilteredCards > 0)
+			[self showNewCard];
+		else
+			[self hideCard];
+	}
 	
 	// if in Study or Test mode, check to see how many sides should be showing
 	if ((_studyType == Learn) || (_studyType == Test))
@@ -368,9 +378,26 @@ InlineScoreViewController *inlineScoreViewController;
 	{
 		BOOL additionalCardExists;
 		if (_studyType == Learn)
-			{additionalCardExists = [deck moveToCardInDirection:PreviousCard includeKnownCards:NO];}
+			{
+				BOOL dismissedCardWasKnown = [deck isCurrentCardKnown];
+				if (dismissedCardWasKnown)
+				{
+					// replace the dismissed card in the study session with a new card, and point to this new card
+					// thus the user will be presented with the new card straight away (they are going backwards through their cards)
+					[deck replaceCardInStudySessionAtIndex:0];
+					[deck pointToUsersStudySession];
+					additionalCardExists = ([deck numCardsInStudySession] > 0);
+				}
+				else
+				{
+					// move to the previous card
+					additionalCardExists = [deck moveToPreviousCardInStudySession];
+				}
+			}
 		else // _studyType == View
-			{additionalCardExists = [deck moveToCardInDirection:PreviousCard withSearchTerm:[searchBar text]];}
+			{
+				additionalCardExists = [deck moveToCardInDirection:PreviousCard withSearchTerm:[searchBar text]];
+			}
 		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 		{
 			[self showNewCardWithAnimation:CardViewAnimationSlideRight];
@@ -388,9 +415,19 @@ InlineScoreViewController *inlineScoreViewController;
 	{
 		BOOL additionalCardExists;
 		if (_studyType == Learn)
-			{additionalCardExists = [deck moveToCardInDirection:NextCard includeKnownCards:NO];}
+			{
+				BOOL dismissedCardWasKnown = [deck isCurrentCardKnown];
+				additionalCardExists = [deck moveToNextCardInStudySession];
+				if (dismissedCardWasKnown)
+				{
+					// the user will be presented with the new card only once they have gone through all the older cards in their hands again first
+					[deck replaceLastCardInStudySession];
+				}
+			}
 		else // _studyType == View
-			{additionalCardExists = [deck moveToCardInDirection:NextCard withSearchTerm:[searchBar text]];}
+			{
+				additionalCardExists = [deck moveToCardInDirection:NextCard withSearchTerm:[searchBar text]];
+			}
 		if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
 		{
 			[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
@@ -503,70 +540,77 @@ InlineScoreViewController *inlineScoreViewController;
 
 - (IBAction)bottomButtonClicked:(id)sender
 {
-	if (_studyType == Test)
+	// only process button clicks if there is a stable card being shown
+	if ((topCardViewController.animationInProgress == NO) && (bottomCardViewController.animationInProgress == NO))
 	{
-		// log card completed
-			cardsCompleted = cardsCompleted + 1;
-		
-		// update known status & tick colours
-			if (sender == tickButton) // tick was pressed
-			{
-				// update test & card data; increment score
-				[deck setTestQuestionCorrect:YES];
-				cardsCorrect++;
-			}
-			else // cross was pressed
-			{
-				// update test & card data; increment score
-				[deck setTestQuestionCorrect:NO];
-			}
-		
-		// update score display
-			[self updateInlineScore];
-		
-		// move to next card or show finish screen
-			if (cardsCompleted == numCards) // if all cards have been tested
-			{
-				// Push the FinalScoreViewController onto the navigation stack
-				[self pushFinalScoreViewControllerAsPartofApplicationLoadProcess:NO];
-			}
-			else // move to the next card
-			{
-				BOOL additionalCardExists = [deck moveToFirstUnansweredTestQuestion];
-				if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
+		if (_studyType == Test)
+		{
+			// log card completed
+				cardsCompleted = cardsCompleted + 1;
+			
+			// update known status & tick colours
+				if (sender == tickButton) // tick was pressed
 				{
-					[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
+					// update test & card data; increment score
+					[deck setTestQuestionCorrect:YES];
+					cardsCorrect++;
 				}
+				else // cross was pressed
+				{
+					// update test & card data; increment score
+					[deck setTestQuestionCorrect:NO];
+				}
+			
+			// update score display
+				[self updateInlineScore];
+			
+			// move to next card or show finish screen
+				if (cardsCompleted == numCards) // if all cards have been tested
+				{
+					// Push the FinalScoreViewController onto the navigation stack
+					[self pushFinalScoreViewControllerAsPartofApplicationLoadProcess:NO];
+				}
+				else // move to the next card
+				{
+					BOOL additionalCardExists = [deck moveToFirstUnansweredTestQuestion];
+					if (additionalCardExists == YES) // if there's a card in this deck other than the one already displayed
+					{
+						[self showNewCardWithAnimation:CardViewAnimationSlideLeft];
+					}
+				}
+		}
+		else // study type is Learn
+		{
+			if ([deck isCurrentCardKnown])
+			{
+				// set card to unknown; decrement score
+				[deck setCurrentCardKnown:NO];
+				cardsKnown--;
+				
+				// set tick to white
+				[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];			
 			}
-	}
-	else // study type is Learn
-	{
-		if ([deck isCurrentCardKnown])
-		{
-			// set card to unknown; decrement score
-			[deck setCurrentCardKnown:NO];
-			cardsKnown--;
+			else
+			{
+				// set card to known; increment score
+				[deck setCurrentCardKnown:YES];
+				cardsKnown++;
+				
+				// set tick to green
+				[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];
+			}
 			
-			// set tick to white
-			[tickButton setImage:[UIImage imageNamed:@"WhiteTick.png"] forState:UIControlStateNormal];			
-		}
-		else
-		{
-			// set card to known; increment score
-			[deck setCurrentCardKnown:YES];
-			cardsKnown++;
+			// update score display
+			[self updateInlineScore];
 			
-			// set tick to green
-			[tickButton setImage:[UIImage imageNamed:@"GreenTick.png"] forState:UIControlStateNormal];
-		}
-		
-		// update score display
-		[self updateInlineScore];
-		
-		if (cardsKnown == numCards) // if all cards have been tested
-		{
-			// Push the CongratulationsViewController onto the navigation stack
-			[self pushCongratulationsViewControllerAsPartofApplicationLoadProcess:NO];
+			if (cardsKnown == numCards) // if all cards have been tested
+			{
+				// remove the final card from the study session
+				[deck replaceLastCardInStudySession];
+				
+				// Push the CongratulationsViewController onto the navigation stack
+				[self pushCongratulationsViewControllerAsPartofApplicationLoadProcess:NO];
+			}
 		}
 	}
 }
@@ -593,36 +637,20 @@ InlineScoreViewController *inlineScoreViewController;
 -(void)pushFinalScoreViewControllerAsPartofApplicationLoadProcess:(BOOL)partOfLoadProcess
 {
 	FinalScoreViewController *finalScoreViewController = [FinalScoreViewController sharedInstance];
-	
+	finalScoreViewController.deck = deck;		
+
 	if (partOfLoadProcess)
 	{
 		// set up back button (viewDidLoad will not have fired yet)
 		UIBarButtonItem *backArrowButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"BackArrow.png"] style:UIBarButtonItemStyleDone target:nil action:nil]; 
 		self.navigationItem.backBarButtonItem = backArrowButton;
 		[backArrowButton release];
-		
-		// set the scores
-		float percent = ((float)deck.cardsCorrect / (float)cardsCompleted) * 100.0;
-		finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
-		finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
-		finalScoreViewController.correctScore = cardsCorrect;
-		
+				
 		// push view controller
 		[self.navigationController pushViewController:finalScoreViewController animated:NO];
 	}
 	else
-	{
-		// retrieve scores from DB
-		cardsCompleted = deck.cardsCompleted;
-		cardsCorrect = deck.cardsCorrect;
-		cardsInTestSet = deck.cardsInTestSet;
-		
-		// set the scores
-		float percent = ((float)cardsCorrect / (float)cardsCompleted) * 100.0;
-		finalScoreViewController.percent = (int)percent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
-		finalScoreViewController.incorrectScore = cardsCompleted - cardsCorrect;
-		finalScoreViewController.correctScore = cardsCorrect;
-		
+	{		
 		// push view controller
 		[self.navigationController pushViewController:finalScoreViewController animated:YES];
 	}

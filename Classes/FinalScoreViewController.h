@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "StudyViewController.h"
 #import "DeckDetailViewController.h"
-
+#import "Deck.h"
 
 @interface FinalScoreViewController : UIViewController
 {
@@ -19,17 +19,13 @@
 	
 	IBOutlet UIButton *learnButton;
 	
-	int percent;
-	int correctScore;
-	int incorrectScore;
+	Deck *deck;	
 }
+
+@property (nonatomic, retain) Deck *deck;
 
 + (FinalScoreViewController *)sharedInstance;
 
 -(IBAction)studyButtonPressed:(id)sender;
-
-@property (nonatomic, assign) int percent;
-@property (nonatomic, assign) int correctScore;
-@property (nonatomic, assign) int incorrectScore;
 
 @end

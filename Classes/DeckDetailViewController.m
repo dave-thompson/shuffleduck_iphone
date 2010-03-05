@@ -76,10 +76,15 @@ SideViewController *miniSideViewController;
 	{
 		if ((type == Test) && (!fromLoadProcess)) // no test in progress, therefore start a new one
 		{
-			// prepare deck for new test
+			// throw away any existing test and prepare a new one
 			[deck prepareTest];
 		}
 
+		if (type == Learn)
+		{
+			[deck prepareStudySession]; // this works differently from prepareTest; prepareStudySession prepares the user's 'hand', leaving it untouched if it is already in a suitable state
+		}
+		
 		// Prepare the study view controller (referencing the new deck object)
 		StudyViewController *studyViewController = [StudyViewController sharedInstance];
 		studyViewController.deck = deck;

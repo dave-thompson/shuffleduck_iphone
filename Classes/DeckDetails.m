@@ -28,8 +28,10 @@
 	// create a view controller for the mini side & set its dimensions
 	sideViewController = [[SideViewController alloc] initWithNibName:@"SideView" bundle:nil];
 	sideViewController.view.clipsToBounds = YES;
-	[sideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
-	sideViewController.view.frame = CGRectMake(0, 0, 104, 64);
+	[sideViewController setCustomSizeByWidth:91]; // height is 56
+	sideViewController.view.frame = CGRectMake(0, 0, 91, 56);
+	//[sideViewController setCustomSizeByWidth:104]; // height is 64; multiplier is 0.4
+	//sideViewController.view.frame = CGRectMake(0, 0, 104, 64);
 	
 	// draw the side
 	[sideViewController replaceSideWithSideID:firstSideID];	

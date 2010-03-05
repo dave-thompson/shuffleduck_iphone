@@ -29,7 +29,6 @@
 - (void) refreshTable;
 - (void) updateTableSettingsBasedOnNumberOfDecks;
 - (void) retrieveLocalLibraryDetails;
-- (void) runDeletionWithSQL:(NSString *)sqlString;
 - (NSInteger) numDecks;
 - (void)loadSidesForOnscreenRows;
 

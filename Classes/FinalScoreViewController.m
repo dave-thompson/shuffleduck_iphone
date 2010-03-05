@@ -14,7 +14,7 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 
 @implementation FinalScoreViewController
 
-@synthesize percent, correctScore, incorrectScore;
+@synthesize deck;
 
 // manage the shared instance of this singleton View Controller
 + (FinalScoreViewController *)sharedInstance
@@ -53,13 +53,21 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 {
 	[super viewWillAppear:animated];
 	
+	// set the scores
+	int cardsCompleted = deck.cardsCompleted;
+	int cardsCorrect = deck.cardsCorrect;
+	float floatPercent = ((float)deck.cardsCorrect / (float)cardsCompleted) * 100.0;
+	int percent = (int)floatPercent; // 100% is only awarded if all Qs answered correctly (int cast appears to round down)
+	int incorrectScore = cardsCompleted - cardsCorrect;
+	int correctScore = cardsCorrect;
+		
 	// set up score labels
 	percentLabel.text = [NSString stringWithFormat: @"%d%%", percent];
 	correctScoreLabel.text = [NSString stringWithFormat: @"%d", correctScore];
 	incorrectScoreLabel.text = [NSString stringWithFormat: @"%d", incorrectScore];	
 	
 	// enable / disable Learn button
-	if (incorrectScore == 0)
+	if (([deck numCards] - [deck numKnownCards]) == 0) // if there are no cards left to learn (note there may be no cards left to learn, even though the test score may not be 100% - this scenario arises where the user interrupts their test to learn those cards they missed, then resumes the test having marked those cards as Known using Learn mode)	
 	{
 		learnButton.enabled = NO;
 	}

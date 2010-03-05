@@ -178,6 +178,16 @@ BOOL fullyFinishedLaunch = NO;
 		NSLog(@"Failed to open database");
 	}
 	
+	// Tune the DB
+		if(sqlite3_exec(db, "PRAGMA CACHE_SIZE=50", NULL, NULL, NULL) != SQLITE_OK)
+			NSLog(@"Couldn't set cache size: %s", sqlite3_errmsg(db));
+
+		if(sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, NULL) != SQLITE_OK)
+			NSLog(@"Couldn't set synchronous OFF: %s", sqlite3_errmsg(db));
+
+		if(sqlite3_exec(db, "PRAGMA journal_mode=MEMORY", NULL, NULL, NULL) != SQLITE_OK)
+			NSLog(@"Couldn't set journal mode to MEMORY: %s", sqlite3_errmsg(db));
+
 	// Store the database pointer as a global variable
 	[VariableStore sharedInstance].database = db;
 }
