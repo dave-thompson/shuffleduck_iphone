@@ -10,10 +10,14 @@
 
 
 @interface ProgressViewController : UIViewController {
-	
+
+	IBOutlet UIActivityIndicatorView *activityIndicatorView;
 }
 
+@property (nonatomic, retain) UIActivityIndicatorView *activityIndicatorView;
+
 + (ProgressViewController *)sharedInstance;
+
 + (void)startShowingProgress;
 + (void)stopShowingProgress;
 + (void)refresh;

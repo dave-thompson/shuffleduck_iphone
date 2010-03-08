@@ -6,7 +6,7 @@
 //  Copyright 2009 All-Seeing Interactive. All rights reserved.
 //
 //	Modified by Dave Thompson on 26/01/2010
-//  Modifications copyright 2009 MindEgg Ltd. All rights reserved.
+//  Modifications copyright 2010 ShuffleDuck Ltd. All rights reserved.
 
 #import "ASIAuthenticationDialog.h"
 #import "ASIHTTPRequest.h"
@@ -73,7 +73,7 @@ NSLock *dialogLock = nil;
 	else
 	{
 		[label setTextColor:[UIColor blackColor]];
-		[label setText:@"Create cards on mindegg.com."];
+		[label setText:@"Create cards on shuffleduck.com."];
 		[label setShadowColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5]];
 	}
 	
@@ -88,7 +88,7 @@ NSLock *dialogLock = nil;
 	[items addObject:backButton];
 	
 	label = [[[UILabel alloc] initWithFrame:CGRectMake(0,0,170,50)] autorelease];
-	[label setText:@"mindegg.com"];
+	[label setText:@"shuffleduck.com"];
 	[label setTextColor:[UIColor whiteColor]];
 	[label setFont:[UIFont boldSystemFontOfSize:22.0]];
 	[label setShadowColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.5]];
@@ -216,7 +216,6 @@ NSLock *dialogLock = nil;
 	if (section == [self numberOfSectionsInTableView:tableView]-1)
 	{	
 		return @"You can download existing cards without an account by supplying a Deck ID.";
-		//return @"No account required to download existing cards by Deck ID.";
 	}
 	return nil;
 }

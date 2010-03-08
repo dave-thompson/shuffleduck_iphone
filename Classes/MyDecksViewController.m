@@ -19,6 +19,7 @@
 #import "Synchroniser.h"
 #import "DeckDownloader.h"
 #import "MindEggUtilities.h"
+#import "ManualTableViewController.h"
 
 static MyDecksViewController *sharedMyDecksViewController = nil;
 
@@ -52,10 +53,10 @@ static MyDecksViewController *sharedMyDecksViewController = nil;
 	self.navigationItem.backBarButtonItem = backArrowButton;
 	[backArrowButton release];	
 	
-	// setup feedback button
-	UIBarButtonItem *downloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(pushFeedbackScreen:)]; 
-	self.navigationItem.rightBarButtonItem = downloadButton;
-	[downloadButton release];
+	// setup manual / feedback button
+	UIBarButtonItem *manualButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(pushManualScreen:)]; 
+	self.navigationItem.rightBarButtonItem = manualButton;
+	[manualButton release];
 	
 	// create table footer
 	tableFooterViewController = [[TableFooterViewController alloc] initWithNibName:@"TableFooterView" bundle:nil];
@@ -401,10 +402,14 @@ static MyDecksViewController *sharedMyDecksViewController = nil;
 #pragma mark -
 #pragma mark Action Methods
 
--(void)pushFeedbackScreen:(id)sender
+- (IBAction)pushManualScreen:(id)sender;
 {
+	// push the feedback controller
+	ManualTableViewController *manualTableViewController = [[ManualTableViewController alloc] initWithNibName:@"ManualTableView" bundle:nil];
+	[self.navigationController pushViewController:manualTableViewController animated:YES];
+	[manualTableViewController release];
+	manualTableViewController = nil;
 }
-
 - (IBAction)pushDownloadScreen:(id)sender
 {
 	[self.navigationController pushViewController:[DownloadViewController sharedInstance] animated:YES];

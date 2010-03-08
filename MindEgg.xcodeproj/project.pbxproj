@@ -25,8 +25,6 @@
 		550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441A10FAE1FD004B47F4 /* SystemConfiguration.framework */; };
 		550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441C10FAE216004B47F4 /* libz.1.2.3.dylib */; };
 		550E449610FB2E14004B47F4 /* DeckDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 550E449510FB2E14004B47F4 /* DeckDownloader.m */; };
-		550F4FCF107D7C10002A6662 /* NarrowGreenTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 550F4FCD107D7C10002A6662 /* NarrowGreenTick.png */; };
-		550F4FD0107D7C10002A6662 /* NarrowWhiteTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 550F4FCE107D7C10002A6662 /* NarrowWhiteTick.png */; };
 		5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22B107D1C940074B376 /* FeedbackView.xib */; };
 		5510E22E107D1C940074B376 /* ReviseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22C107D1C940074B376 /* ReviseView.xib */; };
 		5515E1A4107C259D002E4339 /* FeedbackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A1107C259D002E4339 /* FeedbackViewController.m */; };
@@ -51,19 +49,20 @@
 		5576B11710FC8A1D00306F4C /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 5576B11010FC8A1D00306F4C /* DDXMLElement.m */; };
 		5576B11810FC8A1D00306F4C /* DDXMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5576B11210FC8A1D00306F4C /* DDXMLDocument.m */; };
 		557C051810801E9200D1F2F2 /* RedCross.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C051510801E9200D1F2F2 /* RedCross.png */; };
-		557C051910801E9200D1F2F2 /* WhiteCross.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C051610801E9200D1F2F2 /* WhiteCross.png */; };
-		557C051A10801E9200D1F2F2 /* WhiteRedCross.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C051710801E9200D1F2F2 /* WhiteRedCross.png */; };
 		557C05BC108035D100D1F2F2 /* GreenTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C05B9108035D000D1F2F2 /* GreenTick.png */; };
-		557C05BD108035D100D1F2F2 /* WhiteGreenTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C05BA108035D100D1F2F2 /* WhiteGreenTick.png */; };
 		557C05BE108035D100D1F2F2 /* WhiteTick.png in Resources */ = {isa = PBXBuildFile; fileRef = 557C05BB108035D100D1F2F2 /* WhiteTick.png */; };
 		557C060410804EA200D1F2F2 /* InlineScoreView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 557C060310804EA200D1F2F2 /* InlineScoreView.xib */; };
 		557C060B10804EBF00D1F2F2 /* InlineScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 557C060A10804EBF00D1F2F2 /* InlineScoreViewController.m */; };
 		55814A9410FE483D00B2A625 /* ProgressViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55814A9210FE483D00B2A625 /* ProgressViewController.m */; };
 		55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55814A9310FE483D00B2A625 /* ProgressView.xib */; };
-		5591B30D0FD625F9000BECF8 /* library.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30C0FD625F9000BECF8 /* library.png */; };
-		5591B30F0FD62614000BECF8 /* study.png in Resources */ = {isa = PBXBuildFile; fileRef = 5591B30E0FD62614000BECF8 /* study.png */; };
 		5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5591B4F20FD653BD000BECF8 /* DownloadView.xib */; };
 		5591B5180FD77759000BECF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5591B5170FD77759000BECF8 /* Settings.bundle */; };
+		55B93A63114511F9004B463F /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55B93A62114511F9004B463F /* libFlurry.a */; };
+		55B93A9411453506004B463F /* PlaceholderTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9311453506004B463F /* PlaceholderTextView.m */; };
+		55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9911454CF7004B463F /* ManualTableViewController.m */; };
+		55B93A9C11454CF7004B463F /* ManualTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55B93A9A11454CF7004B463F /* ManualTableView.xib */; };
+		55B93B061145690C004B463F /* ManualPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93B041145690C004B463F /* ManualPageViewController.m */; };
+		55B93B071145690C004B463F /* ManualPageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55B93B051145690C004B463F /* ManualPageView.xib */; };
 		55CD3CB30FDC1AC100C4ECB2 /* SideView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */; };
 		55CD3CCB0FDC32CA00C4ECB2 /* SideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */; };
 		55CD3EE90FDC593A00C4ECB2 /* CardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CD3EE80FDC593A00C4ECB2 /* CardViewController.m */; };
@@ -74,7 +73,6 @@
 		55CF27BE0FDA9BAF00B16DFB /* LibraryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55CF27BD0FDA9BAF00B16DFB /* LibraryCell.xib */; };
 		55CFB05A10814B03002FF68D /* VariableStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 55CFB05910814B03002FF68D /* VariableStore.m */; };
 		55D0F9B80FDBCF1300DFB132 /* BackArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D0F9B70FDBCF1300DFB132 /* BackArrow.png */; };
-		55D0F9BB0FDBD0EA00DFB132 /* MagnifyingGlass.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D0F9BA0FDBD0EA00DFB132 /* MagnifyingGlass.png */; };
 		55D3F8DE1112D412003E1688 /* CongratulationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */; };
 		55D3F8DF1112D412003E1688 /* CongratulationsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55D3F8DD1112D412003E1688 /* CongratulationsView.xib */; };
 		55DAC7FA107EA54200D0C621 /* DeckDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55DAC7F9107EA54200D0C621 /* DeckDetailViewController.m */; };
@@ -118,8 +116,6 @@
 		550E441C10FAE216004B47F4 /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = usr/lib/libz.1.2.3.dylib; sourceTree = SDKROOT; };
 		550E449410FB2E14004B47F4 /* DeckDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDownloader.h; sourceTree = "<group>"; };
 		550E449510FB2E14004B47F4 /* DeckDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDownloader.m; sourceTree = "<group>"; };
-		550F4FCD107D7C10002A6662 /* NarrowGreenTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NarrowGreenTick.png; sourceTree = "<group>"; };
-		550F4FCE107D7C10002A6662 /* NarrowWhiteTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NarrowWhiteTick.png; sourceTree = "<group>"; };
 		5510E22B107D1C940074B376 /* FeedbackView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeedbackView.xib; sourceTree = "<group>"; };
 		5510E22C107D1C940074B376 /* ReviseView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ReviseView.xib; sourceTree = "<group>"; };
 		5515E1A0107C259D002E4339 /* FeedbackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedbackViewController.h; sourceTree = "<group>"; };
@@ -161,10 +157,7 @@
 		5576B11310FC8A1D00306F4C /* DDXMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDXMLDocument.h; sourceTree = "<group>"; };
 		5576B11410FC8A1D00306F4C /* DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDXML.h; sourceTree = "<group>"; };
 		557C051510801E9200D1F2F2 /* RedCross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RedCross.png; sourceTree = "<group>"; };
-		557C051610801E9200D1F2F2 /* WhiteCross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WhiteCross.png; sourceTree = "<group>"; };
-		557C051710801E9200D1F2F2 /* WhiteRedCross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WhiteRedCross.png; sourceTree = "<group>"; };
 		557C05B9108035D000D1F2F2 /* GreenTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenTick.png; sourceTree = "<group>"; };
-		557C05BA108035D100D1F2F2 /* WhiteGreenTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WhiteGreenTick.png; sourceTree = "<group>"; };
 		557C05BB108035D100D1F2F2 /* WhiteTick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WhiteTick.png; sourceTree = "<group>"; };
 		557C060310804EA200D1F2F2 /* InlineScoreView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InlineScoreView.xib; path = Classes/InlineScoreView.xib; sourceTree = "<group>"; };
 		557C060910804EBF00D1F2F2 /* InlineScoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InlineScoreViewController.h; sourceTree = "<group>"; };
@@ -172,10 +165,18 @@
 		55814A9110FE483D00B2A625 /* ProgressViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressViewController.h; sourceTree = "<group>"; };
 		55814A9210FE483D00B2A625 /* ProgressViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressViewController.m; sourceTree = "<group>"; };
 		55814A9310FE483D00B2A625 /* ProgressView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressView.xib; path = Classes/ProgressView.xib; sourceTree = "<group>"; };
-		5591B30C0FD625F9000BECF8 /* library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = library.png; sourceTree = "<group>"; };
-		5591B30E0FD62614000BECF8 /* study.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = study.png; sourceTree = "<group>"; };
 		5591B4F20FD653BD000BECF8 /* DownloadView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadView.xib; sourceTree = "<group>"; };
 		5591B5170FD77759000BECF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		55B93A61114511F9004B463F /* FlurryAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlurryAPI.h; sourceTree = "<group>"; };
+		55B93A62114511F9004B463F /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
+		55B93A9211453506004B463F /* PlaceholderTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaceholderTextView.h; sourceTree = "<group>"; };
+		55B93A9311453506004B463F /* PlaceholderTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaceholderTextView.m; sourceTree = "<group>"; };
+		55B93A9811454CF7004B463F /* ManualTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualTableViewController.h; sourceTree = "<group>"; };
+		55B93A9911454CF7004B463F /* ManualTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManualTableViewController.m; sourceTree = "<group>"; };
+		55B93A9A11454CF7004B463F /* ManualTableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ManualTableView.xib; path = Classes/ManualTableView.xib; sourceTree = "<group>"; };
+		55B93B031145690C004B463F /* ManualPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualPageViewController.h; sourceTree = "<group>"; };
+		55B93B041145690C004B463F /* ManualPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManualPageViewController.m; sourceTree = "<group>"; };
+		55B93B051145690C004B463F /* ManualPageView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ManualPageView.xib; path = Classes/ManualPageView.xib; sourceTree = "<group>"; };
 		55CD3CB20FDC1AC100C4ECB2 /* SideView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideView.xib; sourceTree = "<group>"; };
 		55CD3CC90FDC32CA00C4ECB2 /* SideViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SideViewController.h; sourceTree = "<group>"; };
 		55CD3CCA0FDC32CA00C4ECB2 /* SideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SideViewController.m; sourceTree = "<group>"; };
@@ -193,7 +194,6 @@
 		55CFB05810814B03002FF68D /* VariableStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VariableStore.h; sourceTree = "<group>"; };
 		55CFB05910814B03002FF68D /* VariableStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VariableStore.m; sourceTree = "<group>"; };
 		55D0F9B70FDBCF1300DFB132 /* BackArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BackArrow.png; sourceTree = "<group>"; };
-		55D0F9BA0FDBD0EA00DFB132 /* MagnifyingGlass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MagnifyingGlass.png; sourceTree = "<group>"; };
 		55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CongratulationsViewController.m; sourceTree = "<group>"; };
 		55D3F8DC1112D412003E1688 /* CongratulationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CongratulationsViewController.h; sourceTree = "<group>"; };
 		55D3F8DD1112D412003E1688 /* CongratulationsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CongratulationsView.xib; path = Classes/CongratulationsView.xib; sourceTree = "<group>"; };
@@ -221,6 +221,7 @@
 				550E441910FAE1F3004B47F4 /* CFNetwork.framework in Frameworks */,
 				550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */,
 				550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */,
+				55B93A63114511F9004B463F /* libFlurry.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,6 +298,7 @@
 		550E43F310FAE0C3004B47F4 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				55B93A60114511F9004B463F /* FlurryLib */,
 				5576B0DB10FC89E200306F4C /* KissXML */,
 				550E440B10FAE192004B47F4 /* Reachability */,
 				550E440A10FAE188004B47F4 /* ASIHTTP */,
@@ -354,13 +356,17 @@
 			name = Study;
 			sourceTree = "<group>";
 		};
-		5510E234107D2DAA0074B376 /* Feedback */ = {
+		5510E234107D2DAA0074B376 /* Manual */ = {
 			isa = PBXGroup;
 			children = (
 				5515E1A0107C259D002E4339 /* FeedbackViewController.h */,
 				5515E1A1107C259D002E4339 /* FeedbackViewController.m */,
+				55B93A9811454CF7004B463F /* ManualTableViewController.h */,
+				55B93A9911454CF7004B463F /* ManualTableViewController.m */,
+				55B93B031145690C004B463F /* ManualPageViewController.h */,
+				55B93B041145690C004B463F /* ManualPageViewController.m */,
 			);
-			name = Feedback;
+			name = Manual;
 			sourceTree = "<group>";
 		};
 		5510E235107D2DB40074B376 /* Revise */ = {
@@ -427,6 +433,8 @@
 				552BB677110FBA4000793DE3 /* MindEggUtilities.m */,
 				55CD79E11111627B006A65C4 /* MultipartLabel.h */,
 				55CD79E21111627B006A65C4 /* MultipartLabel.m */,
+				55B93A9211453506004B463F /* PlaceholderTextView.h */,
+				55B93A9311453506004B463F /* PlaceholderTextView.m */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -438,7 +446,7 @@
 				5510E237107D2DD70074B376 /* Library */,
 				5510E233107D2D530074B376 /* Study */,
 				5510E235107D2DB40074B376 /* Revise */,
-				5510E234107D2DAA0074B376 /* Feedback */,
+				5510E234107D2DAA0074B376 /* Manual */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -446,6 +454,8 @@
 		556138390FAEDF1C00365DF1 /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				55B93B051145690C004B463F /* ManualPageView.xib */,
+				55B93A9A11454CF7004B463F /* ManualTableView.xib */,
 				55F79D18113E520000375C47 /* ContinueTestView.xib */,
 				55D3F8DD1112D412003E1688 /* CongratulationsView.xib */,
 				55814A9310FE483D00B2A625 /* ProgressView.xib */,
@@ -484,23 +494,24 @@
 			name = KissXML;
 			sourceTree = "<group>";
 		};
+		55B93A60114511F9004B463F /* FlurryLib */ = {
+			isa = PBXGroup;
+			children = (
+				55B93A61114511F9004B463F /* FlurryAPI.h */,
+				55B93A62114511F9004B463F /* libFlurry.a */,
+			);
+			path = FlurryLib;
+			sourceTree = "<group>";
+		};
 		55DB728E0FD9375300B1A115 /* Images */ = {
 			isa = PBXGroup;
 			children = (
 				5565198910D1ADEC00DD8110 /* NoContent.png */,
-				550F4FCD107D7C10002A6662 /* NarrowGreenTick.png */,
-				550F4FCE107D7C10002A6662 /* NarrowWhiteTick.png */,
 				557C05B9108035D000D1F2F2 /* GreenTick.png */,
-				557C05BA108035D100D1F2F2 /* WhiteGreenTick.png */,
 				557C05BB108035D100D1F2F2 /* WhiteTick.png */,
 				557C051510801E9200D1F2F2 /* RedCross.png */,
-				557C051610801E9200D1F2F2 /* WhiteCross.png */,
-				557C051710801E9200D1F2F2 /* WhiteRedCross.png */,
 				55E97CEA0FAD03C900E6BD7C /* MindEgg Snowflake.png */,
-				5591B30C0FD625F9000BECF8 /* library.png */,
-				5591B30E0FD62614000BECF8 /* study.png */,
 				55D0F9B70FDBCF1300DFB132 /* BackArrow.png */,
-				55D0F9BA0FDBD0EA00DFB132 /* MagnifyingGlass.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -560,26 +571,18 @@
 				55E97CEB0FAD03C900E6BD7C /* MindEgg Snowflake.png in Resources */,
 				5561383B0FAEDF5800365DF1 /* MyDecksView.xib in Resources */,
 				556138880FAEE73A00365DF1 /* MainWindow.xib in Resources */,
-				5591B30D0FD625F9000BECF8 /* library.png in Resources */,
-				5591B30F0FD62614000BECF8 /* study.png in Resources */,
 				5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */,
 				5591B5180FD77759000BECF8 /* Settings.bundle in Resources */,
 				55DB727C0FD9214200B1A115 /* InternalSettings.plist in Resources */,
 				55CF27BE0FDA9BAF00B16DFB /* LibraryCell.xib in Resources */,
 				55D0F9B80FDBCF1300DFB132 /* BackArrow.png in Resources */,
-				55D0F9BB0FDBD0EA00DFB132 /* MagnifyingGlass.png in Resources */,
 				55CD3CB30FDC1AC100C4ECB2 /* SideView.xib in Resources */,
 				5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */,
 				5510E22E107D1C940074B376 /* ReviseView.xib in Resources */,
-				550F4FCF107D7C10002A6662 /* NarrowGreenTick.png in Resources */,
-				550F4FD0107D7C10002A6662 /* NarrowWhiteTick.png in Resources */,
 				5522BE8B107D9619006322F2 /* ShuffleDuck.sqlite in Resources */,
 				55DAC7FE107EA56A00D0C621 /* DeckDetailView.xib in Resources */,
 				557C051810801E9200D1F2F2 /* RedCross.png in Resources */,
-				557C051910801E9200D1F2F2 /* WhiteCross.png in Resources */,
-				557C051A10801E9200D1F2F2 /* WhiteRedCross.png in Resources */,
 				557C05BC108035D100D1F2F2 /* GreenTick.png in Resources */,
-				557C05BD108035D100D1F2F2 /* WhiteGreenTick.png in Resources */,
 				557C05BE108035D100D1F2F2 /* WhiteTick.png in Resources */,
 				557C060410804EA200D1F2F2 /* InlineScoreView.xib in Resources */,
 				555D1ADB108409AF0041DB21 /* TableFooterView.xib in Resources */,
@@ -588,6 +591,8 @@
 				55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */,
 				55D3F8DF1112D412003E1688 /* CongratulationsView.xib in Resources */,
 				55F79D1A113E520000375C47 /* ContinueTestView.xib in Resources */,
+				55B93A9C11454CF7004B463F /* ManualTableView.xib in Resources */,
+				55B93B071145690C004B463F /* ManualPageView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -636,6 +641,9 @@
 				55CE1BC9111701A800530CC4 /* Synchroniser.m in Sources */,
 				55CE1C1D1117217900530CC4 /* DeckDownloaderQueueItem.m in Sources */,
 				55F79D19113E520000375C47 /* ContinueTestViewController.m in Sources */,
+				55B93A9411453506004B463F /* PlaceholderTextView.m in Sources */,
+				55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */,
+				55B93B061145690C004B463F /* ManualPageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -652,6 +660,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MindEgg_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Classes/FlurryLib\"",
+				);
 				PRODUCT_NAME = MindEgg;
 			};
 			name = Debug;
@@ -664,6 +676,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MindEgg_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Classes/FlurryLib\"",
+				);
 				PRODUCT_NAME = MindEgg;
 			};
 			name = Release;

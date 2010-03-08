@@ -17,6 +17,6 @@
 
 - (NSString *)findDatabase;
 - (void)connectToDB:(NSString *)dbPath;
-- (void) processUserDefaults;
+- (void)processUserDefaults;
 
 @end

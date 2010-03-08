@@ -13,6 +13,8 @@ static BOOL showing = NO;
 
 @implementation ProgressViewController
 
+@synthesize activityIndicatorView;
+
 + (ProgressViewController *)sharedInstance
 {
     // the instance of this class is stored here
@@ -26,6 +28,7 @@ static BOOL showing = NO;
     // return the instance of this class
     return myInstance;
 }
+
 
 + (void)startShowingProgress
 {
@@ -57,16 +60,14 @@ static BOOL showing = NO;
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	//[activityIndicator startAnimating];
+	[activityIndicatorView startAnimating];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
-	//[activityIndicator stopAnimating];
+	[activityIndicatorView stopAnimating];
 }
-
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -80,6 +81,7 @@ static BOOL showing = NO;
 
 - (void)dealloc {
     [super dealloc];
+	[activityIndicatorView release];
 }
 
 

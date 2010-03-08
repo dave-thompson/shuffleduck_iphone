@@ -7,10 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "PlaceholderTextView.h"
 
 @interface FeedbackViewController : UIViewController {
 
+	IBOutlet PlaceholderTextView *messageTextView;
+	IBOutlet PlaceholderTextView *emailTextView;
 }
+
++ (FeedbackViewController *)sharedInstance;
 
 @end

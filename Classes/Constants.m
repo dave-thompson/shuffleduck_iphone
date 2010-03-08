@@ -14,9 +14,9 @@
 @implementation Constants
 
 const NSString* XML_ERROR_TAG = @"error";
-const NSString* ERROR_DIALOG_TITLE = @"Oh no.";
+const NSString* ERROR_DIALOG_TITLE = @"Sorry";
 
-const NSString* CONTEXT_URL = @"http://localhost:3000";
-//const NSString* CONTEXT_URL = @"http://shuffleduck.heroku.com";
+//const NSString* CONTEXT_URL = @"http://localhost:3000";
+const NSString* CONTEXT_URL = @"http://shuffleduck.heroku.com";
 
 @end

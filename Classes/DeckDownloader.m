@@ -113,7 +113,7 @@ sqlite3_stmt *addStmt;
 	{
 		locked = YES;
 		[ProgressViewController startShowingProgress];
-		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuttleDuck"];
+		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuffleDuck"];
 		
 		// retrieve deck metadata
 		[self sendMetadataRequestForUserVisibleDeckID:userVisibleID];
