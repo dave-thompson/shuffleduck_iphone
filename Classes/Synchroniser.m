@@ -38,12 +38,7 @@ static Synchroniser *sharedSynchroniser = nil;
 }
 
 -(void)synchronise
-{
-	// show busy & disable sync button
-	[ProgressViewController startShowingProgress];
-	[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuffleDuck"];
-	[MyDecksViewController sharedInstance].syncButton.enabled = NO;
-	
+{	
 	// setup URL
 	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
@@ -51,6 +46,11 @@ static Synchroniser *sharedSynchroniser = nil;
 	NSURLCredential *authenticationCredentials = [ASIHTTPRequest savedCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
 	if (authenticationCredentials) // if credentials exist, request the deck list
 	{
+		// show busy & disable sync button
+		[ProgressViewController startShowingProgress];
+		[[MyDecksViewController sharedInstance] showMessage:@"Connecting to ShuffleDuck"];
+		[MyDecksViewController sharedInstance].syncButton.enabled = NO;
+		
 		// send request
 		[request setUsername:[authenticationCredentials user]];
 		[request setPassword:[authenticationCredentials password]];
@@ -80,7 +80,7 @@ static Synchroniser *sharedSynchroniser = nil;
 	if (doc == nil)	{[doc release];	return;}
 	
 	DDXMLElement *rootElement = [doc rootElement];
-	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error...
+	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if server returns error
 	{
 		// remove busy indicator
 		[ProgressViewController stopShowingProgress];		

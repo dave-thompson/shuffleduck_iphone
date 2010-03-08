@@ -205,7 +205,7 @@ sqlite3_stmt *addStmt;
 	if (doc == nil) {[doc release]; return;}
 	
 	DDXMLElement *rootElement = [doc rootElement];
-	if ([XML_ERROR_TAG isEqualToString:[rootElement name]]) // if the server returned an error, abort and tell the user
+	if ([XML_ERROR_TAG isEqualToString:[rootElement name]])
 	{
 		// tell the user
 		NSString *errorDescription = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
