@@ -265,6 +265,7 @@ InlineScoreViewController *inlineScoreViewController;
 		}
 	}
 	[self navigationController].viewControllers = newVCArray;
+	[newVCArray release];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

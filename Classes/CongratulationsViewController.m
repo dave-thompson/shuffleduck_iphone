@@ -80,7 +80,7 @@ static CongratulationsViewController *sharedCongratulationsViewController = nil;
 		}
 	}
 	[self navigationController].viewControllers = newVCArray;
-	 
+	[newVCArray release];
 }
 
 -(void)viewDidDisappear:(BOOL)animated

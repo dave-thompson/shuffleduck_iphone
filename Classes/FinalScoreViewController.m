@@ -99,7 +99,7 @@ static FinalScoreViewController *sharedFinalScoreViewController = nil;
 		}
 	}
 	[self navigationController].viewControllers = newVCArray;
-	 
+	[newVCArray release];
 }
 
 -(void)viewDidDisappear:(BOOL)animated

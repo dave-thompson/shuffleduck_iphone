@@ -322,10 +322,12 @@ sqlite3_stmt *addStmt;
 	[fullDeckRequest setDelegate:self];
 	[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];
 	[fullDeckRequest setDidFailSelector:@selector(fullDeckRequestFailed:)];
-	fullDeckRequest.userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-								[NSString stringWithFormat:@"%d", aUserVisibleID], @"userVisibleID",
-								nil];
+	NSDictionary *userVisibleIDs = [[NSDictionary alloc] initWithObjectsAndKeys:
+									[NSString stringWithFormat:@"%d", aUserVisibleID], @"userVisibleID",
+									nil];
+	fullDeckRequest.userInfo = userVisibleIDs;
 	[fullDeckRequest startAsynchronous];
+	[userVisibleIDs release];
 }
 
 - (void) fullDeckRequestFinished:(ASIHTTPRequest *)request
@@ -375,14 +377,11 @@ sqlite3_stmt *addStmt;
     [parser setShouldReportNamespacePrefixes:NO]; //
     [parser setShouldResolveExternalEntities:NO]; // We just want data, no other stuff
 	
-	// NSLog(@"About to parse.");
     [parser parse]; // Parse the data
-	
-	
+		
     if ([parser parserError])
 	{
 		NSLog([parser parserError].localizedDescription);
-		
 		// finish up
 		fullDeckFailureFlag = YES; // log failure so that user may be notified of it after end of current sync / download
 		[parser release];
@@ -660,7 +659,7 @@ sqlite3_stmt *addStmt;
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
-	currentText = [currentText stringByAppendingString:string];	
+	currentText = [currentText stringByAppendingString:string];
 }
 
 #pragma mark -
@@ -712,7 +711,8 @@ sqlite3_stmt *addStmt;
 		else // otherwise, download the metadata first and then go on to complete it
 		{
 			[self downloadDeckID:[nextItem userVisibleID]];
-		}		
+		}
+		[nextItem release];
 	}
 	else // if there are no downloads queued, then any sync that was in progress has finished
 	{

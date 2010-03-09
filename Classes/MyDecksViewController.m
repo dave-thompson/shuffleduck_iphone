@@ -10,7 +10,6 @@
 #import "DownloadViewController.h"
 #import "DeckDetails.h"
 #import "LibraryCell.h"
-#import "ReviseViewController.h"
 #import "SideViewController.h"
 #import "DDXML.h"
 #import "VariableStore.h"
