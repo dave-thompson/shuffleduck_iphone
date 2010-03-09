@@ -155,7 +155,7 @@
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
-						<string key="IBUIText">Elusive</string>
+						<string key="IBUIText">Unknown</string>
 						<object class="NSFont" key="IBUIFont" id="645482571">
 							<string key="NSName">Helvetica-Bold</string>
 							<double key="NSSize">2.400000e+01</double>
@@ -234,7 +234,7 @@
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
-						<string key="IBUIText">Correct</string>
+						<string key="IBUIText">Known</string>
 						<reference key="IBUIFont" ref="645482571"/>
 						<reference key="IBUITextColor" ref="568502470"/>
 						<object class="NSColor" key="IBUIHighlightedColor">

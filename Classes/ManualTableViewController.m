@@ -10,7 +10,6 @@
 #import "FeedbackViewController.h"
 #import "ManualPageViewController.h"
 
-
 @implementation ManualTableViewController
 
 - (void)viewDidLoad {
@@ -107,9 +106,14 @@
 	}
 	else
 	{
+		// get manual page file path
+		NSString *fileName = [[selectedOption stringByReplacingOccurrencesOfString:@" " withString:@""] stringByAppendingString:@".html"];
+		NSString *filePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:fileName];
+		
 		// push the appropriate manual page
 		ManualPageViewController *manualPageViewController = [[ManualPageViewController alloc] initWithNibName:@"ManualPageView" bundle:nil];
-		manualPageViewController.urlString = @"http://help.atebits.com/tweetie-iphone/";
+		manualPageViewController.filePath = filePath;
+		manualPageViewController.title = selectedOption;
 		[self.navigationController pushViewController:manualPageViewController animated:YES];
 		[manualPageViewController release];
 		manualPageViewController = nil;

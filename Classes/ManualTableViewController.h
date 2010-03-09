@@ -8,11 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface ManualTableViewController : UITableViewController {
 
 	NSMutableArray *listOfItems;
-	
 }
 
 @end

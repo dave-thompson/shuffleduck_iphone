@@ -28,7 +28,6 @@
 		5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22B107D1C940074B376 /* FeedbackView.xib */; };
 		5510E22E107D1C940074B376 /* ReviseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22C107D1C940074B376 /* ReviseView.xib */; };
 		5515E1A4107C259D002E4339 /* FeedbackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A1107C259D002E4339 /* FeedbackViewController.m */; };
-		5515E1A5107C259D002E4339 /* ReviseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A3107C259D002E4339 /* ReviseViewController.m */; };
 		551C75C0110E3EC90031530F /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 551C75BF110E3EC90031530F /* Constants.m */; };
 		5522BE8B107D9619006322F2 /* ShuffleDuck.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5522BE8A107D9619006322F2 /* ShuffleDuck.sqlite */; };
 		552694070FDA6943003CECEF /* DeckDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = 552694060FDA6943003CECEF /* DeckDetails.m */; };
@@ -57,6 +56,10 @@
 		55814A9510FE483D00B2A625 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55814A9310FE483D00B2A625 /* ProgressView.xib */; };
 		5591B4F30FD653BD000BECF8 /* DownloadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5591B4F20FD653BD000BECF8 /* DownloadView.xib */; };
 		5591B5180FD77759000BECF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5591B5170FD77759000BECF8 /* Settings.bundle */; };
+		55A404A01146C8A00040CFC8 /* Test.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A4049F1146C8A00040CFC8 /* Test.html */; };
+		55A404A21146C8AF0040CFC8 /* DeckSummaryScreen.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */; };
+		55A404A41146C8BC0040CFC8 /* Learn.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A31146C8BC0040CFC8 /* Learn.html */; };
+		55A404A61146C8C30040CFC8 /* Reference.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A51146C8C30040CFC8 /* Reference.html */; };
 		55B93A63114511F9004B463F /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55B93A62114511F9004B463F /* libFlurry.a */; };
 		55B93A9411453506004B463F /* PlaceholderTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9311453506004B463F /* PlaceholderTextView.m */; };
 		55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9911454CF7004B463F /* ManualTableViewController.m */; };
@@ -75,6 +78,14 @@
 		55D0F9B80FDBCF1300DFB132 /* BackArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D0F9B70FDBCF1300DFB132 /* BackArrow.png */; };
 		55D3F8DE1112D412003E1688 /* CongratulationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */; };
 		55D3F8DF1112D412003E1688 /* CongratulationsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55D3F8DD1112D412003E1688 /* CongratulationsView.xib */; };
+		55D7CAEA1146B1F700E9DA57 /* 3_Learn.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE41146B1F700E9DA57 /* 3_Learn.png */; };
+		55D7CAEB1146B1F700E9DA57 /* 4_Test.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE51146B1F700E9DA57 /* 4_Test.png */; };
+		55D7CAEC1146B1F700E9DA57 /* 2_DeckDetails.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE61146B1F700E9DA57 /* 2_DeckDetails.png */; };
+		55D7CAED1146B1F700E9DA57 /* 5_Score.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE71146B1F700E9DA57 /* 5_Score.png */; };
+		55D7CAEE1146B1F700E9DA57 /* 6_Reference.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE81146B1F700E9DA57 /* 6_Reference.png */; };
+		55D7CAEF1146B1F700E9DA57 /* 1_Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAE91146B1F700E9DA57 /* 1_Library.png */; };
+		55D7CAF11146B26B00E9DA57 /* LibraryScreen.html in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAF01146B26B00E9DA57 /* LibraryScreen.html */; };
+		55D7CAF31146B2BF00E9DA57 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 55D7CAF21146B2BF00E9DA57 /* background.png */; };
 		55DAC7FA107EA54200D0C621 /* DeckDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55DAC7F9107EA54200D0C621 /* DeckDetailViewController.m */; };
 		55DAC7FE107EA56A00D0C621 /* DeckDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55DAC7FD107EA56A00D0C621 /* DeckDetailView.xib */; };
 		55DB727C0FD9214200B1A115 /* InternalSettings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55DB727B0FD9214200B1A115 /* InternalSettings.plist */; };
@@ -120,8 +131,6 @@
 		5510E22C107D1C940074B376 /* ReviseView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ReviseView.xib; sourceTree = "<group>"; };
 		5515E1A0107C259D002E4339 /* FeedbackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedbackViewController.h; sourceTree = "<group>"; };
 		5515E1A1107C259D002E4339 /* FeedbackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedbackViewController.m; sourceTree = "<group>"; };
-		5515E1A2107C259D002E4339 /* ReviseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviseViewController.h; sourceTree = "<group>"; };
-		5515E1A3107C259D002E4339 /* ReviseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviseViewController.m; sourceTree = "<group>"; };
 		551C75BE110E3EC90031530F /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		551C75BF110E3EC90031530F /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		5522BE8A107D9619006322F2 /* ShuffleDuck.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = ShuffleDuck.sqlite; sourceTree = "<group>"; };
@@ -167,6 +176,10 @@
 		55814A9310FE483D00B2A625 /* ProgressView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressView.xib; path = Classes/ProgressView.xib; sourceTree = "<group>"; };
 		5591B4F20FD653BD000BECF8 /* DownloadView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadView.xib; sourceTree = "<group>"; };
 		5591B5170FD77759000BECF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		55A4049F1146C8A00040CFC8 /* Test.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Test.html; sourceTree = "<group>"; };
+		55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = DeckSummaryScreen.html; sourceTree = "<group>"; };
+		55A404A31146C8BC0040CFC8 /* Learn.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Learn.html; sourceTree = "<group>"; };
+		55A404A51146C8C30040CFC8 /* Reference.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Reference.html; sourceTree = "<group>"; };
 		55B93A61114511F9004B463F /* FlurryAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlurryAPI.h; sourceTree = "<group>"; };
 		55B93A62114511F9004B463F /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
 		55B93A9211453506004B463F /* PlaceholderTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaceholderTextView.h; sourceTree = "<group>"; };
@@ -197,6 +210,14 @@
 		55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CongratulationsViewController.m; sourceTree = "<group>"; };
 		55D3F8DC1112D412003E1688 /* CongratulationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CongratulationsViewController.h; sourceTree = "<group>"; };
 		55D3F8DD1112D412003E1688 /* CongratulationsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CongratulationsView.xib; path = Classes/CongratulationsView.xib; sourceTree = "<group>"; };
+		55D7CAE41146B1F700E9DA57 /* 3_Learn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3_Learn.png; sourceTree = "<group>"; };
+		55D7CAE51146B1F700E9DA57 /* 4_Test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4_Test.png; sourceTree = "<group>"; };
+		55D7CAE61146B1F700E9DA57 /* 2_DeckDetails.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2_DeckDetails.png; sourceTree = "<group>"; };
+		55D7CAE71146B1F700E9DA57 /* 5_Score.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5_Score.png; sourceTree = "<group>"; };
+		55D7CAE81146B1F700E9DA57 /* 6_Reference.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 6_Reference.png; sourceTree = "<group>"; };
+		55D7CAE91146B1F700E9DA57 /* 1_Library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1_Library.png; sourceTree = "<group>"; };
+		55D7CAF01146B26B00E9DA57 /* LibraryScreen.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = LibraryScreen.html; sourceTree = "<group>"; };
+		55D7CAF21146B2BF00E9DA57 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		55DAC7F8107EA54200D0C621 /* DeckDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDetailViewController.h; sourceTree = "<group>"; };
 		55DAC7F9107EA54200D0C621 /* DeckDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDetailViewController.m; sourceTree = "<group>"; };
 		55DAC7FD107EA56A00D0C621 /* DeckDetailView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeckDetailView.xib; sourceTree = "<group>"; };
@@ -276,6 +297,7 @@
 			isa = PBXGroup;
 			children = (
 				5522BE8A107D9619006322F2 /* ShuffleDuck.sqlite */,
+				55D7CB5B1146C7B400E9DA57 /* Manual Pages */,
 				556138390FAEDF1C00365DF1 /* XIBs */,
 				55DB728E0FD9375300B1A115 /* Images */,
 				8D1107310486CEB800E47090 /* Info.plist */,
@@ -369,15 +391,6 @@
 			name = Manual;
 			sourceTree = "<group>";
 		};
-		5510E235107D2DB40074B376 /* Revise */ = {
-			isa = PBXGroup;
-			children = (
-				5515E1A2107C259D002E4339 /* ReviseViewController.h */,
-				5515E1A3107C259D002E4339 /* ReviseViewController.m */,
-			);
-			name = Revise;
-			sourceTree = "<group>";
-		};
 		5510E236107D2DC30074B376 /* Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -445,7 +458,6 @@
 				55DB72D30FD93E8700B1A115 /* Application */,
 				5510E237107D2DD70074B376 /* Library */,
 				5510E233107D2D530074B376 /* Study */,
-				5510E235107D2DB40074B376 /* Revise */,
 				5510E234107D2DAA0074B376 /* Manual */,
 			);
 			name = Controllers;
@@ -501,6 +513,33 @@
 				55B93A62114511F9004B463F /* libFlurry.a */,
 			);
 			path = FlurryLib;
+			sourceTree = "<group>";
+		};
+		55D7CB5A1146C7A500E9DA57 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				55D7CAF21146B2BF00E9DA57 /* background.png */,
+				55D7CAE91146B1F700E9DA57 /* 1_Library.png */,
+				55D7CAE61146B1F700E9DA57 /* 2_DeckDetails.png */,
+				55D7CAE41146B1F700E9DA57 /* 3_Learn.png */,
+				55D7CAE51146B1F700E9DA57 /* 4_Test.png */,
+				55D7CAE71146B1F700E9DA57 /* 5_Score.png */,
+				55D7CAE81146B1F700E9DA57 /* 6_Reference.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+		55D7CB5B1146C7B400E9DA57 /* Manual Pages */ = {
+			isa = PBXGroup;
+			children = (
+				55D7CAF01146B26B00E9DA57 /* LibraryScreen.html */,
+				55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */,
+				55A404A31146C8BC0040CFC8 /* Learn.html */,
+				55A4049F1146C8A00040CFC8 /* Test.html */,
+				55A404A51146C8C30040CFC8 /* Reference.html */,
+				55D7CB5A1146C7A500E9DA57 /* Images */,
+			);
+			name = "Manual Pages";
 			sourceTree = "<group>";
 		};
 		55DB728E0FD9375300B1A115 /* Images */ = {
@@ -593,6 +632,18 @@
 				55F79D1A113E520000375C47 /* ContinueTestView.xib in Resources */,
 				55B93A9C11454CF7004B463F /* ManualTableView.xib in Resources */,
 				55B93B071145690C004B463F /* ManualPageView.xib in Resources */,
+				55D7CAEA1146B1F700E9DA57 /* 3_Learn.png in Resources */,
+				55D7CAEB1146B1F700E9DA57 /* 4_Test.png in Resources */,
+				55D7CAEC1146B1F700E9DA57 /* 2_DeckDetails.png in Resources */,
+				55D7CAED1146B1F700E9DA57 /* 5_Score.png in Resources */,
+				55D7CAEE1146B1F700E9DA57 /* 6_Reference.png in Resources */,
+				55D7CAEF1146B1F700E9DA57 /* 1_Library.png in Resources */,
+				55D7CAF11146B26B00E9DA57 /* LibraryScreen.html in Resources */,
+				55D7CAF31146B2BF00E9DA57 /* background.png in Resources */,
+				55A404A01146C8A00040CFC8 /* Test.html in Resources */,
+				55A404A21146C8AF0040CFC8 /* DeckSummaryScreen.html in Resources */,
+				55A404A41146C8BC0040CFC8 /* Learn.html in Resources */,
+				55A404A61146C8C30040CFC8 /* Reference.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,7 +665,6 @@
 				55CD3EE90FDC593A00C4ECB2 /* CardViewController.m in Sources */,
 				553A8E101010F59A00496BE5 /* Deck.m in Sources */,
 				5515E1A4107C259D002E4339 /* FeedbackViewController.m in Sources */,
-				5515E1A5107C259D002E4339 /* ReviseViewController.m in Sources */,
 				55DAC7FA107EA54200D0C621 /* DeckDetailViewController.m in Sources */,
 				557C060B10804EBF00D1F2F2 /* InlineScoreViewController.m in Sources */,
 				55CFB05A10814B03002FF68D /* VariableStore.m in Sources */,

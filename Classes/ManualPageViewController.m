@@ -11,20 +11,13 @@
 
 @implementation ManualPageViewController
 
-@synthesize webView, urlString;
-
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
-    [super viewDidLoad];
-}
-*/
+@synthesize webView, filePath;
 
 -(void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
 	
-	NSURL *url = [NSURL URLWithString:urlString];
+	NSURL *url = [NSURL fileURLWithPath:filePath];
 	NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
 	[webView loadRequest:requestObj];
 }
@@ -45,7 +38,7 @@
 - (void)dealloc {
     [super dealloc];
 	[webView release];
-	[urlString release];
+	[filePath release];
 }
 
 

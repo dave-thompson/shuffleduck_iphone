@@ -8,17 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface ManualPageViewController : UIViewController {
 
 	IBOutlet UIWebView *webView;
 
-	NSString *urlString;
+	NSString *filePath;
 
 	
 }
 
 @property (nonatomic, retain) UIWebView *webView;
-@property (nonatomic, copy) NSString *urlString;
+@property (nonatomic, copy) NSString *filePath;
 
 @end

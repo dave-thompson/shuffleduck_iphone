@@ -11,7 +11,6 @@
 #import "MyDecksViewController.h"
 #import "DownloadViewController.h"
 #import "FeedbackViewController.h"
-#import "ReviseViewController.h"
 #import "CongratulationsViewController.h"
 #import "FinalScoreViewController.h"
 #import "Constants.h"
@@ -168,8 +167,6 @@ void uncaughtExceptionHandler(NSException *exception)
 	{
 		NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:dbName];
 		dbExists = [fileManager copyItemAtPath:defaultDBPath toPath:dbPath error:&error];
-		NSLog(defaultDBPath);
-		NSLog(dbPath);
 	}
 	
 	if(!dbExists) // if it still doesn't exist, something went wrong with the copy: log the problem
