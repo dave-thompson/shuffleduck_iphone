@@ -66,7 +66,7 @@ typedef enum {
 		-(int)getOriginalFirstSideID;
 		-(int)getCurrentSideID;
 		-(BOOL)isCurrentCardKnown;
-
+		-(BOOL)doesCurrentCardContainSideID:(int)aSideID;
 
 	// Setters
 		-(void)setCurrentCardKnown:(BOOL)known;

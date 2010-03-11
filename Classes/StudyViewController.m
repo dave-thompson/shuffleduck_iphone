@@ -15,6 +15,7 @@
 #import "FinalScoreViewController.h"
 #import "CongratulationsViewController.h"
 #import "Constants.h"
+#import "TutorialViewController.h"
 
 static StudyViewController *sharedStudyViewController = nil;
 
@@ -238,7 +239,15 @@ InlineScoreViewController *inlineScoreViewController;
 	if ((_studyType == Learn) || (_studyType == Test))
 	{
 		int sideIDToShow = [deck lastSessionsSideIDForStudyType:_studyType];
-		if ((sideIDToShow >= 0) &&(deck.currentSideID != sideIDToShow))
+		// sideIDToShow is either - -1, meaning that there was no previous session for this deck
+		//                     or - a side of a card which is no longer the first card shown
+		//					   or - one of the sides of the shown card
+		
+		// if this deck has been studied in Learn mode before
+		//    and the side that was last revealed in Learn mode is a side from the current card
+		//    and the side that was last revealed in Learn mode is NOT the current side
+		//    .... then show the next side
+		if ((sideIDToShow >= 0) && ([deck doesCurrentCardContainSideID:sideIDToShow]) && (deck.currentSideID != sideIDToShow))
 		{
 			[self showNextSide];
 		}
@@ -259,7 +268,7 @@ InlineScoreViewController *inlineScoreViewController;
 	NSMutableArray *newVCArray = [[NSMutableArray alloc] init];
 	for (UIViewController *vc in oldVCArray)
 	{
-		if ((!(vc == [FinalScoreViewController sharedInstance])) && (!(vc == [CongratulationsViewController sharedInstance])) && (!(vc == [ContinueTestViewController sharedInstance])))
+		if ((!(vc == [FinalScoreViewController sharedInstance])) && (!(vc == [CongratulationsViewController sharedInstance])) && (!(vc == [ContinueTestViewController sharedInstance])) &&  (!(vc == [TutorialViewController sharedInstance])))
 		{
 			[newVCArray addObject:vc];
 		}
@@ -311,7 +320,7 @@ InlineScoreViewController *inlineScoreViewController;
 		cardHidden = NO;
 	}
 	
-	// Top Card: Display the the current side of the current card
+	// Top Card: Display the current side of the current card
 	[topCardViewController loadFrontSideWithDBSideID:deck.currentSideID];
 	[topCardViewController setBackSideBlank];
 	

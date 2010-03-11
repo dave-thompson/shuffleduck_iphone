@@ -10,6 +10,8 @@
 #import "VariableStore.h"
 #import "SideViewController.h"
 #import "ContinueTestViewController.h"
+#import "MindEggUtilities.h"
+#import "TutorialViewController.h"
 
 static DeckDetailViewController *sharedDeckDetailViewController = nil;
 
@@ -62,13 +64,13 @@ SideViewController *miniSideViewController;
 
 -(void)pushStudyViewController:(StudyType)type asPartOfApplicationLoadProcess:(BOOL)fromLoadProcess
 {
-	int questionNumber;
 	// if user just selected to start a test and a test is already in progress, check with the user to see if they want to resume or start a new test
-	if ((!fromLoadProcess) && ((type == Test) && ([deck testIsInProgress]) && ((questionNumber = (deck.numCards - deck.testQuestionsRemaining) + 1) > 1)))
+	if ((!fromLoadProcess) && (type == Test) && ([deck testIsInProgress]) )
 	{
 		// push screen to ask if user wants to resume
 		ContinueTestViewController *continueTestViewController = [ContinueTestViewController sharedInstance];
 		continueTestViewController.deck = deck;
+		int questionNumber = (deck.numCards - deck.testQuestionsRemaining) + 1;
 		[continueTestViewController setScoreString:[NSString stringWithFormat:@"Q%d of %d", questionNumber, deck.numCards]];
 		[self.navigationController pushViewController:continueTestViewController animated:YES];				
 	}
@@ -92,7 +94,21 @@ SideViewController *miniSideViewController;
 		
 		// Push the study view controller onto the navigation stack
 		if (!fromLoadProcess)
-			[self.navigationController pushViewController:studyViewController animated:YES];
+		{
+			int showTutorialScreen = 0;
+			if (type == Learn)
+				showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_learn FROM ApplicationStatus"];
+			else if (type == Test)
+				showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
+			if (showTutorialScreen == 1) // if tutorial screen should be shown, push it
+			{
+				TutorialViewController *tutorialViewController = [TutorialViewController sharedInstance];
+				tutorialViewController.studyType = type;
+				[self.navigationController pushViewController:tutorialViewController animated:YES];
+			}
+			else // otherwise, just push the study view directly
+				[self.navigationController pushViewController:studyViewController animated:YES];
+		}
 		else
 		{
 			// set up back button (viewDidLoad will not have fired yet)

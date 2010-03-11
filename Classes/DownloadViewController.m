@@ -29,8 +29,6 @@ static DownloadViewController *sharedDownloadViewController = nil;
 }
 
 - (void)viewDidLoad {
-	UIColor *color = [[VariableStore sharedInstance] backgroundColor];
-	super.view.backgroundColor = color;
 	super.title = @"Download";
     [super viewDidLoad];	
 }

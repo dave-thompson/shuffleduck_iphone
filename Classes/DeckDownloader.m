@@ -512,7 +512,7 @@ sqlite3_stmt *addStmt;
 			sqlite3_bind_int(addStmt, 4, y);
 			sqlite3_bind_int(addStmt, 5, width);
 			sqlite3_bind_int(addStmt, 6, height);
-			sqlite3_bind_int(addStmt, 7, 1); // !!!!! TYPE TEMPORARILY HARDCODED TO 1 - TYPE TO LATER BE REMOVED 
+			sqlite3_bind_int(addStmt, 7, 1); // !!!!! hardcoded to 1 (TextBox) - should be updated to save appropriate type, once other types exist
 			
 			if(SQLITE_DONE != sqlite3_step(addStmt))
 			{

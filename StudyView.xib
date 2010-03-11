@@ -140,7 +140,7 @@
 				<reference key="NSSuperview"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">1</int>
-					<bytes key="NSRGB">MC41MjU0NDcwNyAwLjU2Mzk3MTIyIDAuNjU3NjA4NjkAA</bytes>
+					<bytes key="NSRGB">MC4wNjI3NDUxMDIgMC4wNjI3NDUxMDIgMC4wNjI3NDUxMDIAA</bytes>
 				</object>
 			</object>
 		</object>
@@ -321,7 +321,7 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>{{596, 18}, {320, 416}}</string>
+					<string>{{398, 176}, {320, 416}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>

@@ -8,6 +8,8 @@
 
 #import "ContinueTestViewController.h"
 #import "StudyViewController.h"
+#import "TutorialViewController.h"
+#import "MindEggUtilities.h"
 
 static ContinueTestViewController *continueTestViewController = nil;
 
@@ -66,13 +68,22 @@ NSString *scoreString = @"";
 
 -(void)pushStudyViewController
 {
-	// Prepare the study view controller (referencing the new deck object)
+	// Prepare the study view controller
 	StudyViewController *studyViewController = [StudyViewController sharedInstance];
 	studyViewController.deck = deck;
 	[studyViewController setStudyType:Test];
 	
-	// Push the study view controller onto the navigation stack
-	[self.navigationController pushViewController:studyViewController animated:YES];		
+	// push either the study view controller, or the tutorial screen that precedes it
+	int showTutorialScreen = 0;
+	showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
+	if (showTutorialScreen == 1) // if tutorial screen should be shown, push it
+	{
+		TutorialViewController *tutorialViewController = [TutorialViewController sharedInstance];
+		tutorialViewController.studyType = Test;
+		[self.navigationController pushViewController:tutorialViewController animated:YES];
+	}
+	else // otherwise, just push the study view directly
+		[self.navigationController pushViewController:studyViewController animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {

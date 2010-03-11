@@ -316,15 +316,16 @@
 }
 
 -(void)prepareStudySession
-{
+{	
 	// remove any cards from the hand that are already known (a DB trigger updates the positions of the remaining cards)
-	NSString *sqlString = [NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d AND card_id IN (SELECT card_id FROM Card WHERE deck_id = %d AND known = 0)", currentDeckID, currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT id FROM Card WHERE deck_id = %d AND known = 1)", currentDeckID, currentDeckID];
 	[MindEggUtilities runSQLUpdate:sqlString];
 
 	// if there are more cards in the hand than the MAX_NO_CARDS_IN_HAND, truncate the hand
 	int numCardsInHand = [self numCardsInStudySession];
 	int numCardsToRemove = numCardsInHand - MAX_NO_CARDS_IN_HAND;
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT %d)", currentDeckID, numCardsToRemove]];
+	if (numCardsToRemove > 0)
+		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT %d)", currentDeckID, numCardsToRemove]];
 		
 	// if there are less cards in the hand than the MAX_NO_CARDS_IN_HAND, add cards to end of hand until there are enough or until there are no cards left
 	int numCardsToAdd = MAX_NO_CARDS_IN_HAND - numCardsInHand;
@@ -340,6 +341,16 @@
 -(int)numCardsInStudySession
 {
 	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
+}
+
+-(BOOL)doesCurrentCardContainSideID:(int)aSideID
+{
+	
+	int numInstancesOfSideInCurrentCard = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Side WHERE card_id = %d AND id = %d", currentCardID, aSideID]];
+	if (numInstancesOfSideInCurrentCard > 0)
+		return YES;
+	else
+		return NO;
 }
 
 -(BOOL)addCardAtEndOfStudySession
@@ -679,101 +690,34 @@
 	}
 	
 	// update the database to position each card according to the randomly ordered array
-	sqlite3_stmt *updateStmt = nil;	
 	for (int cardNumber = 1; cardNumber <= deckLength; cardNumber++) 	// loop through the cards in the deck and execute an update statement against each one
 	{
-		// Reposition cards
-		if(updateStmt == nil)
-		{
-			const char *sql = "UPDATE Card SET position = ? WHERE orig_position = ? AND deck_id = ?";
-			if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-				NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-		}
-		else
-		{
-			NSLog(@"Error: updatestmt not nil");
-		}
-		sqlite3_bind_int(updateStmt, 1, [[orderArray objectAtIndex:cardNumber - 1] integerValue]);
-		sqlite3_bind_int(updateStmt, 2, cardNumber);
-		sqlite3_bind_int(updateStmt, 3, currentDeckID);
-				
-		if(SQLITE_DONE != sqlite3_step(updateStmt))
-		{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-		
-		sqlite3_reset(updateStmt);
-		updateStmt = nil;
+		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = %d WHERE orig_position = %d AND deck_id = %d", [[orderArray objectAtIndex:cardNumber - 1] integerValue],cardNumber,currentDeckID]];
 	}
 	
 	// log that deck has been shuffled
-	if(updateStmt == nil)
-	{
-		const char *sql = "UPDATE Deck SET shuffled = 1 WHERE Deck.id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-	{
-		NSLog(@"Error: updatestmt not nil");
-	}
-	sqlite3_bind_int(updateStmt, 1, currentDeckID);
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 1 WHERE Deck.id = %d", currentDeckID]];
+		
+	// ditch the current learning session (later a new one will be created with the shuffled deck)
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
 	
-	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-	
-	sqlite3_reset(updateStmt);
-	updateStmt = nil;
-	
-	// Deck is still pointing at old 'first card'. Need to update it to point to new 'first card'.
-	// Note that shuffling is done from within the deck details screen, and the deck object is therefore ready for test mode - therefore include known cards
-	[self moveToCardAtPosition:FirstCard includeKnownCards:YES];
-	
+	// also wipe the user's Study position, so that they are put back into the deck at a random location
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];
 }
 
 -(void)unshuffle
 {
 	// reset all cards in the deck to their orig_position
-	sqlite3_stmt *updateStmt = nil;	
-	if(updateStmt == nil)
-	{
-		const char *sql = "UPDATE Card SET position = orig_position WHERE deck_id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-	{
-		NSLog(@"Error: updatestmt not nil");
-	}
-	
-	sqlite3_bind_int(updateStmt, 1, currentDeckID);
-	
-	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with original positions. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-	
-	sqlite3_reset(updateStmt);
-	updateStmt = nil;
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = orig_position WHERE deck_id = %d", currentDeckID]];	
 	
 	// log that deck is not shuffled
-	if(updateStmt == nil)
-	{
-		const char *sql = "UPDATE Deck SET shuffled = 0 WHERE Deck.id = ?";
-		if(sqlite3_prepare_v2([VariableStore sharedInstance].database, sql, -1, &updateStmt, NULL) != SQLITE_OK)
-			NSAssert1(0, @"Error while creating update statement. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));
-	}
-	else
-	{
-		NSLog(@"Error: updatestmt not nil");
-	}
-	sqlite3_bind_int(updateStmt, 1, currentDeckID);
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 0 WHERE Deck.id = %d",currentDeckID]];
+
+	// ditch the current learning session (later a new one will be created with the shuffled deck)
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
 	
-	if(SQLITE_DONE != sqlite3_step(updateStmt))
-	{NSAssert1(0, @"Error while updating DB with new card position. '%s'", sqlite3_errmsg([VariableStore sharedInstance].database));}
-	
-	sqlite3_reset(updateStmt);
-	updateStmt = nil;
-	
-	// Deck is still pointing at old 'first card'. Need to update it to point to new 'first card'.
-	// Note that shuffling is done from within the deck details screen, and the deck object is therefore ready for test mode - therefore include known cards
-	[self moveToCardAtPosition:FirstCard includeKnownCards:YES];	
+	// also wipe the user's Study position, so that they are put back into the deck at a random location
+	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];	
 }
 
 -(BOOL)isShuffled

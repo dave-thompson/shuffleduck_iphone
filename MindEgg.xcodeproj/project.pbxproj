@@ -90,6 +90,10 @@
 		55DAC7FE107EA56A00D0C621 /* DeckDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55DAC7FD107EA56A00D0C621 /* DeckDetailView.xib */; };
 		55DB727C0FD9214200B1A115 /* InternalSettings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 55DB727B0FD9214200B1A115 /* InternalSettings.plist */; };
 		55DB72890FD9287400B1A115 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 55DB72880FD9287400B1A115 /* libsqlite3.dylib */; };
+		55E40D43114827EA000C33DC /* TutorialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55E40D41114827EA000C33DC /* TutorialViewController.m */; };
+		55E40D44114827EA000C33DC /* TutorialView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55E40D42114827EA000C33DC /* TutorialView.xib */; };
+		55E40D9211483ED7000C33DC /* TutorialLearn.html in Resources */ = {isa = PBXBuildFile; fileRef = 55E40D9111483ED7000C33DC /* TutorialLearn.html */; };
+		55E40D9411483FC1000C33DC /* TutorialTest.html in Resources */ = {isa = PBXBuildFile; fileRef = 55E40D9311483FC1000C33DC /* TutorialTest.html */; };
 		55E97CEB0FAD03C900E6BD7C /* MindEgg Snowflake.png in Resources */ = {isa = PBXBuildFile; fileRef = 55E97CEA0FAD03C900E6BD7C /* MindEgg Snowflake.png */; };
 		55F79D19113E520000375C47 /* ContinueTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55F79D17113E520000375C47 /* ContinueTestViewController.m */; };
 		55F79D1A113E520000375C47 /* ContinueTestView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55F79D18113E520000375C47 /* ContinueTestView.xib */; };
@@ -223,6 +227,11 @@
 		55DAC7FD107EA56A00D0C621 /* DeckDetailView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeckDetailView.xib; sourceTree = "<group>"; };
 		55DB727B0FD9214200B1A115 /* InternalSettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = InternalSettings.plist; sourceTree = "<group>"; };
 		55DB72880FD9287400B1A115 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		55E40D40114827EA000C33DC /* TutorialViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialViewController.h; sourceTree = "<group>"; };
+		55E40D41114827EA000C33DC /* TutorialViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialViewController.m; sourceTree = "<group>"; };
+		55E40D42114827EA000C33DC /* TutorialView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = TutorialView.xib; path = Classes/TutorialView.xib; sourceTree = "<group>"; };
+		55E40D9111483ED7000C33DC /* TutorialLearn.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = TutorialLearn.html; sourceTree = "<group>"; };
+		55E40D9311483FC1000C33DC /* TutorialTest.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = TutorialTest.html; sourceTree = "<group>"; };
 		55E97CEA0FAD03C900E6BD7C /* MindEgg Snowflake.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MindEgg Snowflake.png"; sourceTree = "<group>"; };
 		55F79D16113E520000375C47 /* ContinueTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContinueTestViewController.h; sourceTree = "<group>"; };
 		55F79D17113E520000375C47 /* ContinueTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContinueTestViewController.m; sourceTree = "<group>"; };
@@ -374,6 +383,8 @@
 				55D3F8DB1112D412003E1688 /* CongratulationsViewController.m */,
 				55F79D16113E520000375C47 /* ContinueTestViewController.h */,
 				55F79D17113E520000375C47 /* ContinueTestViewController.m */,
+				55E40D40114827EA000C33DC /* TutorialViewController.h */,
+				55E40D41114827EA000C33DC /* TutorialViewController.m */,
 			);
 			name = Study;
 			sourceTree = "<group>";
@@ -466,6 +477,7 @@
 		556138390FAEDF1C00365DF1 /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				55E40D42114827EA000C33DC /* TutorialView.xib */,
 				55B93B051145690C004B463F /* ManualPageView.xib */,
 				55B93A9A11454CF7004B463F /* ManualTableView.xib */,
 				55F79D18113E520000375C47 /* ContinueTestView.xib */,
@@ -532,6 +544,7 @@
 		55D7CB5B1146C7B400E9DA57 /* Manual Pages */ = {
 			isa = PBXGroup;
 			children = (
+				55E40D6111483556000C33DC /* Tutorial */,
 				55D7CAF01146B26B00E9DA57 /* LibraryScreen.html */,
 				55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */,
 				55A404A31146C8BC0040CFC8 /* Learn.html */,
@@ -562,6 +575,15 @@
 				1D3623250D0F684500981E51 /* MindEggAppDelegate.m */,
 			);
 			name = Application;
+			sourceTree = "<group>";
+		};
+		55E40D6111483556000C33DC /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				55E40D9311483FC1000C33DC /* TutorialTest.html */,
+				55E40D9111483ED7000C33DC /* TutorialLearn.html */,
+			);
+			name = Tutorial;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -644,6 +666,9 @@
 				55A404A21146C8AF0040CFC8 /* DeckSummaryScreen.html in Resources */,
 				55A404A41146C8BC0040CFC8 /* Learn.html in Resources */,
 				55A404A61146C8C30040CFC8 /* Reference.html in Resources */,
+				55E40D44114827EA000C33DC /* TutorialView.xib in Resources */,
+				55E40D9211483ED7000C33DC /* TutorialLearn.html in Resources */,
+				55E40D9411483FC1000C33DC /* TutorialTest.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,6 +719,7 @@
 				55B93A9411453506004B463F /* PlaceholderTextView.m in Sources */,
 				55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */,
 				55B93B061145690C004B463F /* ManualPageViewController.m in Sources */,
+				55E40D43114827EA000C33DC /* TutorialViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

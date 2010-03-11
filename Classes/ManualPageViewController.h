@@ -11,10 +11,7 @@
 @interface ManualPageViewController : UIViewController {
 
 	IBOutlet UIWebView *webView;
-
 	NSString *filePath;
-
-	
 }
 
 @property (nonatomic, retain) UIWebView *webView;
