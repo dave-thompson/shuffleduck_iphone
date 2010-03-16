@@ -8,6 +8,7 @@
 
 #import "SideViewController.h"
 #import "VariableStore.h"
+#import "CustomLabel.h"
 
 #define UIColorFromRGB(rgbValue) [UIColor \
   colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
@@ -114,9 +115,11 @@
 					
 					
 					// create label and set properties
-					UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(x, y, width, height)];
+					CustomLabel *label = [[CustomLabel alloc] initWithFrame:CGRectMake(x, y, width, height)];
 					label.text = displayText;
-					label.font = [UIFont fontWithName:@"Arial" size: font_size];
+					
+					label.font = [UIFont fontWithName:@"Arial" size: font_size]; // familyName == "Arial", font name == "ArialMT"
+					
 					switch(alignment_id)
 					{
 					 case 1:
@@ -154,6 +157,7 @@
 					else
 					{
 						componentImage = [UIImage imageWithData:componentImageData];
+						[componentImageData release];
 					}
 					
 					// create image view and set properties
@@ -161,7 +165,7 @@
 					componentImageView.frame = CGRectMake(x, y, width, height);
 					componentImageView.contentMode = UIViewContentModeScaleAspectFit;
 					[self.view addSubview:componentImageView];
-					[componentImageData release]; // THIS MEMORY RELEASE NOT TESTED AS WORKING - IF PROBLEMS ARISE LATER WITH IMAGES, TRY COMMENTING THIS OUT
+					[componentImageView release];
 					
 					break;
 			}

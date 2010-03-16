@@ -165,7 +165,7 @@
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
-						<string key="IBUIText">Cards</string>
+						<string key="IBUIText">CardsIsAReallyLongWordReally</string>
 						<reference key="IBUIFont" ref="419664854"/>
 						<reference key="IBUITextColor" ref="751232470"/>
 						<object class="NSColor" key="IBUIHighlightedColor">
@@ -181,6 +181,7 @@
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 						<float key="IBUIMinimumFontSize">1.800000e+01</float>
 						<int key="IBUITextAlignment">1</int>
+						<int key="IBUILineBreakMode">2</int>
 					</object>
 				</object>
 				<string key="NSFrameSize">{320, 416}</string>
@@ -402,7 +403,7 @@ LQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQgQXBwbGUsIEluYy4sIDIwMTAAA</bytes
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>CongratulationsViewController</string>
 					<string>UIResponder</string>
-					<string>{{374, 308}, {320, 416}}</string>
+					<string>{{828, 241}, {320, 416}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<boolean value="NO"/>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>

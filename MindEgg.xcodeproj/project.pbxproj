@@ -29,6 +29,7 @@
 		5510E22E107D1C940074B376 /* ReviseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22C107D1C940074B376 /* ReviseView.xib */; };
 		5515E1A4107C259D002E4339 /* FeedbackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5515E1A1107C259D002E4339 /* FeedbackViewController.m */; };
 		551C75C0110E3EC90031530F /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 551C75BF110E3EC90031530F /* Constants.m */; };
+		551E1D1F114FA08F00F025C0 /* CustomLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 551E1D1E114FA08F00F025C0 /* CustomLabel.m */; };
 		5522BE8B107D9619006322F2 /* ShuffleDuck.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5522BE8A107D9619006322F2 /* ShuffleDuck.sqlite */; };
 		552694070FDA6943003CECEF /* DeckDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = 552694060FDA6943003CECEF /* DeckDetails.m */; };
 		552A5A2710DBF39E00A8264B /* FinalScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 552A5A2510DBF39E00A8264B /* FinalScoreViewController.m */; };
@@ -137,6 +138,8 @@
 		5515E1A1107C259D002E4339 /* FeedbackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedbackViewController.m; sourceTree = "<group>"; };
 		551C75BE110E3EC90031530F /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		551C75BF110E3EC90031530F /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		551E1D1D114FA08F00F025C0 /* CustomLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomLabel.h; sourceTree = "<group>"; };
+		551E1D1E114FA08F00F025C0 /* CustomLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomLabel.m; sourceTree = "<group>"; };
 		5522BE8A107D9619006322F2 /* ShuffleDuck.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = ShuffleDuck.sqlite; sourceTree = "<group>"; };
 		552694050FDA6943003CECEF /* DeckDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeckDetails.h; sourceTree = "<group>"; };
 		552694060FDA6943003CECEF /* DeckDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeckDetails.m; sourceTree = "<group>"; };
@@ -459,6 +462,8 @@
 				55CD79E21111627B006A65C4 /* MultipartLabel.m */,
 				55B93A9211453506004B463F /* PlaceholderTextView.h */,
 				55B93A9311453506004B463F /* PlaceholderTextView.m */,
+				551E1D1D114FA08F00F025C0 /* CustomLabel.h */,
+				551E1D1E114FA08F00F025C0 /* CustomLabel.m */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -720,6 +725,7 @@
 				55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */,
 				55B93B061145690C004B463F /* ManualPageViewController.m in Sources */,
 				55E40D43114827EA000C33DC /* TutorialViewController.m in Sources */,
+				551E1D1F114FA08F00F025C0 /* CustomLabel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
