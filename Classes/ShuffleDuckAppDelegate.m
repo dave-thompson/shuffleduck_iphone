@@ -1,12 +1,12 @@
 //
-//  MindEggAppDelegate.m
-//  MindEgg
+//  ShuffleDuckAppDelegate.m
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 5/2/09.
 //  Copyright __MyCompanyName__ 2009. All rights reserved.
 //
 
-#import "MindEggAppDelegate.h"
+#import "ShuffleDuckAppDelegate.h"
 #import "StudyViewController.h"
 #import "MyDecksViewController.h"
 #import "DownloadViewController.h"
@@ -17,7 +17,7 @@
 #import "VariableStore.h"
 #import "FlurryAPI.h"
 
-@implementation MindEggAppDelegate
+@implementation ShuffleDuckAppDelegate
 
 @synthesize window;
 
@@ -82,7 +82,7 @@ void uncaughtExceptionHandler(NSException *exception)
 		}
 		else
 		{
-			NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+			NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 		}
 
 		// navigate to required screen

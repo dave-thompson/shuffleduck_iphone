@@ -1,6 +1,6 @@
 //
 //  DeckDownloader.m
-//  MindEgg
+//  ShuffleDuck
 //
 //
 //  Created by Dave Thompson on 1/11/10.
@@ -163,7 +163,7 @@ sqlite3_stmt *addStmt;
 			int brokenDeckID = (int)sqlite3_column_int(compiledStatement, 0);
 			int brokenUserVisibleID = (int)sqlite3_column_int(compiledStatement, 1);
 
-			[brokenDecks addObject:[NSArray arrayWithObjects: [NSNumber numberWithInt:brokenDeckID], [NSNumber numberWithInt:brokenUserVisibleID]]];
+			[brokenDecks addObject:[NSArray arrayWithObjects: [NSNumber numberWithInt:brokenDeckID], [NSNumber numberWithInt:brokenUserVisibleID], nil]];
 		}
 	}
 
@@ -337,7 +337,7 @@ sqlite3_stmt *addStmt;
 	
 	// get XML response
 	NSString *responseString = [request responseString];
-	NSLog(responseString);
+	NSLog(@"%@", responseString);
 	
 	// create document, ready to parse XML response
 	doc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:nil];
@@ -381,7 +381,7 @@ sqlite3_stmt *addStmt;
 		
     if ([parser parserError])
 	{
-		NSLog([parser parserError].localizedDescription);
+		NSLog(@"%@", [parser parserError].localizedDescription);
 		// finish up
 		fullDeckFailureFlag = YES; // log failure so that user may be notified of it after end of current sync / download
 		[parser release];
@@ -407,7 +407,7 @@ sqlite3_stmt *addStmt;
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parserError
 {
 	NSString *errorString = [NSString stringWithFormat:@"Parser error, error code %i", [parserError code]];
-	NSLog(errorString);
+	NSLog(@"%@", errorString);
 	
 	UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error loading downloaded deck" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
 	[errorAlert show];	

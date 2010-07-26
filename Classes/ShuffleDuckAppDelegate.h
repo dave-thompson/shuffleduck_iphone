@@ -1,6 +1,6 @@
 //
-//  MindEggAppDelegate.h
-//  MindEgg
+//  ShuffleDuckAppDelegate.h
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 5/2/09.
 //  Copyright __MyCompanyName__ 2009. All rights reserved.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "sqlite3.h"
 
-@interface MindEggAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> {
+@interface ShuffleDuckAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> {
     IBOutlet UIWindow *window;
 }
 

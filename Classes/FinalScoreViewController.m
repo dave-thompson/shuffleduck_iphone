@@ -1,13 +1,13 @@
 //
 //  FinalScoreViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 12/18/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "FinalScoreViewController.h"
-#import "MindEggAppDelegate.h"
+#import "ShuffleDuckAppDelegate.h"
 #import "VariableStore.h"
 
 static FinalScoreViewController *sharedFinalScoreViewController = nil;

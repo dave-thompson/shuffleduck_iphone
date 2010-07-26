@@ -1,6 +1,6 @@
 //
 //  SideViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 6/7/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -173,7 +173,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	
 }

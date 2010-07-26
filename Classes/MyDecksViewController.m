@@ -1,6 +1,6 @@
 //
 //  MyDecksViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 5/4/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -17,7 +17,7 @@
 #import "Constants.h"
 #import "Synchroniser.h"
 #import "DeckDownloader.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "ManualTableViewController.h"
 
 static MyDecksViewController *sharedMyDecksViewController = nil;
@@ -387,7 +387,7 @@ static MyDecksViewController *sharedMyDecksViewController = nil;
 		
 		// delete the deck from the database (DB cascades deletions)
 		NSString *deletionString = [NSString stringWithFormat:@"DELETE FROM Deck WHERE id = %d", deckIDToDelete];
-		[MindEggUtilities runSQLUpdate:deletionString];
+		[ShuffleDuckUtilities runSQLUpdate:deletionString];
 				
 		// Animate the deletion from the table.
 		[libraryTableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];

@@ -1,13 +1,13 @@
 //
 //  ProgressViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 1/13/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
 #import "ProgressViewController.h"
-#import "MindEggAppDelegate.h"
+#import "ShuffleDuckAppDelegate.h"
 
 static BOOL showing = NO;
 
@@ -35,7 +35,7 @@ static BOOL showing = NO;
 	// If progress not currently shown, show it
 	if (!(showing))
 	{
-		MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
+		ShuffleDuckAppDelegate *appDelegate = (ShuffleDuckAppDelegate *)[[UIApplication sharedApplication] delegate];
 		[[appDelegate window] addSubview:[[ProgressViewController sharedInstance] view]];
 	}
 	showing = YES;
@@ -51,7 +51,7 @@ static BOOL showing = NO;
 {
 	if (showing) // move the progress view controller to the top of the view stack UIViewController
 	{
-		MindEggAppDelegate *appDelegate = (MindEggAppDelegate *)[[UIApplication sharedApplication] delegate];
+		ShuffleDuckAppDelegate *appDelegate = (ShuffleDuckAppDelegate *)[[UIApplication sharedApplication] delegate];
 		[[appDelegate window] bringSubviewToFront:[ProgressViewController sharedInstance].view];
 	}	
 }

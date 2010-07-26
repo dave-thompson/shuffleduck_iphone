@@ -1,6 +1,6 @@
 //
 //  LibraryCell.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 6/6/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -18,14 +18,13 @@
 
 BOOL isFullyDownloaded;
 
-- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
-    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier])
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])
 	{
     }
     return self;
 }
-
 
 - (void)awakeFromNib
 {

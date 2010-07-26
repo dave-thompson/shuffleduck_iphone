@@ -1,6 +1,6 @@
 //
 //  ContinueTestViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 3/3/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
@@ -9,7 +9,7 @@
 #import "ContinueTestViewController.h"
 #import "StudyViewController.h"
 #import "TutorialViewController.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 
 static ContinueTestViewController *continueTestViewController = nil;
 
@@ -75,7 +75,7 @@ NSString *scoreString = @"";
 	
 	// push either the study view controller, or the tutorial screen that precedes it
 	int showTutorialScreen = 0;
-	showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
+	showTutorialScreen = [ShuffleDuckUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
 	if (showTutorialScreen == 1) // if tutorial screen should be shown, push it
 	{
 		TutorialViewController *tutorialViewController = [TutorialViewController sharedInstance];

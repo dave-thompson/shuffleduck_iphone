@@ -1,21 +1,21 @@
 //
-//  MindEggUtilities.m
-//  MindEgg
+//  ShuffleDuckUtilities.m
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 1/27/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "Constants.h"
 #import "sqlite3.h"
 #import "VariableStore.h"
 
-@implementation MindEggUtilities
+@implementation ShuffleDuckUtilities
 
 static sqlite3_stmt *updateStmt = nil;
 
-+ (void)mindEggErrorAlertWithMessage:(NSString *)aMessage
++ (void)shuffleDuckErrorAlertWithMessage:(NSString *)aMessage
 {
 	// tell user that there was a problem and that decks are not being synchronised
 	UIAlertView *errorAlert = [[UIAlertView alloc]
@@ -61,7 +61,7 @@ static sqlite3_stmt *updateStmt = nil;
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return returnValue;
 }
@@ -80,7 +80,7 @@ static sqlite3_stmt *updateStmt = nil;
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return returnValue;
 }

@@ -1,6 +1,6 @@
 //
 //  DeckDownloader.m
-//  MindEgg
+//  ShuffleDuck
 //
 //
 //  Created by Dave Thompson on 1/11/10.
@@ -15,7 +15,7 @@
 #import "ProgressViewController.h"
 #import "Constants.h"
 #import "ASIAuthenticationDialog.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "DeckDownloader.h"
 #import "DeckDownloaderQueueItem.h"
 static Synchroniser *sharedSynchroniser = nil;
@@ -98,7 +98,7 @@ static Synchroniser *sharedSynchroniser = nil;
 		else // otherwise, just notify the user of the failure
 		{
 			NSString *error_description = [[[rootElement elementsForName:@"description"] objectAtIndex:0] stringValue];
-			[MindEggUtilities mindEggErrorAlertWithMessage:error_description];
+			[ShuffleDuckUtilities shuffleDuckErrorAlertWithMessage:error_description];
 
 			// tidy up
 			[self handleSyncFailure];

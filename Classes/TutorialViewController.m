@@ -1,13 +1,13 @@
 //
 //  TutorialViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 3/10/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
 #import "TutorialViewController.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "StudyViewController.h"
 #import "ContinueTestViewController.h"
 
@@ -98,9 +98,9 @@ static TutorialViewController *sharedTutorialViewController = nil;
 -(IBAction)neverAgainButtonClicked:(id)sender
 {
 	if (studyType == Learn)
-		[MindEggUtilities runSQLUpdate:@"UPDATE ApplicationStatus SET tutorial_learn = 0"];		
+		[ShuffleDuckUtilities runSQLUpdate:@"UPDATE ApplicationStatus SET tutorial_learn = 0"];		
 	else // studyType == Test
-		[MindEggUtilities runSQLUpdate:@"UPDATE ApplicationStatus SET tutorial_test = 0"];
+		[ShuffleDuckUtilities runSQLUpdate:@"UPDATE ApplicationStatus SET tutorial_test = 0"];
 	[self okayButtonClicked:self];
 }
 

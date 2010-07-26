@@ -1,6 +1,6 @@
 //
 //  StudyViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 5/2/09.
 //  Copyright __MyCompanyName__ 2009. All rights reserved.

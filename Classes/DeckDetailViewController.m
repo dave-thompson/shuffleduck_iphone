@@ -1,6 +1,6 @@
 //
 //  DeckDetailViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 10/8/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -10,7 +10,7 @@
 #import "VariableStore.h"
 #import "SideViewController.h"
 #import "ContinueTestViewController.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "TutorialViewController.h"
 
 static DeckDetailViewController *sharedDeckDetailViewController = nil;
@@ -97,9 +97,9 @@ SideViewController *miniSideViewController;
 		{
 			int showTutorialScreen = 0;
 			if (type == Learn)
-				showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_learn FROM ApplicationStatus"];
+				showTutorialScreen = [ShuffleDuckUtilities getIntUsingSQL:@"SELECT tutorial_learn FROM ApplicationStatus"];
 			else if (type == Test)
-				showTutorialScreen = [MindEggUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
+				showTutorialScreen = [ShuffleDuckUtilities getIntUsingSQL:@"SELECT tutorial_test FROM ApplicationStatus"];
 			if (showTutorialScreen == 1) // if tutorial screen should be shown, push it
 			{
 				TutorialViewController *tutorialViewController = [TutorialViewController sharedInstance];

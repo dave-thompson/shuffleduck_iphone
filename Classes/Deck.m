@@ -1,13 +1,13 @@
 //
 //  Deck.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 7/17/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 
 #import "Deck.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "VariableStore.h"
 
 #define MAX_NO_CARDS_IN_HAND 10
@@ -67,7 +67,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request to load find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return cardsExist;
 }
@@ -104,7 +104,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return cardsExist;
 }
@@ -149,7 +149,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	
 	if (success == NO) // no rows were returned - i.e. already looking at either the last or first card
@@ -194,7 +194,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	
 	if (success == NO) // no rows were returned - i.e. already looking at either the last or first card
@@ -232,7 +232,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return success;
 }
@@ -246,7 +246,7 @@
 	else if (studyType == Learn)
 		sqlString = [NSString stringWithFormat:@"SELECT learn_side_id FROM DeckStatus WHERE deck_id = %d;", currentDeckID];		
 
-	return [MindEggUtilities getIntUsingSQL:sqlString];
+	return [ShuffleDuckUtilities getIntUsingSQL:sqlString];
 }
 
 -(void)moveToLastSessionsCardForStudyType:(StudyType)studyType
@@ -281,7 +281,7 @@
 		}
 		else
 		{
-			NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+			NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 		}
 		
 		if (lastSessionsCardID >= 0)
@@ -309,23 +309,23 @@
 // prepares a new test for the current deck
 {
 	// Clear any existing test
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM TestStatus WHERE deck_id = %d", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM TestStatus WHERE deck_id = %d", currentDeckID]];
 	
 	// Set up new test
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO TestStatus (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = %d ORDER BY Card.position", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO TestStatus (deck_id, card_id, question_number, completed, correct) SELECT deck_id, id, position, 0, 0 FROM Card WHERE Card.deck_id = %d ORDER BY Card.position", currentDeckID]];
 }
 
 -(void)prepareStudySession
 {	
 	// remove any cards from the hand that are already known (a DB trigger updates the positions of the remaining cards)
 	NSString *sqlString = [NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT id FROM Card WHERE deck_id = %d AND known = 1)", currentDeckID, currentDeckID];
-	[MindEggUtilities runSQLUpdate:sqlString];
+	[ShuffleDuckUtilities runSQLUpdate:sqlString];
 
 	// if there are more cards in the hand than the MAX_NO_CARDS_IN_HAND, truncate the hand
 	int numCardsInHand = [self numCardsInStudySession];
 	int numCardsToRemove = numCardsInHand - MAX_NO_CARDS_IN_HAND;
 	if (numCardsToRemove > 0)
-		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT %d)", currentDeckID, numCardsToRemove]];
+		[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT %d)", currentDeckID, numCardsToRemove]];
 		
 	// if there are less cards in the hand than the MAX_NO_CARDS_IN_HAND, add cards to end of hand until there are enough or until there are no cards left
 	int numCardsToAdd = MAX_NO_CARDS_IN_HAND - numCardsInHand;
@@ -340,13 +340,13 @@
 
 -(int)numCardsInStudySession
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
 }
 
 -(BOOL)doesCurrentCardContainSideID:(int)aSideID
 {
 	
-	int numInstancesOfSideInCurrentCard = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Side WHERE card_id = %d AND id = %d", currentCardID, aSideID]];
+	int numInstancesOfSideInCurrentCard = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Side WHERE card_id = %d AND id = %d", currentCardID, aSideID]];
 	if (numInstancesOfSideInCurrentCard > 0)
 		return YES;
 	else
@@ -364,10 +364,10 @@
 // returns YES iff there was an unknown card to add, or NO if no card was added
 {
 	// find the first card in the deck that is not already in the hand
-	int cardIDToAdd = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT id FROM Card WHERE deck_id = %d AND known = 0 AND id NOT IN ( SELECT card_id FROM StudyStatus WHERE deck_id = %d ) ORDER BY position LIMIT 1;", currentDeckID, currentDeckID]];
+	int cardIDToAdd = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT id FROM Card WHERE deck_id = %d AND known = 0 AND id NOT IN ( SELECT card_id FROM StudyStatus WHERE deck_id = %d ) ORDER BY position LIMIT 1;", currentDeckID, currentDeckID]];
 	if (cardIDToAdd != -1) // if there is an unknown card left to add
 	{
-		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, cardIDToAdd, index]];
+		[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, cardIDToAdd, index]];
 		return YES;
 	}
 	else
@@ -381,7 +381,7 @@
 // returns YES iff there was an unknown card to add, or NO if the first card was removed but no card was added in its place
 {
 	// remove the bottom card
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT 1)", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id IN (SELECT card_id FROM StudyStatus WHERE deck_id = %d ORDER BY position DESC LIMIT 1)", currentDeckID]];
 	// add the new card in its place
 	return [self addCardAtEndOfStudySession];
 }
@@ -391,11 +391,11 @@
 // returns YES iff there was an unknown card to add, or NO if the first card was removed but no card was added in its place
 {
 	// remove the card at index
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d AND POSITION = %d", currentDeckID, index]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d AND POSITION = %d", currentDeckID, index]];
 	if ([self numCardsInStudySession] < ([self numCards] - [self numKnownCards]))
 	{
 		// make space at the requested index
-		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d AND position > %d", currentDeckID, index - 1]];
+		[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d AND position > %d", currentDeckID, index - 1]];
 		// add the new card at index
 		return [self addCardToStudySessionAtIndex:index];
 	}
@@ -411,11 +411,11 @@
 	{
 		// move the current card to the back
 			// remove it from the front
-			int movingCardID = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = 0", currentDeckID]];
-			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
+			int movingCardID = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = 0", currentDeckID]];
+			[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
 			// add it to the back
 			int numCardsInHand = [self numCardsInStudySession]; // this is actually one less than is usually in the hand, as we have deleted but not yet re-added
-			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, numCardsInHand]];
+			[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, numCardsInHand]];
 		// move card & side pointers to show the front card
 		[self pointToUsersStudySession];
 		return YES;
@@ -432,13 +432,13 @@
 	{
 		// move the back card to the front
 			// increment all positions
-			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d", currentDeckID]];
+			[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE StudyStatus SET position = position + 1 WHERE deck_id = %d", currentDeckID]];
 			// remove the back card
 			int numCardsInHand = [self numCardsInStudySession];
-			int movingCardID = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = %d", currentDeckID, numCardsInHand]];
-			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
+			int movingCardID = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT card_id FROM StudyStatus WHERE deck_id = %d AND position = %d", currentDeckID, numCardsInHand]];
+			[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE card_id = %d", movingCardID]];
 			// add it to the front
-			[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, 0]];
+			[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"INSERT INTO StudyStatus (deck_id, card_id, position) VALUES (%d, %d, %d)", currentDeckID, movingCardID, 0]];
 		// move card & side pointers to show the front card
 		[self pointToUsersStudySession];
 		return YES;
@@ -472,7 +472,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return success;
 }		
@@ -532,7 +532,7 @@
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request to find first card / side failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	return nextSideExists;
 }
@@ -542,28 +542,28 @@
 -(int)numCards
 // returns the number of cards in the current deck
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d;", currentDeckID]];
 }
 
 -(int)cardsCompleted;
 // returns the number of questions answered in any current test run
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 1;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 1;", currentDeckID]];
 }
 
 -(int)cardsCorrect;
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND correct = 1;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND correct = 1;", currentDeckID]];
 }
 
 -(int)cardsInTestSet;
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d;", currentDeckID]];
 }
 
 -(int)testQuestionsRemaining
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 0;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT (*) FROM TestStatus WHERE deck_id = %d AND completed = 0;", currentDeckID]];
 }
 
 -(int)numCardsWithSearchTerm:(NSString *)searchTerm
@@ -574,13 +574,13 @@
 	}
 	else
 	{
-		return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(DISTINCT Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%'", currentDeckID, searchTerm]];
+		return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(DISTINCT Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%'", currentDeckID, searchTerm]];
 	}
 }
 
 -(BOOL)currentCardFitsFilter:(NSString *)searchTerm
 {
-	int countOfCurrentCardInFilteredCards = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%' AND Card.id = %d", currentDeckID, searchTerm, currentCardID]];
+	int countOfCurrentCardInFilteredCards = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(Card.id) FROM Card, Side, Component, TextBox WHERE Card.deck_id = %d AND Card.id = Side.card_id AND Side.id = Component.side_id AND Component.id = TextBox.component_id AND TextBox.text LIKE '%%%@%%' AND Card.id = %d", currentDeckID, searchTerm, currentCardID]];
 	
 	if (countOfCurrentCardInFilteredCards > 0)	return YES;  // count may be greater than 1, as we do not use the DISTINCT keyword
 	else										return NO;	
@@ -589,13 +589,13 @@
 -(int)numKnownCards
 // returns the number of known cards in the current deck
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d AND Card.known = 1;", currentDeckID]];	
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT COUNT(*) FROM Card WHERE Card.deck_id = %d AND Card.known = 1;", currentDeckID]];	
 }
 
 -(int)getOriginalFirstSideID
 // returns the ID of the first side of the first card (and ignores shuffling)
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT Side.id AS first_side_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.deck_id = %d AND Card.orig_position = 1 AND Side.position = 1", currentDeckID]];	
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT Side.id AS first_side_id FROM Card, Side WHERE Side.card_id = Card.id AND Card.deck_id = %d AND Card.orig_position = 1 AND Side.position = 1", currentDeckID]];	
 }
 
 -(int)getCurrentSideID
@@ -605,7 +605,7 @@
 
 -(BOOL)isCurrentCardKnown
 {
-	int isCurrentCardKnown = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT known FROM Card WHERE Card.id = %d;", currentCardID]];
+	int isCurrentCardKnown = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT known FROM Card WHERE Card.id = %d;", currentCardID]];
 
 	if (isCurrentCardKnown == 0)
 		{return NO;}
@@ -622,7 +622,7 @@
 	else
 		{isCurrentCardKnown = 0;}
 		
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET known = %d WHERE Card.id = %d", isCurrentCardKnown, currentCardID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET known = %d WHERE Card.id = %d", isCurrentCardKnown, currentCardID]];
 }
 
 -(void)setTestQuestionCorrect:(BOOL)correct
@@ -635,7 +635,7 @@
 		else
 			isCorrect = 0;
 		// write value to database
-		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE TestStatus SET completed = 1, correct = %d WHERE deck_id = %d AND card_id = %d", isCorrect, currentDeckID, currentCardID]];
+		[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE TestStatus SET completed = 1, correct = %d WHERE deck_id = %d AND card_id = %d", isCorrect, currentDeckID, currentCardID]];
 	
 	// also update known flag
 	[self setCurrentCardKnown:correct];
@@ -643,28 +643,28 @@
 
 -(NSString *)getDeckTitle
 {
-	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT title FROM Deck WHERE Deck.id = %d;", currentDeckID]];	
+	return [ShuffleDuckUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT title FROM Deck WHERE Deck.id = %d;", currentDeckID]];	
 }
 
 -(NSString *)author
 {
-	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID]];
+	return [ShuffleDuckUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT author FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 }
 
 -(NSString *)searchBarText
 {
-	return [MindEggUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT search_text FROM DeckStatus WHERE deck_id = %d;", currentDeckID]];
+	return [ShuffleDuckUtilities getStringUsingSQL:[NSString stringWithFormat:@"SELECT search_text FROM DeckStatus WHERE deck_id = %d;", currentDeckID]];
 }
 
 -(void)setSearchBarText:(NSString *)searchBarText
 {
 	NSString *sqlString = [NSString stringWithFormat:@"UPDATE DeckStatus SET search_text = %d WHERE deck_id = %d", searchBarText, currentDeckID];
-	[MindEggUtilities runSQLUpdate:sqlString];	
+	[ShuffleDuckUtilities runSQLUpdate:sqlString];	
 }
 
 -(int)userVisibleID
 {
-	return [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID]];
+	return [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT user_visible_id FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 }
 
 -(void)shuffle
@@ -692,37 +692,37 @@
 	// update the database to position each card according to the randomly ordered array
 	for (int cardNumber = 1; cardNumber <= deckLength; cardNumber++) 	// loop through the cards in the deck and execute an update statement against each one
 	{
-		[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = %d WHERE orig_position = %d AND deck_id = %d", [[orderArray objectAtIndex:cardNumber - 1] integerValue],cardNumber,currentDeckID]];
+		[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = %d WHERE orig_position = %d AND deck_id = %d", [[orderArray objectAtIndex:cardNumber - 1] integerValue],cardNumber,currentDeckID]];
 	}
 	
 	// log that deck has been shuffled
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 1 WHERE Deck.id = %d", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 1 WHERE Deck.id = %d", currentDeckID]];
 		
 	// ditch the current learning session (later a new one will be created with the shuffled deck)
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
 	
 	// also wipe the user's Study position, so that they are put back into the deck at a random location
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];
 }
 
 -(void)unshuffle
 {
 	// reset all cards in the deck to their orig_position
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = orig_position WHERE deck_id = %d", currentDeckID]];	
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Card SET position = orig_position WHERE deck_id = %d", currentDeckID]];	
 	
 	// log that deck is not shuffled
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 0 WHERE Deck.id = %d",currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE Deck SET shuffled = 0 WHERE Deck.id = %d",currentDeckID]];
 
 	// ditch the current learning session (later a new one will be created with the shuffled deck)
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"DELETE FROM StudyStatus WHERE deck_id = %d", currentDeckID]];
 	
 	// also wipe the user's Study position, so that they are put back into the deck at a random location
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];	
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE DeckStatus SET learn_card_id = -1, learn_side_id = -1 WHERE deck_id = %d", currentDeckID]];	
 }
 
 -(BOOL)isShuffled
 {
-	int shuffled = [MindEggUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT shuffled FROM Deck WHERE Deck.id = %d;", currentDeckID]];
+	int shuffled = [ShuffleDuckUtilities getIntUsingSQL:[NSString stringWithFormat:@"SELECT shuffled FROM Deck WHERE Deck.id = %d;", currentDeckID]];
 	
 	BOOL returnValue;
 	if (shuffled == 1)

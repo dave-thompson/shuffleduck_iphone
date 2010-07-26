@@ -1,6 +1,6 @@
 //
 //  FeedbackViewController.m
-//  MindEgg
+//  ShuffleDuck
 //
 //  Created by Dave Thompson on 9/30/09.
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -8,7 +8,7 @@
 
 #import "FeedbackViewController.h"
 #import "VariableStore.h"
-#import "MindEggUtilities.h"
+#import "ShuffleDuckUtilities.h"
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
 #import "Constants.h"
@@ -67,7 +67,7 @@ static FeedbackViewController *sharedFeedbackViewController = nil;
 	}
 	else
 	{
-		NSLog([NSString stringWithFormat:@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)]); 
+		NSLog(@"SQLite request failed with message: %s", sqlite3_errmsg([VariableStore sharedInstance].database)); 
 	}
 	messageTextView.text = [feedback_message stringByReplacingOccurrencesOfString:@"''" withString:@"''"];
 	emailTextView.text = [feedback_email stringByReplacingOccurrencesOfString:@"''" withString:@"''"];
@@ -83,7 +83,7 @@ static FeedbackViewController *sharedFeedbackViewController = nil;
 	// remember the text that the user put in the text views
 	NSString *feedback_message = [messageTextView.text stringByReplacingOccurrencesOfString:@"'" withString:@"''"];
 	NSString *feedback_email = [emailTextView.text stringByReplacingOccurrencesOfString:@"'" withString:@"''"];;		
-	[MindEggUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE ApplicationStatus SET feedback_message = '%@', feedback_email = '%@';", feedback_message, feedback_email]];
+	[ShuffleDuckUtilities runSQLUpdate:[NSString stringWithFormat:@"UPDATE ApplicationStatus SET feedback_message = '%@', feedback_email = '%@';", feedback_message, feedback_email]];
 }
 
 -(void)sendButtonPressed:(id)sender
