@@ -19,4 +19,7 @@ const NSString* ERROR_DIALOG_TITLE = @"Sorry";
 //const NSString* CONTEXT_URL = @"http://localhost:3000";
 const NSString* CONTEXT_URL = @"http://shuffleduck.heroku.com";
 
+const NSString* APP_KEY = @"3000";
+const NSString* APP_SECRET = @"xUoMDKO1iSZPrEC4hY4n";
+
 @end

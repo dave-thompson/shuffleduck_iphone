@@ -85,4 +85,41 @@ static sqlite3_stmt *updateStmt = nil;
 	return returnValue;
 }
 
+
+// Supplies the parameters (always api_key and signature) to be used for web service requests
+// Takes the POST data as an input, and defaults to a GET request if that POST data is not given
++(NSString *)buildRequestParameters:(NSString *)postData
+{
+	NSString *stringToHash;
+	
+	if([postData isEqualToString:@""]) // if a GET request, hash the key and secret
+	{
+		stringToHash = [NSString stringWithFormat:@"app_key%@%@", APP_KEY, APP_SECRET];
+	}
+	else // if a POST, hash the post data
+	{
+		stringToHash = [NSString stringWithFormat:@"%@%@", postData, APP_SECRET];
+	}
+	
+	NSString *signature = [ShuffleDuckUtilities returnMD5Hash:stringToHash];
+	NSString *parameters = [NSString stringWithFormat:@"?app_key=3000&signature=%@", signature];
+	return parameters;
+}
+
+
+// Generate an md5 hash from a given string
+// Credit: http://www.saobart.com/md5-has-in-objective-c/
++ (NSString *) returnMD5Hash:(NSString*)concat
+{
+    const char *concat_str = [concat UTF8String];
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
+    
+	CC_MD5(concat_str, strlen(concat_str), result);
+    
+	NSMutableString *hash = [NSMutableString string];
+    for (int i = 0; i < 16; i++)
+        [hash appendFormat:@"%02X", result[i]];
+    return [hash lowercaseString];
+}
+
 @end

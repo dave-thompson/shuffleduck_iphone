@@ -15,6 +15,7 @@
 #import "ProgressViewController.h"
 #import "Constants.h"
 #import "DeckDownloaderQueueItem.h"
+#import "ShuffleDuckUtilities.h"
 
 static DeckDownloader *sharedDeckDownloader = nil;
 static NSMutableArray *downloadQueue;
@@ -187,7 +188,8 @@ sqlite3_stmt *addStmt;
 
 -(void)sendMetadataRequestForUserVisibleDeckID:(int)aUserVisibleID
 {
-	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d", aUserVisibleID]]];
+	NSString *urlParameters = [ShuffleDuckUtilities buildRequestParameters:@""];
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d%@", aUserVisibleID, urlParameters]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
 	[request setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d", aUserVisibleID], @"userVisibleID", nil]];
 	[request setDelegate:self];
@@ -317,7 +319,8 @@ sqlite3_stmt *addStmt;
 	deckID = anIphoneDeckID;
 	
 	// ask server to send over full deck details
-	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1", aUserVisibleID]]];
+	NSString *urlParameters = [ShuffleDuckUtilities buildRequestParameters:@""];
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks/%d/deck_details/1%@", aUserVisibleID, urlParameters]]];
 	ASIHTTPRequest *fullDeckRequest = [ASIHTTPRequest requestWithURL:url];
 	[fullDeckRequest setDelegate:self];
 	[fullDeckRequest setDidFinishSelector:@selector(fullDeckRequestFinished:)];

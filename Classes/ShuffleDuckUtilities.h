@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <CommonCrypto/CommonDigest.h>
 
 @interface ShuffleDuckUtilities : NSObject {
 
@@ -15,7 +15,9 @@
 
 + (void)shuffleDuckErrorAlertWithMessage:(NSString *)aMessage;
 + (void)runSQLUpdate:(NSString *)sqlString;
-+(int)getIntUsingSQL:(NSString *)sqlString;
-+(NSString *)getStringUsingSQL:(NSString *)sqlString;
++ (int)getIntUsingSQL:(NSString *)sqlString;
++ (NSString *)getStringUsingSQL:(NSString *)sqlString;
++ (NSString *)buildRequestParameters:(NSString *)postData;
++ (NSString *)returnMD5Hash:(NSString*)concat;
 
 @end

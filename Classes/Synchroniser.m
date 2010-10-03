@@ -40,7 +40,8 @@ static Synchroniser *sharedSynchroniser = nil;
 -(void)synchronise
 {	
 	// setup URL
-	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks"]]];
+	NSString *urlParameters = [ShuffleDuckUtilities buildRequestParameters:@""];
+	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:[NSString stringWithFormat:@"/decks%@", urlParameters]]];
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
 	// check for credentials in the keychain
 	NSURLCredential *authenticationCredentials = [ASIHTTPRequest savedCredentialsForHost:[[request url] host] port:[[[request url] port] intValue] protocol:[[request url] scheme] realm:[request authenticationRealm]];
