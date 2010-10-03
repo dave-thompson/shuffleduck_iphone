@@ -96,7 +96,9 @@ static FeedbackViewController *sharedFeedbackViewController = nil;
 	NSString *postData = [[[@"<feedback>" stringByAppendingString:email]stringByAppendingString:message] stringByAppendingString:@"</feedback>"];
 	
 	// POST request
-	NSURL *url = [NSURL URLWithString:[CONTEXT_URL stringByAppendingString:@"/feedbacks"]];
+	NSString *urlParameters = [ShuffleDuckUtilities buildRequestParameters:postData];
+	NSURL *url = [NSURL URLWithString:[[CONTEXT_URL stringByAppendingString:@"/feedbacks"] stringByAppendingString:urlParameters]]
+	;
 	ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
 	[request setDelegate:self];
 	[request appendPostData:[postData dataUsingEncoding:NSUTF8StringEncoding]];
