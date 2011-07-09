@@ -658,7 +658,7 @@
 
 -(void)setSearchBarText:(NSString *)searchBarText
 {
-	NSString *sqlString = [NSString stringWithFormat:@"UPDATE DeckStatus SET search_text = %d WHERE deck_id = %d", searchBarText, currentDeckID];
+	NSString *sqlString = [NSString stringWithFormat:@"UPDATE DeckStatus SET search_text = '%@' WHERE deck_id = %d", searchBarText, currentDeckID];
 	[ShuffleDuckUtilities runSQLUpdate:sqlString];	
 }
 

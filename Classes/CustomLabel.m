@@ -16,6 +16,8 @@
 
 @synthesize verticalAlignment = verticalAlignment_;
 
+ /*
+ 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         self.verticalAlignment = VerticalAlignmentMiddle;
@@ -27,11 +29,25 @@
     verticalAlignment_ = verticalAlignment;
     [self setNeedsDisplay];
 }
+*/
+
+- (void)drawTextInRect:(CGRect)rect
+{
+	[super drawTextInRect:rect];
+	
+	//CGRect rect = self.bounds;
+}
 
 
 - (CGRect)textRectForBounds:(CGRect)bounds limitedToNumberOfLines:(NSInteger)numberOfLines {
-    CGRect textRect = [super textRectForBounds:bounds limitedToNumberOfLines:numberOfLines];
+    
+	// Width - This is the width of the text box
 	
+	
+	CGRect textRect = [super textRectForBounds:bounds limitedToNumberOfLines:numberOfLines];
+	
+	
+	/*
 	// Adjust for vertical alignment
     switch (self.verticalAlignment) {
         case VerticalAlignmentTop:
@@ -65,19 +81,24 @@
 			textRect.origin.x = (bounds.size.width - textRect.size.width)/2;
 	}
 	
+	CGContextStrokeRect(UIGraphicsGetCurrentContext(),textRect);
+	*/
+	
 	return textRect;
 }
 
 
--(void)drawTextInRect:(CGRect)requestedRect {
-    CGRect actualRect = [self textRectForBounds:requestedRect limitedToNumberOfLines:self.numberOfLines];
+/*
+ -(void)drawTextInRect:(CGRect)requestedRect {
+    //CGRect actualRect = [self textRectForBounds:requestedRect limitedToNumberOfLines:self.numberOfLines];
 	//[self.textColor set];
 	//[self.text drawAtPoint:requestedRect.origin withFont:self.font];
 	
     [super drawTextInRect:actualRect];
 	
 	// uncomment the following line to aid in debugging - it shows the rectangle in which the text is drawn
-	//CGContextStrokeRect(UIGraphicsGetCurrentContext(),actualRect);
+	CGContextStrokeRect(UIGraphicsGetCurrentContext(),actualRect);
 }
+*/
 
 @end

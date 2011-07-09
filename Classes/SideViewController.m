@@ -92,6 +92,19 @@
 			width = width * _sizeMultiplier;
 			height = height * _sizeMultiplier;
 			
+			
+			// hack to increase textbox height if this is a mini text-box (so that text isn't cut off due to font's leading value being an integer and therefore not scaling perfectly)
+			if ((_sizeMultiplier == (float)91 / (float)260) && (height==56)) // if this is a mini side on the library tableview
+			// EXPERIMENTING TO FIX LEADING ISSUE - WORK TO BE DONE HERE - LEFT IN TEMP STATE
+			{
+				// set height to slightly larger to allow all text to fit on
+				height = height * 1.08;
+				y = (height * -0.04);
+				//height = 60;
+				//y = -2;
+			}
+			
+			
 			switch(componentType)
 			{
 					
@@ -115,10 +128,17 @@
 					
 					
 					// create label and set properties
-					CustomLabel *label = [[CustomLabel alloc] initWithFrame:CGRectMake(x, y, width, height)];
+					UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(x, y, width, height)];
 					label.text = displayText;
 					
 					label.font = [UIFont fontWithName:@"Arial" size: font_size]; // familyName == "Arial", font name == "ArialMT"
+					
+					UIFont *testFont = label.font;
+					CGFloat testSize = testFont.pointSize;
+					CGFloat ascender = testFont.ascender;
+					CGFloat descender = testFont.descender;
+					CGFloat leading = testFont.leading;
+					
 					
 					switch(alignment_id)
 					{
@@ -137,6 +157,7 @@
 						label.backgroundColor = [UIColor clearColor];
 					else
 						label.backgroundColor = UIColorFromRGB(background_color);
+					label.numberOfLines = 0;
 					label.lineBreakMode = UILineBreakModeClip;
 					[self.view addSubview:label];
 					
