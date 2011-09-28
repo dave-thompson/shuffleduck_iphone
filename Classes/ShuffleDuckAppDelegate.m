@@ -15,7 +15,7 @@
 #import "FinalScoreViewController.h"
 #import "Constants.h"
 #import "VariableStore.h"
-#import "FlurryAPI.h"
+//#import "FlurryAPI.h" // Removed Flurry temporarily - think it requires a new binary from the Flurry website
 
 @implementation ShuffleDuckAppDelegate
 
@@ -28,10 +28,10 @@ UINavigationController *navigationController;
 BOOL fullyFinishedLaunch = NO;
 
 
-void uncaughtExceptionHandler(NSException *exception)
-{
-    [FlurryAPI logError:@"Uncaught" message:@"Crash!" exception:exception];
-}
+//void uncaughtExceptionHandler(NSException *exception)
+//{
+//    [FlurryAPI logError:@"Uncaught" message:@"Crash!" exception:exception];
+//}
 
 #pragma mark -
 #pragma mark Main Method
@@ -39,8 +39,8 @@ void uncaughtExceptionHandler(NSException *exception)
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
 
 	// start analytics session
-	NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
-	[FlurryAPI startSession:@"J1LAW7SK7UA5DB6SF53J"];
+//	NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+//	[FlurryAPI startSession:@"J1LAW7SK7UA5DB6SF53J"];
 	
 	// set Look & Feel
 		[application setStatusBarStyle:UIStatusBarStyleDefault];

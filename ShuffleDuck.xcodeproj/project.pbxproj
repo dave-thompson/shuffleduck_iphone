@@ -61,7 +61,6 @@
 		55A404A21146C8AF0040CFC8 /* DeckSummaryScreen.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */; };
 		55A404A41146C8BC0040CFC8 /* Learn.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A31146C8BC0040CFC8 /* Learn.html */; };
 		55A404A61146C8C30040CFC8 /* Reference.html in Resources */ = {isa = PBXBuildFile; fileRef = 55A404A51146C8C30040CFC8 /* Reference.html */; };
-		55B93A63114511F9004B463F /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55B93A62114511F9004B463F /* libFlurry.a */; };
 		55B93A9411453506004B463F /* PlaceholderTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9311453506004B463F /* PlaceholderTextView.m */; };
 		55B93A9B11454CF7004B463F /* ManualTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B93A9911454CF7004B463F /* ManualTableViewController.m */; };
 		55B93A9C11454CF7004B463F /* ManualTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55B93A9A11454CF7004B463F /* ManualTableView.xib */; };
@@ -187,8 +186,6 @@
 		55A404A11146C8AF0040CFC8 /* DeckSummaryScreen.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = DeckSummaryScreen.html; sourceTree = "<group>"; };
 		55A404A31146C8BC0040CFC8 /* Learn.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Learn.html; sourceTree = "<group>"; };
 		55A404A51146C8C30040CFC8 /* Reference.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Reference.html; sourceTree = "<group>"; };
-		55B93A61114511F9004B463F /* FlurryAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlurryAPI.h; sourceTree = "<group>"; };
-		55B93A62114511F9004B463F /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry.a; sourceTree = "<group>"; };
 		55B93A9211453506004B463F /* PlaceholderTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaceholderTextView.h; sourceTree = "<group>"; };
 		55B93A9311453506004B463F /* PlaceholderTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaceholderTextView.m; sourceTree = "<group>"; };
 		55B93A9811454CF7004B463F /* ManualTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualTableViewController.h; sourceTree = "<group>"; };
@@ -254,7 +251,6 @@
 				550E441910FAE1F3004B47F4 /* CFNetwork.framework in Frameworks */,
 				550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */,
 				550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */,
-				55B93A63114511F9004B463F /* libFlurry.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,7 +328,6 @@
 		550E43F310FAE0C3004B47F4 /* External */ = {
 			isa = PBXGroup;
 			children = (
-				55B93A60114511F9004B463F /* FlurryLib */,
 				5576B0DB10FC89E200306F4C /* KissXML */,
 				550E440B10FAE192004B47F4 /* Reachability */,
 				550E440A10FAE188004B47F4 /* ASIHTTP */,
@@ -523,15 +518,6 @@
 			name = KissXML;
 			sourceTree = "<group>";
 		};
-		55B93A60114511F9004B463F /* FlurryLib */ = {
-			isa = PBXGroup;
-			children = (
-				55B93A61114511F9004B463F /* FlurryAPI.h */,
-				55B93A62114511F9004B463F /* libFlurry.a */,
-			);
-			path = FlurryLib;
-			sourceTree = "<group>";
-		};
 		55D7CB5A1146C7A500E9DA57 /* Images */ = {
 			isa = PBXGroup;
 			children = (
@@ -621,7 +607,11 @@
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ShuffleDuck" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -745,6 +735,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ShuffleDuck_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes/FlurryLib\"",
@@ -761,6 +752,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ShuffleDuck_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes/FlurryLib\"",
@@ -778,10 +770,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lxml2";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.0;
+				SDKROOT = iphoneos4.3;
 			};
 			name = Debug;
 		};
@@ -794,9 +787,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_LDFLAGS = "-lxml2";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.0;
+				SDKROOT = iphoneos4.3;
 			};
 			name = Release;
 		};
