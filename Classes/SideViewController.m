@@ -19,7 +19,7 @@
 
  - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-	 if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+	 if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
 	 {
 		 _sizeMultiplier = 1.0;
 	 }
@@ -133,11 +133,11 @@
 					
 					label.font = [UIFont fontWithName:@"Arial" size: font_size]; // familyName == "Arial", font name == "ArialMT"
 					
-					UIFont *testFont = label.font;
-					CGFloat testSize = testFont.pointSize;
-					CGFloat ascender = testFont.ascender;
-					CGFloat descender = testFont.descender;
-					CGFloat leading = testFont.leading;
+					//UIFont *testFont = label.font;
+					//CGFloat testSize = testFont.pointSize;
+					//CGFloat ascender = testFont.ascender;
+					//CGFloat descender = testFont.descender;
+					//CGFloat leading = testFont.leading;
 					
 					
 					switch(alignment_id)

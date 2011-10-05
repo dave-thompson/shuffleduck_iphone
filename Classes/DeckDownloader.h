@@ -11,9 +11,11 @@
 // DeckDownloader operates in the background and manages a queue of downloads if necessary. Simply call this function and forget about it.
 
 #import <Foundation/Foundation.h>
+#import <Foundation/NSXMLParser.h>
 #import "sqlite3.h"
 
-@interface DeckDownloader : NSObject {
+@interface DeckDownloader : NSObject <NSXMLParserDelegate>
+{
 }
 
 + (DeckDownloader *)sharedInstance;
