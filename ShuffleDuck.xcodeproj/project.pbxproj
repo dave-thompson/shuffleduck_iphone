@@ -23,7 +23,6 @@
 		550E440910FAE181004B47F4 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 550E440210FAE181004B47F4 /* Reachability.m */; };
 		550E441910FAE1F3004B47F4 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441810FAE1F3004B47F4 /* CFNetwork.framework */; };
 		550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441A10FAE1FD004B47F4 /* SystemConfiguration.framework */; };
-		550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 550E441C10FAE216004B47F4 /* libz.1.2.3.dylib */; };
 		550E449610FB2E14004B47F4 /* DeckDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 550E449510FB2E14004B47F4 /* DeckDownloader.m */; };
 		5510E22D107D1C940074B376 /* FeedbackView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22B107D1C940074B376 /* FeedbackView.xib */; };
 		5510E22E107D1C940074B376 /* ReviseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5510E22C107D1C940074B376 /* ReviseView.xib */; };
@@ -36,6 +35,7 @@
 		552A5A2810DBF39E00A8264B /* FinalScoreView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 552A5A2610DBF39E00A8264B /* FinalScoreView.xib */; };
 		552BB678110FBA4000793DE3 /* ShuffleDuckUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 552BB677110FBA4000793DE3 /* ShuffleDuckUtilities.m */; };
 		553A8E101010F59A00496BE5 /* Deck.m in Sources */ = {isa = PBXBuildFile; fileRef = 553A8E0F1010F59A00496BE5 /* Deck.m */; };
+		5547737E14924CE000580FA2 /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5547737D14924CE000580FA2 /* libz.1.2.5.dylib */; };
 		555D1AD7108409990041DB21 /* TableFooterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 555D1AD6108409990041DB21 /* TableFooterViewController.m */; };
 		555D1ADB108409AF0041DB21 /* TableFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 555D1ADA108409AF0041DB21 /* TableFooterView.xib */; };
 		556138340FAEDECC00365DF1 /* MyDecksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 556138330FAEDECC00365DF1 /* MyDecksViewController.m */; };
@@ -149,6 +149,7 @@
 		552BB677110FBA4000793DE3 /* ShuffleDuckUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShuffleDuckUtilities.m; sourceTree = "<group>"; };
 		553A8E0E1010F59A00496BE5 /* Deck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Deck.h; sourceTree = "<group>"; };
 		553A8E0F1010F59A00496BE5 /* Deck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Deck.m; sourceTree = "<group>"; };
+		5547737D14924CE000580FA2 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libz.1.2.5.dylib; sourceTree = DEVELOPER_DIR; };
 		555D1AD5108409990041DB21 /* TableFooterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableFooterViewController.h; sourceTree = "<group>"; };
 		555D1AD6108409990041DB21 /* TableFooterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableFooterViewController.m; sourceTree = "<group>"; };
 		555D1ADA108409AF0041DB21 /* TableFooterView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = TableFooterView.xib; path = Classes/TableFooterView.xib; sourceTree = "<group>"; };
@@ -244,13 +245,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5547737E14924CE000580FA2 /* libz.1.2.5.dylib in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
 				55DB72890FD9287400B1A115 /* libsqlite3.dylib in Frameworks */,
 				550E441910FAE1F3004B47F4 /* CFNetwork.framework in Frameworks */,
 				550E441B10FAE1FD004B47F4 /* SystemConfiguration.framework in Frameworks */,
-				550E441D10FAE216004B47F4 /* libz.1.2.3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,6 +280,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				5547737D14924CE000580FA2 /* libz.1.2.5.dylib */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -735,12 +737,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ShuffleDuck_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Classes/FlurryLib\"",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = ShuffleDuck;
+				SDKROOT = iphoneos5.0;
 			};
 			name = Debug;
 		};
@@ -752,12 +752,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ShuffleDuck_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Classes/FlurryLib\"",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = ShuffleDuck;
+				SDKROOT = iphoneos5.0;
 			};
 			name = Release;
 		};
@@ -770,11 +768,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lxml2";
 				PREBINDING = NO;
-				SDKROOT = iphoneos4.3;
+				SDKROOT = iphoneos5.0;
 			};
 			name = Debug;
 		};
@@ -787,10 +785,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-lxml2";
 				PREBINDING = NO;
-				SDKROOT = iphoneos4.3;
+				SDKROOT = iphoneos5.0;
 			};
 			name = Release;
 		};
